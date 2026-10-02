@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf8f5;
+  --foreground: #1c1917;
+  --surface: #ffffff;
+  --surface-warm: #f5f2eb;
+  --surface-border: #e7e5e0;
+  
+  --primary-deep: #064e3b;
+  --primary-forest: #047857;
+  --primary-leaf: #059669;
+  --primary-mint: #10b981;
+  --primary-light: #ecfdf5;
+
+  --accent-earth: #92400e;
+  --accent-turmeric: #d97706;
+  --accent-warm-light: #fef3c7;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Accessible focus ring */
+:focus-visible {
+  outline: 2px solid var(--primary-forest);
+  outline-offset: 2px;
+}
+
+/* Subtle custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f5f2eb;
+}
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+}
+
+/* Print mode optimizations for Track-a-Bite Nutrition Report */
+@media print {
+  @page {
+    margin: 1.5cm;
+    size: A4 portrait;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+    font-size: 10pt !important;
+  }
+
+  /* Hide navigation, action bars, buttons, and interactive controls */
+  header,
+  nav,
+  footer,
+  .print-hide,
+  .print\:hidden,
+  button,
+  input,
+  [role="tablist"],
+  .no-print {
+    display: none !important;
+  }
+
+  /* Force display of formal report header and journal table */
+  .print-only,
+  .print\:block {
+    display: block !important;
+  }
+
+  /* Remove shadows and enforce clean print borders */
+  div[class*="shadow-"],
+  div[class*="rounded-"] {
+    box-shadow: none !important;
+  }
+
+  /* Page-break avoidance */
+  .break-inside-avoid,
+  table,
+  tr,
+  .card {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Crisp table border styling */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+}

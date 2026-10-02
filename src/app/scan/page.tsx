@@ -1,0 +1,957 @@
+'use client';
+
+import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Container } from '../../components/layout/container';
+import { AuthGuard } from '../../components/auth/AuthGuard';
+import { useAuth } from '../../components/auth/AuthProvider';
+import { ScanViewport } from '../../components/scan/scan-viewport';
+import { FoodDetectionCard } from '../../components/scan/food-detection-card';
+import { FoodSelectorModal } from '../../components/scan/food-selector-modal';
+import { MacroDistributionBar } from '../../components/nutrition/macro-distribution-bar';
+import { MealIntelligenceCard } from '../../components/nutrition/meal-intelligence-card';
+import { Button } from '../../components/ui/button';
+import { Card, CardContent } from '../../components/ui/card';
+import {
+  foodRecognitionService,
+  portionEstimationService,
+  foodDatabaseService,
+  nutritionService,
+  nutrientAnalysisService,
+  mealAnalysisService,
+  mealHistoryService,
+  firestoreMealHistoryService,
+  userProfileService,
+  useUserProfile,
+  detectionToMealItem,
+  createManualDetection,
+  replaceDetection,
+} from '../../lib/services';
+import { RecognitionProviderMode } from '../../lib/services/foodRecognitionService';
+import {
+  ScanStage,
+  DetectedFoodItem,
+  FoodItem,
+  MealAnalysis,
+  AppImage,
+  FoodDetection,
+  FoodRecognitionResult,
+} from '../../lib/types';
+import {
+  ArrowRightIcon,
+  CameraIcon,
+  SparklesIcon,
+  PlusIcon,
+  AlertCircleIcon,
+  InfoIcon,
+  RefreshCwIcon,
+} from '../../components/ui/icons';
+
+export const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+export const ALLOWED_IMAGE_MIME_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/avif',
+  'image/heic',
+  'image/heif',
+  'image/gif',
+];
+
+export function validateImageFile(file: unknown): { isValid: boolean; error?: string } {
+  if (!file || !(file instanceof File)) {
+    return { isValid: false, error: 'Please select an image file to proceed.' };
+  }
+  if (!ALLOWED_IMAGE_MIME_TYPES.includes(file.type.toLowerCase())) {
+    return {
+      isValid: false,
+      error: 'Unsupported image format. Please upload a JPEG, PNG, WebP, or HEIC photo.',
+    };
+  }
+  if (file.size > MAX_IMAGE_SIZE_BYTES) {
+    return {
+      isValid: false,
+      error: 'Image file size exceeds 10MB limit. Please upload a smaller photo.',
+    };
+  }
+  if (file.size === 0) {
+    return {
+      isValid: false,
+      error: 'Selected file is empty or corrupted. Please capture or select another photo.',
+    };
+  }
+  return { isValid: true };
+}
+
+export default function ScanPage() {
+  const router = useRouter();
+  const { user } = useAuth();
+
+  // State machine for scan & perception pipeline
+  const [stage, setStage] = useState<ScanStage>('idle');
+  const [items, setItems] = useState<DetectedFoodItem[]>([]);
+  const [detections, setDetections] = useState<FoodDetection[]>([]);
+  const [recognitionResult, setRecognitionResult] = useState<FoodRecognitionResult | null>(null);
+  const [recognitionMode, setRecognitionMode] = useState<RecognitionProviderMode>(() =>
+    foodRecognitionService.getMode()
+  );
+
+  // Active scenario preset (defaulting to 4-dish thali or campus sprouts)
+  const [selectedScenarioId, setSelectedScenarioId] = useState<string>('multi-thali-4food');
+  const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+  const [targetChangeItemId, setTargetChangeItemId] = useState<string | null>(null);
+  const [isProcessingFinal, setIsProcessingFinal] = useState(false);
+  const [activeImage, setActiveImage] = useState<AppImage | null>(null);
+
+  // Phase 10: Scan UX states
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  // Clean up object URLs when unmounting or changing preview
+  React.useEffect(() => {
+    return () => {
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  // 1. Trigger capture action
+  const handleCapture = () => {
+    setValidationError(null);
+    const imagePayload: AppImage = {
+      id: `capture-${Date.now()}`,
+      sourceType: 'camera',
+      scenarioHintId: selectedScenarioId,
+      capturedAt: new Date().toISOString(),
+    };
+    setActiveImage(imagePayload);
+    setStage('preview');
+  };
+
+  // 2. File upload action with validation
+  const handleUploadFile = (file: File) => {
+    const validation = validateImageFile(file);
+    if (!validation.isValid) {
+      setValidationError(validation.error || 'Invalid image file.');
+      return;
+    }
+
+    setValidationError(null);
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+
+    const imagePayload: AppImage = {
+      id: `upload-${Date.now()}`,
+      sourceType: 'upload',
+      file,
+      uri: url,
+      scenarioHintId: selectedScenarioId,
+      capturedAt: new Date().toISOString(),
+    };
+    setActiveImage(imagePayload);
+    setStage('preview');
+  };
+
+  // 3. User initiates analysis from preview (with duplicate protection)
+  const handleStartAnalysis = () => {
+    if (isAnalyzing || stage === 'analyzing') {
+      return;
+    }
+    setIsAnalyzing(true);
+    setStage('analyzing');
+  };
+
+  // 4. Complete analysis callback from viewport radar
+  const handleAnalysisComplete = async () => {
+    try {
+      const img =
+        activeImage || {
+          id: `img-${Date.now()}`,
+          sourceType: 'camera',
+          scenarioHintId: selectedScenarioId,
+          capturedAt: new Date().toISOString(),
+        };
+
+      const result = await foodRecognitionService.recognizeFood(img, {
+        scenarioHintId: selectedScenarioId,
+      });
+      setRecognitionResult(result);
+      setDetections(result.detections);
+
+      // Convert pure perception detections into meal items with computed nutrition
+      if (result.status === 'success' || result.status === 'low-confidence') {
+        const mealItems: DetectedFoodItem[] = [];
+        for (const d of result.detections) {
+          const mealItem = await detectionToMealItem(
+            d,
+            foodDatabaseService,
+            nutritionService
+          );
+          mealItems.push(mealItem);
+        }
+        setItems(mealItems);
+        setStage('detected');
+      } else {
+        // Empty or error state
+        setItems([]);
+        setStage('detected');
+      }
+    } catch (err: unknown) {
+      console.error('[ScanPage] Analysis failed:', err);
+      setRecognitionResult({
+        imageId: activeImage?.id || `img-${Date.now()}`,
+        model: recognitionMode === 'gemini' ? 'gemini-server-route' : 'mock-perception-engine',
+        processingTimeMs: 150,
+        status: 'error',
+        detections: [],
+        errorMessage: "Couldn't confidently identify the food in this image. Please try again or capture a clearer photo.",
+      });
+      setItems([]);
+      setStage('detected');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  // 5. Quick sample scenario selection
+  const handleSelectSample = (scenarioId: string) => {
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl(null);
+    setValidationError(null);
+    setIsAnalyzing(false);
+    setSelectedScenarioId(scenarioId);
+    setStage('idle');
+    setItems([]);
+    setDetections([]);
+    setRecognitionResult(null);
+    setActiveImage(null);
+  };
+
+  // 5. Portion adjustment
+  const handleUpdatePortion = async (detectionId: string, delta: number) => {
+    // 1. Update detections state via PortionEstimationService
+    const targetDetection = detections.find(d => d.id === detectionId);
+    let updatedDetection = targetDetection;
+    if (targetDetection) {
+      const adjustedPortion = portionEstimationService.adjustPortion(
+        targetDetection.estimatedPortion,
+        delta
+      );
+      updatedDetection = {
+        ...targetDetection,
+        estimatedPortion: adjustedPortion,
+        source: 'user-corrected',
+      };
+      setDetections(prev =>
+        prev.map(d => (d.id === detectionId ? updatedDetection! : d))
+      );
+    }
+
+    const currentItem = items.find(i => i.detectionId === detectionId);
+    if (!currentItem) return;
+
+    const food = await foodDatabaseService.getFoodById(currentItem.foodId);
+    const newMultiplier = Math.max(
+      0.25,
+      Math.min(5.0, Math.round((currentItem.portionMultiplier + delta) * 100) / 100)
+    );
+    const baseGrams =
+      food?.serving?.weightGrams ||
+      food?.weightGramsPerUnit ||
+      Math.round(currentItem.estimatedGrams / currentItem.portionMultiplier);
+    const estimatedGrams = Math.round(baseGrams * newMultiplier);
+
+    const nutritionResult = nutritionService.calculateNutrition(food, {
+      quantity: newMultiplier,
+      unit: currentItem.portionUnit,
+      weightGrams: estimatedGrams,
+    });
+
+    const newNutrition: import('../../lib/types').NutritionProfile = {
+      calories: nutritionResult.calories,
+      carbohydrates: nutritionResult.carbohydrates,
+      protein: nutritionResult.protein,
+      fat: nutritionResult.fat,
+      fiber: nutritionResult.fiber,
+      sodium: food?.nutrition.sodium
+        ? Math.round(food.nutrition.sodium * (nutritionResult.serving.weightGrams / Math.max(1, baseGrams)))
+        : undefined,
+      sugar: food?.nutrition.sugar
+        ? Math.round(food.nutrition.sugar * (nutritionResult.serving.weightGrams / Math.max(1, baseGrams)) * 10) / 10
+        : undefined,
+    };
+
+    setItems(prev =>
+      prev.map(item => {
+        if (item.detectionId !== detectionId) return item;
+        return {
+          ...item,
+          portionMultiplier: newMultiplier,
+          estimatedGrams: nutritionResult.serving.weightGrams || estimatedGrams,
+          nutrition: newNutrition,
+          nutritionAvailable: nutritionResult.nutritionAvailable,
+          micronutrients: nutritionResult.micronutrients,
+          nutritionResult,
+          isUserModified: true,
+        };
+      })
+    );
+  };
+
+  // 6. Remove item
+  const handleRemoveItem = (detectionId: string) => {
+    setItems(prev => prev.filter(i => i.detectionId !== detectionId));
+    setDetections(prev => prev.filter(d => d.id !== detectionId));
+  };
+
+  // 7. Change food match trigger ("Not correct?")
+  const handleRequestChangeFood = (detectionId: string) => {
+    setTargetChangeItemId(detectionId);
+    setIsSelectorOpen(true);
+  };
+
+  // 8. Add extra food manually trigger
+  const handleRequestAddFood = () => {
+    setTargetChangeItemId(null);
+    setIsSelectorOpen(true);
+  };
+
+  // 9. Quick swap from alternative visual candidate
+  const handleSelectAlternative = async (detectionId: string, foodId: string) => {
+    const food = await foodDatabaseService.getFoodById(foodId);
+    if (!food) return;
+
+    const existingDetection = detections.find(d => d.id === detectionId);
+    if (existingDetection) {
+      const updatedDetection = await replaceDetection(
+        existingDetection,
+        food,
+        portionEstimationService
+      );
+      setDetections(prev =>
+        prev.map(d => (d.id === detectionId ? updatedDetection : d))
+      );
+
+      const updatedMealItem = await detectionToMealItem(
+        updatedDetection,
+        foodDatabaseService,
+        nutritionService
+      );
+
+      setItems(prev =>
+        prev.map(item => (item.detectionId === detectionId ? updatedMealItem : item))
+      );
+    }
+  };
+
+  // 10. Process selection from FoodSelectorModal
+  const handleFoodSelected = async (food: FoodItem) => {
+    if (targetChangeItemId) {
+      // Replace existing item
+      const existingDetection = detections.find(d => d.id === targetChangeItemId);
+      if (existingDetection) {
+        const updatedDetection = await replaceDetection(
+          existingDetection,
+          food,
+          portionEstimationService
+        );
+        setDetections(prev =>
+          prev.map(d => (d.id === targetChangeItemId ? updatedDetection : d))
+        );
+
+        const updatedMealItem = await detectionToMealItem(
+          updatedDetection,
+          foodDatabaseService,
+          nutritionService
+        );
+
+        setItems(prev =>
+          prev.map(item => (item.detectionId === targetChangeItemId ? updatedMealItem : item))
+        );
+      }
+    } else {
+      // Add new item manually
+      const manualDetection = await createManualDetection(
+        food,
+        portionEstimationService
+      );
+      setDetections(prev => [...prev, manualDetection]);
+
+      const newMealItem = await detectionToMealItem(
+        manualDetection,
+        foodDatabaseService,
+        nutritionService
+      );
+      setItems(prev => [...prev, newMealItem]);
+    }
+  };
+
+  // 11. Reset scan
+  const handleReset = () => {
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl(null);
+    setValidationError(null);
+    setIsAnalyzing(false);
+    setStage('idle');
+    setItems([]);
+    setDetections([]);
+    setRecognitionResult(null);
+    setActiveImage(null);
+  };
+
+  // Live aggregated nutrition totals
+  const totalNutrition = nutritionService.aggregateNutrition(items);
+  const macroDistribution = nutritionService.calculateMacroDistribution(totalNutrition);
+
+  // User profile for personalized hostel and nutrient intelligence
+  const profile = useUserProfile();
+
+  // Phase 4: Live calculated meal nutrition across all foods
+  const mealNutritionResult = useMemo(() => {
+    if (items.length === 0) return null;
+    const foodDbItems = items.map(item => {
+      const food = foodDatabaseService.getFoodByIdSync(item.foodId);
+      return {
+        food,
+        portion: {
+          quantity: item.portionMultiplier,
+          unit: item.portionUnit,
+          weightGrams: item.estimatedGrams,
+        },
+      };
+    });
+    return nutritionService.calculateMealNutrition(foodDbItems);
+  }, [items]);
+
+  // Phase 5: Live calculated nutrient intelligence (5-star score, strengths, gaps, recommendations)
+  const mealAnalysisResult = useMemo(() => {
+    if (!mealNutritionResult) return null;
+    return nutrientAnalysisService.analyzeMeal(mealNutritionResult, profile);
+  }, [mealNutritionResult, profile]);
+
+  // Handle one-click adding of recommended foods to the meal
+  const handleAddRecommendation = async (foodId: string) => {
+    const food = await foodDatabaseService.getFoodById(foodId);
+    if (!food) return;
+    await handleFoodSelected(food);
+  };
+
+  // 12. Finalize and proceed to full results page
+  const handleProceedToResults = async () => {
+    if (items.length === 0 || isProcessingFinal) return;
+    setIsProcessingFinal(true);
+    try {
+      const profile = userProfileService.getProfile();
+      const mealTitle =
+        items.length === 1
+          ? items[0].name
+          : `${items[0].name} & Sides (${items.length} items)`;
+
+      const analysis: MealAnalysis = await mealAnalysisService.analyzeMeal(
+        items,
+        mealTitle,
+        activeImage?.uri,
+        profile
+      );
+
+      // 1. Optimistic local persistence (instant and resilient offline guarantee)
+      await mealHistoryService.saveMeal(analysis);
+
+      // 2. Cloud persistence for authenticated users (await with fallback to eliminate race condition)
+      if (user?.uid) {
+        try {
+          await firestoreMealHistoryService.saveMeal(user.uid, analysis);
+        } catch (err) {
+          console.warn('[ScanPage] Cloud meal persistence notice:', err);
+        }
+      }
+
+      router.push(`/results?id=${analysis.id}`);
+    } catch {
+      router.push('/results');
+    } finally {
+      setIsProcessingFinal(false);
+    }
+  };
+
+  const hasDetections = items.length > 0 && stage === 'detected';
+  const isErrorState =
+    stage === 'detected' && recognitionResult?.status === 'error';
+  const isInvalidImageState =
+    stage === 'detected' && recognitionResult?.status === 'invalid-image';
+  const isNoFoodState =
+    stage === 'detected' &&
+    !isErrorState &&
+    !isInvalidImageState &&
+    (recognitionResult?.status === 'no-food-detected' || items.length === 0);
+
+  return (
+    <AuthGuard>
+      <div className="py-6 sm:py-10">
+        <Container size="lg">
+        {/* Header */}
+        <div className="text-center max-w-xl mx-auto mb-6">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <span className="text-2xs font-bold tracking-widest text-emerald-800 uppercase px-3 py-1 rounded-full bg-emerald-100 border border-emerald-200 inline-block">
+              Perception Pipeline • Phase 3
+            </span>
+          </div>
+
+          {/* Mode Switcher: Gemini AI Vision vs Mock Simulation */}
+          <div className="inline-flex items-center gap-1 p-1 bg-stone-100 border border-stone-200 rounded-full mb-3 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => {
+                foodRecognitionService.setMode('gemini');
+                setRecognitionMode('gemini');
+              }}
+              className={`px-3 py-1 text-xs font-semibold rounded-full transition-all cursor-pointer ${
+                recognitionMode === 'gemini'
+                  ? 'bg-emerald-700 text-white shadow-xs'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              ✨ Gemini AI Vision
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                foodRecognitionService.setMode('mock');
+                setRecognitionMode('mock');
+              }}
+              className={`px-3 py-1 text-xs font-semibold rounded-full transition-all cursor-pointer ${
+                recognitionMode === 'mock'
+                  ? 'bg-stone-800 text-white shadow-xs'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              🧪 Mock Simulation
+            </button>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+            Scan Your Meal
+          </h1>
+          <p className="text-xs sm:text-sm text-stone-600 mt-1.5">
+            Identify single snacks, multi-dish canteen plates, and packaged foods with computer vision.
+          </p>
+        </div>
+
+        {/* Profile Completion Callout if Incomplete */}
+        {!profile.onboardingCompleted && (
+          <div className="max-w-2xl mx-auto mb-6 p-3 sm:p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xl">💡</span>
+              <div className="space-y-0.5">
+                <span className="font-bold block">General Nutrition Mode</span>
+                <span className="text-2xs text-amber-900 leading-snug">
+                  Complete your profile for personalized energy targets and campus-tailored recommendations.
+                </span>
+              </div>
+            </div>
+            <Link
+              href="/onboarding"
+              className="px-3 py-1.5 rounded-xl bg-amber-800 hover:bg-amber-900 text-white font-bold text-2xs transition-colors shrink-0 text-center"
+            >
+              Complete Profile →
+            </Link>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
+          {/* Left Column: Camera Viewport (7 Cols) */}
+          <div className="lg:col-span-7 space-y-4">
+            <ScanViewport
+              stage={stage}
+              items={items}
+              previewUrl={previewUrl}
+              selectedScenarioId={selectedScenarioId}
+              validationError={validationError}
+              isAnalyzing={isAnalyzing}
+              onCapture={handleCapture}
+              onStartAnalysis={handleStartAnalysis}
+              onUploadFile={handleUploadFile}
+              onAnalysisComplete={handleAnalysisComplete}
+              onReset={handleReset}
+              onSelectSample={handleSelectSample}
+              onClearValidationError={() => setValidationError(null)}
+            />
+
+            {/* Architecture Separation & Confidence Notice */}
+            <div className="p-3.5 rounded-2xl bg-stone-100 border border-stone-200 text-xs text-stone-600 flex items-start gap-2.5">
+              <InfoIcon size={16} className="text-stone-500 shrink-0 mt-0.5" />
+              <div className="space-y-0.5 leading-relaxed">
+                <span className="font-semibold text-stone-800">
+                  Confidence Notice:
+                </span>{' '}
+                Confidence percentages indicate visual pattern match against our regional dish models, not nutritional certainty. All portions are estimates.
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Identification Feedback & Review (5 Cols) */}
+          <div className="lg:col-span-5 space-y-4">
+            {/* Stage: Idle */}
+            {stage === 'idle' && (
+              <Card className="border-stone-200/90 shadow-sm">
+                <CardContent className="p-6 sm:p-8 text-center space-y-4">
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto shadow-inner">
+                    <CameraIcon size={26} />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-stone-900">
+                      Vision Engine Ready
+                    </h2>
+                    <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                      Select a test scenario below the camera or upload a plate image to trigger multi-dish food identification.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={handleCapture}
+                    fullWidth
+                    size="lg"
+                    leftIcon={<SparklesIcon size={16} />}
+                  >
+                    Run Food Recognition
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Stage: Preview */}
+            {stage === 'preview' && (
+              <Card className="border-emerald-200/90 bg-emerald-50/30 shadow-sm">
+                <CardContent className="p-6 sm:p-8 text-center space-y-4">
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto shadow-inner">
+                    <SparklesIcon size={26} />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-stone-900">
+                      Photo Ready for Analysis
+                    </h2>
+                    <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                      Review your food photo preview. Ensure the meal is well-lit and all items are visible before running recognition.
+                    </p>
+                  </div>
+                  <div className="space-y-2 pt-1">
+                    <Button
+                      onClick={handleStartAnalysis}
+                      fullWidth
+                      size="lg"
+                      disabled={isAnalyzing}
+                      isLoading={isAnalyzing}
+                      leftIcon={<SparklesIcon size={16} />}
+                    >
+                      Analyze Meal
+                    </Button>
+                    <Button
+                      onClick={handleReset}
+                      fullWidth
+                      variant="outline"
+                      size="md"
+                      disabled={isAnalyzing}
+                    >
+                      Retake Photo
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Stage: Analyzing Feedback ("Identifying your food...") */}
+            {stage === 'analyzing' && (
+              <Card className="border-emerald-200 bg-emerald-50/50 shadow-sm">
+                <CardContent className="p-8 text-center space-y-3">
+                  <div className="inline-block w-9 h-9 border-3 border-emerald-700 border-t-transparent rounded-full animate-spin" />
+                  <h2 className="text-base font-bold text-stone-900">
+                    Identifying your food...
+                  </h2>
+                  <p className="text-xs text-stone-600 max-w-xs mx-auto leading-relaxed">
+                    Executing vision segmentation, matching against regional recipes, and estimating volumetric portion weights.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* ERROR STATE: General Error / API / Timeout */}
+            {isErrorState && (
+              <Card className="border-rose-200 bg-rose-50/40 shadow-sm">
+                <CardContent className="p-6 sm:p-7 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-800 flex items-center justify-center mx-auto">
+                    <AlertCircleIcon size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-rose-950">
+                      Couldn&apos;t confidently identify the food in this image
+                    </h3>
+                    <p className="text-xs text-rose-900 mt-1 leading-relaxed">
+                      {recognitionResult?.errorMessage ||
+                        "Track-a-Bite couldn't identify the food at this moment. Try taking a clearer photo or enter manually."}
+                    </p>
+                  </div>
+                  <div className="pt-2 space-y-2">
+                    <Button
+                      fullWidth
+                      variant="primary"
+                      onClick={handleStartAnalysis}
+                      disabled={isAnalyzing}
+                      leftIcon={<RefreshCwIcon size={15} />}
+                    >
+                      Try Again
+                    </Button>
+                    <Button fullWidth variant="outline" onClick={handleReset}>
+                      Retake Photo
+                    </Button>
+                    <Button
+                      fullWidth
+                      variant="subtle"
+                      onClick={handleRequestAddFood}
+                      leftIcon={<PlusIcon size={15} />}
+                    >
+                      Choose Food Manually
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* ERROR STATE: No Food Detected */}
+            {isNoFoodState && (
+              <Card className="border-amber-200 bg-amber-50/40 shadow-sm">
+                <CardContent className="p-6 sm:p-7 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center mx-auto">
+                    <AlertCircleIcon size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-amber-950">
+                      No Food Detected
+                    </h3>
+                    <p className="text-xs text-amber-900 mt-1 leading-relaxed">
+                      {recognitionResult?.errorMessage ||
+                        "We couldn't detect recognizable foods in this image. Please ensure your plate is clearly framed."}
+                    </p>
+                  </div>
+                  <div className="pt-2 space-y-2">
+                    <Button
+                      fullWidth
+                      variant="primary"
+                      onClick={handleStartAnalysis}
+                      disabled={isAnalyzing}
+                      leftIcon={<RefreshCwIcon size={15} />}
+                    >
+                      Try Again
+                    </Button>
+                    <Button fullWidth variant="outline" onClick={handleReset}>
+                      Retake Photo
+                    </Button>
+                    <Button
+                      fullWidth
+                      variant="subtle"
+                      onClick={handleRequestAddFood}
+                      leftIcon={<PlusIcon size={15} />}
+                    >
+                      Choose Food Manually
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* ERROR STATE: Invalid Image */}
+            {isInvalidImageState && (
+              <Card className="border-rose-200 bg-rose-50/40 shadow-sm">
+                <CardContent className="p-6 sm:p-7 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-800 flex items-center justify-center mx-auto">
+                    <AlertCircleIcon size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-rose-950">
+                      Invalid or Corrupted Image
+                    </h3>
+                    <p className="text-xs text-rose-900 mt-1 leading-relaxed">
+                      {recognitionResult?.errorMessage ||
+                        'Unable to decode the visual frame. Please capture another image.'}
+                    </p>
+                  </div>
+                  <div className="pt-2 space-y-2">
+                    <Button fullWidth variant="outline" onClick={handleReset}>
+                      Retake Photo
+                    </Button>
+                    <Button
+                      fullWidth
+                      variant="subtle"
+                      onClick={handleRequestAddFood}
+                      leftIcon={<PlusIcon size={15} />}
+                    >
+                      Enter Food Manually
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Stage: Detected / Reviewing */}
+            {hasDetections && (
+              <div className="space-y-4 animate-in fade-in duration-300">
+                {/* Low-confidence warning banner if flagged */}
+                {recognitionResult?.status === 'low-confidence' && (
+                  <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-xs text-amber-900 flex items-start gap-2.5">
+                    <AlertCircleIcon size={16} className="text-amber-700 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold block">Low-Confidence Detection</span>
+                      <p className="text-2xs text-amber-800 mt-0.5">
+                        {recognitionResult.confidenceWarning ||
+                          "We couldn't confidently identify this food. Tap 'Not correct?' to select your exact dish."}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Detected Food Card List */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-stone-700">
+                        Detected ({items.length})
+                      </span>
+                      {items.length > 1 && (
+                        <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                          Multi-Food Plate
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRequestAddFood}
+                      className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200/80 flex items-center gap-1 transition-colors cursor-pointer"
+                    >
+                      <PlusIcon size={13} />
+                      <span>Add Extra Item</span>
+                    </button>
+                  </div>
+
+                  {items.map(item => {
+                    const matchingDetection = detections.find(d => d.id === item.detectionId);
+                    return (
+                      <FoodDetectionCard
+                        key={item.detectionId}
+                        item={item}
+                        alternativeCandidates={matchingDetection?.candidateMatches}
+                        onUpdatePortion={handleUpdatePortion}
+                        onRemoveItem={handleRemoveItem}
+                        onRequestChangeFood={handleRequestChangeFood}
+                        onSelectAlternative={handleSelectAlternative}
+                        canRemove={items.length > 1}
+                      />
+                    );
+                  })}
+                </div>
+
+                {/* Aggregated Macro Preview & Proceed */}
+                <Card className="border-stone-200 shadow-sm">
+                  <CardContent className="p-4 sm:p-5 space-y-4">
+                    <div className="flex items-center justify-between pb-2 border-b border-stone-100">
+                      <div>
+                        <span className="text-xs font-bold text-stone-800 block">
+                          Total Meal Estimation
+                        </span>
+                        <span className="text-3xs text-stone-500">
+                          {items.length} item{items.length > 1 ? 's' : ''} combined
+                        </span>
+                      </div>
+                      <span className="text-sm font-extrabold text-emerald-800">
+                        {totalNutrition.calories} kcal
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-1.5 text-center text-xs">
+                      <div className="p-2 rounded-xl bg-emerald-50/70 border border-emerald-100">
+                        <span className="block text-3xs text-emerald-700 font-semibold uppercase">Protein</span>
+                        <span className="text-sm font-bold text-emerald-900">{totalNutrition.protein}g</span>
+                      </div>
+                      <div className="p-2 rounded-xl bg-amber-50/70 border border-amber-100">
+                        <span className="block text-3xs text-amber-700 font-semibold uppercase">Carbs</span>
+                        <span className="text-sm font-bold text-amber-900">{totalNutrition.carbohydrates}g</span>
+                      </div>
+                      <div className="p-2 rounded-xl bg-rose-50/70 border border-rose-100">
+                        <span className="block text-3xs text-rose-700 font-semibold uppercase">Fat</span>
+                        <span className="text-sm font-bold text-rose-900">{totalNutrition.fat}g</span>
+                      </div>
+                      <div className="p-2 rounded-xl bg-teal-50/70 border border-teal-100">
+                        <span className="block text-3xs text-teal-700 font-semibold uppercase">Fiber</span>
+                        <span className="text-sm font-bold text-teal-900">{totalNutrition.fiber}g</span>
+                      </div>
+                    </div>
+
+                    <MacroDistributionBar distribution={macroDistribution} />
+
+                    {/* Saving Status Feedback Banner */}
+                    {isProcessingFinal && (
+                      <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center gap-2 animate-pulse" role="status">
+                        <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping shrink-0" />
+                        <span className="font-semibold">
+                          {user?.uid ? 'Syncing meal to your cloud nutrition journal...' : 'Saving meal to local nutrition journal...'}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Proceed Button */}
+                    <Button
+                      fullWidth
+                      size="lg"
+                      onClick={handleProceedToResults}
+                      isLoading={isProcessingFinal}
+                      rightIcon={<ArrowRightIcon size={18} />}
+                      className="mt-2"
+                    >
+                      {isProcessingFinal ? 'Saving to Nutrition Journal...' : 'View Richness & Upgrades'}
+                    </Button>
+
+                    {/* Subtle Accuracy Disclaimer */}
+                    <p className="text-3xs text-center text-stone-500 pt-1 leading-relaxed">
+                      * Nutrition values are estimates based on standard regional reference food data and confirmed portion size, not laboratory measurements.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* Phase 5: 5-Star Nutrient Intelligence & Recommended Additions */}
+                {mealAnalysisResult && (
+                  <MealIntelligenceCard
+                    analysis={mealAnalysisResult}
+                    onAddRecommendation={handleAddRecommendation}
+                    isHostelite={profile.isHostelite}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Food Selector Modal for Customizing / Swapping Items */}
+        <FoodSelectorModal
+          isOpen={isSelectorOpen}
+          onClose={() => setIsSelectorOpen(false)}
+          onSelectFood={handleFoodSelected}
+          title={targetChangeItemId ? 'Change Food Identification' : 'Add Item to Plate'}
+          description={
+            targetChangeItemId
+              ? 'Select the dish or snack that was actually on your plate instead of the auto-detected item.'
+              : 'Add any side dish, banana, boiled egg, curd, or drink to your meal.'
+          }
+        />
+      </Container>
+    </div>
+    </AuthGuard>
+  );
+}
