@@ -169,14 +169,18 @@ export function ScanViewport({
   const handleShutterCapture = () => {
     if (cameraState === 'live') {
       const capturedFile = captureFrameFromVideo();
-      stopCamera();
       if (capturedFile) {
+        stopCamera();
         onCapture(capturedFile);
+        return;
+      } else {
+        setCameraErrorMessage('Could not capture frame from camera stream. Please try again or upload a photo.');
+        setCameraState('error');
         return;
       }
     }
-    stopCamera();
-    onCapture();
+    // If camera is not live, prompt user to enable camera
+    requestCamera();
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -461,6 +465,8 @@ export function ScanViewport({
             </p>
             <button
               type="button"
+              id="enable-camera-btn"
+              data-testid="enable-camera-btn"
               onClick={requestCamera}
               className="px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 mx-auto cursor-pointer"
             >

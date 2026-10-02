@@ -199,19 +199,14 @@ export async function POST(req: NextRequest) {
 
     // Check GEMINI_API_KEY
     const apiKey = getGeminiApiKey();
-
-    // Check if this is an explicit scenario/test preview request
-    const isExplicitScenarioOrPlaceholder =
-      base64Data === 'placeholder' ||
-      base64Data.length < 50 ||
-      req.headers.get('x-trackabite-mock-mode') === 'true';
+    const isExplicitMockHeader = req.headers.get('x-trackabite-mock-mode') === 'true';
 
     if (!apiKey) {
-      if (isExplicitScenarioOrPlaceholder || scenarioHintId) {
+      if (isExplicitMockHeader && scenarioHintId) {
         const syntheticImage: AppImage = {
           id: imageId,
           sourceType: 'sample',
-          scenarioHintId: scenarioHintId || 'multi-thali-4food',
+          scenarioHintId,
           capturedAt: new Date().toISOString(),
         };
         const mockResult = await mockRecognitionService.recognizeFood(syntheticImage);
@@ -222,7 +217,7 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      // Real user image capture/upload without an API key MUST fail clearly with a helpful server configuration error (Requirement 9 & 10)
+      // Real user image capture/upload without an API key MUST fail clearly with a helpful server configuration error
       return NextResponse.json<FoodRecognitionResult>(
         {
           imageId,
@@ -237,9 +232,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // If image data is a placeholder (e.g. from preset scenario clicks without an uploaded photo)
+    // If image data is empty or placeholder without real pixels
     if (base64Data === 'placeholder' || base64Data.length < 50) {
-      if (scenarioHintId) {
+      if (isExplicitMockHeader && scenarioHintId) {
         const syntheticImage: AppImage = {
           id: imageId,
           sourceType: 'sample',
@@ -253,13 +248,14 @@ export async function POST(req: NextRequest) {
           meal: mealCompositionService.composeMeal(mockResult.detections, imageId, userProfile, mealContext),
         });
       }
+
       return NextResponse.json<FoodRecognitionResult>({
         imageId,
         model: GEMINI_CONFIG.model,
         processingTimeMs: Date.now() - startTime,
         status: 'invalid-image',
         detections: [],
-        errorMessage: 'No image data was received. Please capture or upload a photo of your meal.',
+        errorMessage: 'Capture a new meal to analyze. No valid camera image was received.',
       });
     }
 

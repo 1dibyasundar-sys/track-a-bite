@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Container } from '../../components/layout/container';
 import { AuthGuard } from '../../components/auth/AuthGuard';
 import { useAuth } from '../../components/auth/AuthProvider';
@@ -91,8 +91,10 @@ export function validateImageFile(file: unknown): { isValid: boolean; error?: st
   return { isValid: true };
 }
 
-export default function ScanPage() {
+function ScanContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isReanalyze = searchParams.get('reanalyze') === 'true';
   const { user } = useAuth();
 
   // State machine for scan & perception pipeline
@@ -100,12 +102,10 @@ export default function ScanPage() {
   const [items, setItems] = useState<DetectedFoodItem[]>([]);
   const [detections, setDetections] = useState<FoodDetection[]>([]);
   const [recognitionResult, setRecognitionResult] = useState<FoodRecognitionResult | null>(null);
-  const [recognitionMode, setRecognitionMode] = useState<RecognitionProviderMode>(() =>
-    foodRecognitionService.getMode()
-  );
+  const [recognitionMode, setRecognitionMode] = useState<RecognitionProviderMode>('gemini');
 
-  // Active scenario preset (defaulting to 4-dish thali or campus sprouts)
-  const [selectedScenarioId, setSelectedScenarioId] = useState<string>('multi-thali-4food');
+  // Active scenario preset: None by default (never preload mock scenario for real scans)
+  const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
   const [targetChangeItemId, setTargetChangeItemId] = useState<string | null>(null);
   const [isProcessingFinal, setIsProcessingFinal] = useState(false);
@@ -115,6 +115,11 @@ export default function ScanPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  // Ensure perception service is set to gemini mode
+  useEffect(() => {
+    foodRecognitionService.setMode('gemini');
+  }, []);
 
   // Phase 1 / Phase 6: Top-level mode switcher: 'cooked' (meal plate) vs 'packaged' (barcode + OCR)
   const [scanCategory, setScanCategory] = useState<'cooked' | 'packaged'>('cooked');
@@ -205,7 +210,7 @@ export default function ScanPage() {
     };
   }, [previewUrl]);
 
-  // 1. Trigger capture action from live camera or preset
+  // 1. Trigger capture action from live camera
   const handleCapture = (capturedItem?: unknown) => {
     setValidationError(null);
     if (capturedItem && capturedItem instanceof File) {
@@ -220,20 +225,14 @@ export default function ScanPage() {
         sourceType: 'camera',
         file: capturedItem,
         uri: url,
-        scenarioHintId: selectedScenarioId,
         capturedAt: new Date().toISOString(),
       };
       setActiveImage(imagePayload);
+      setStage('preview');
     } else {
-      const imagePayload: AppImage = {
-        id: `capture-${Date.now()}`,
-        sourceType: 'camera',
-        scenarioHintId: selectedScenarioId,
-        capturedAt: new Date().toISOString(),
-      };
-      setActiveImage(imagePayload);
+      setValidationError('No image frame was captured. Please enable your camera and tap "Capture Plate", or upload a photo.');
+      setStage('idle');
     }
-    setStage('preview');
   };
 
   // 2. File upload action with validation
@@ -256,7 +255,6 @@ export default function ScanPage() {
       sourceType: 'upload',
       file,
       uri: url,
-      scenarioHintId: selectedScenarioId,
       capturedAt: new Date().toISOString(),
     };
     setActiveImage(imagePayload);
@@ -268,6 +266,11 @@ export default function ScanPage() {
     if (isAnalyzing || stage === 'analyzing') {
       return;
     }
+    if (!activeImage?.file && !activeImage?.uri) {
+      setValidationError('Capture a new meal to analyze.');
+      setStage('idle');
+      return;
+    }
     setIsAnalyzing(true);
     setStage('analyzing');
   };
@@ -275,16 +278,17 @@ export default function ScanPage() {
   // 4. Complete analysis callback from viewport radar
   const handleAnalysisComplete = async () => {
     try {
-      const img =
-        activeImage || {
-          id: `img-${Date.now()}`,
-          sourceType: 'camera',
-          scenarioHintId: selectedScenarioId,
-          capturedAt: new Date().toISOString(),
-        };
+      if (!activeImage?.file && !activeImage?.uri) {
+        setValidationError('Capture a new meal to analyze.');
+        setStage('idle');
+        return;
+      }
 
+      const img = activeImage;
+
+      // Real camera and uploaded images do NOT send scenarioHintId
       const result = await foodRecognitionService.recognizeFood(img, {
-        scenarioHintId: selectedScenarioId,
+        scenarioHintId: selectedScenarioId || undefined,
       });
       setRecognitionResult(result);
       setDetections(result.detections);
@@ -311,7 +315,7 @@ export default function ScanPage() {
       console.error('[ScanPage] Analysis failed:', err);
       setRecognitionResult({
         imageId: activeImage?.id || `img-${Date.now()}`,
-        model: recognitionMode === 'gemini' ? 'gemini-server-route' : 'mock-perception-engine',
+        model: 'gemini-server-route',
         processingTimeMs: 150,
         status: 'error',
         detections: [],
@@ -512,6 +516,7 @@ export default function ScanPage() {
     setDetections([]);
     setRecognitionResult(null);
     setActiveImage(null);
+    setSelectedScenarioId(null);
   };
 
   // Live aggregated nutrition totals
@@ -637,6 +642,14 @@ export default function ScanPage() {
 
         {scanCategory === 'cooked' ? (
           <>
+            {/* Re-analyze Active Notice */}
+            {isReanalyze && (
+              <div className="max-w-xl mx-auto mb-4 p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/60 text-xs text-emerald-900 dark:text-emerald-200 flex items-center justify-center gap-2 shadow-xs">
+                <RefreshCwIcon size={14} className="text-emerald-700 dark:text-emerald-400 shrink-0 animate-spin" />
+                <span className="font-semibold">Re-analyzing: Previous meal cleared. Capture your new plate to analyze.</span>
+              </div>
+            )}
+
             {/* Header */}
             <div className="text-center max-w-xl mx-auto mb-6">
           <div className="flex items-center justify-center gap-2 mb-2">
@@ -713,7 +726,7 @@ export default function ScanPage() {
               stage={stage}
               items={items}
               previewUrl={previewUrl}
-              selectedScenarioId={selectedScenarioId}
+              selectedScenarioId={selectedScenarioId || undefined}
               validationError={validationError}
               isAnalyzing={isAnalyzing}
               onCapture={handleCapture}
@@ -739,29 +752,34 @@ export default function ScanPage() {
 
           {/* Right Column: Identification Feedback & Review (5 Cols) */}
           <div className="lg:col-span-5 space-y-4">
-            {/* Stage: Idle */}
+            {/* Stage: Idle - Require New Image */}
             {stage === 'idle' && (
               <Card className="border-stone-200/90 dark:border-[#23382b] bg-white dark:bg-[#131d16] shadow-sm">
                 <CardContent className="p-6 sm:p-8 text-center space-y-4">
                   <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-center mx-auto shadow-inner">
                     <CameraIcon size={26} />
                   </div>
-                  <div>
-                    <h2 className="text-base font-bold text-stone-900 dark:text-stone-100">
-                      Vision Engine Ready
+                  <div className="space-y-1">
+                    <h2 className="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100">
+                      Capture a new meal to analyze
                     </h2>
-                    <p className="text-xs text-stone-600 dark:text-stone-400 mt-1 leading-relaxed">
-                      Select a test scenario below the camera or upload a plate image to trigger multi-dish food identification.
+                    <p className="text-xs text-stone-600 dark:text-stone-400 mt-1 leading-relaxed max-w-sm mx-auto">
+                      Point your camera at your food plate and tap &quot;Capture Plate&quot;, or upload a meal photo to identify actual dishes.
                     </p>
                   </div>
-                  <Button
-                    onClick={() => handleCapture()}
-                    fullWidth
-                    size="lg"
-                    leftIcon={<SparklesIcon size={16} />}
-                  >
-                    Run Food Recognition
-                  </Button>
+                  <div className="pt-2">
+                    <Button
+                      onClick={() => {
+                        const enableBtn = document.getElementById('enable-camera-btn');
+                        if (enableBtn) enableBtn.click();
+                      }}
+                      fullWidth
+                      size="lg"
+                      leftIcon={<CameraIcon size={16} />}
+                    >
+                      Start Camera Scanner
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             )}
@@ -1165,5 +1183,20 @@ export default function ScanPage() {
       </Container>
     </div>
     </AuthGuard>
+  );
+}
+
+export default function ScanPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-24 text-center">
+          <div className="inline-block w-8 h-8 border-3 border-emerald-700 dark:border-emerald-400 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-sm text-stone-600 dark:text-stone-400 font-medium">Opening Food Scanner...</p>
+        </div>
+      }
+    >
+      <ScanContent />
+    </Suspense>
   );
 }

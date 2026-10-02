@@ -27,11 +27,8 @@ export class GeminiFoodRecognitionService implements IFoodRecognitionService {
         const formData = new FormData();
         formData.append('file', image.file);
         formData.append('id', image.id);
-        if (options?.scenarioHintId || image.scenarioHintId) {
-          formData.append(
-            'scenarioHintId',
-            options?.scenarioHintId || image.scenarioHintId || ''
-          );
+        if (options?.scenarioHintId) {
+          formData.append('scenarioHintId', options.scenarioHintId);
         }
 
         response = await fetch('/api/recognize-food', {
@@ -39,13 +36,13 @@ export class GeminiFoodRecognitionService implements IFoodRecognitionService {
           body: formData,
         });
       }
-      // 2. Otherwise send JSON payload with data URI or metadata
-      else {
+      // 2. Otherwise send JSON payload if real data URI is available
+      else if (image.uri && image.uri.startsWith('data:image/') && !image.uri.includes('placeholder')) {
         const payload = {
           id: image.id,
-          image: image.uri || 'data:image/jpeg;base64,placeholder',
+          image: image.uri,
           mimeType: image.mimeType || 'image/jpeg',
-          scenarioHintId: options?.scenarioHintId || image.scenarioHintId,
+          scenarioHintId: options?.scenarioHintId,
         };
 
         response = await fetch('/api/recognize-food', {
@@ -55,6 +52,17 @@ export class GeminiFoodRecognitionService implements IFoodRecognitionService {
           },
           body: JSON.stringify(payload),
         });
+      }
+      // 3. No real image available: require a new capture rather than sending placeholder
+      else {
+        return {
+          imageId: image.id,
+          model: 'gemini-server-route',
+          processingTimeMs: 50,
+          status: 'invalid-image',
+          detections: [],
+          errorMessage: 'Capture a new meal to analyze. Please enable camera or upload a photo.',
+        };
       }
 
       if (!response.ok) {

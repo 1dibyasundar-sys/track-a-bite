@@ -31,6 +31,7 @@ import {
   HistoryIcon,
   CheckIcon,
   InfoIcon,
+  RefreshCwIcon,
 } from '../../components/ui/icons';
 import { formatDate } from '../../lib/utils';
 
@@ -249,9 +250,14 @@ function ResultsContent() {
             </div>
 
             {/* Quick Navigation Actions */}
-            <div className="flex items-center gap-3 shrink-0 self-start md:self-auto">
+            <div className="flex items-center gap-3 shrink-0 self-start md:self-auto flex-wrap">
+              <Link href="/scan?reanalyze=true">
+                <Button variant="primary" size="md" leftIcon={<RefreshCwIcon size={16} />}>
+                  Re-analyze
+                </Button>
+              </Link>
               <Link href="/scan">
-                <Button variant="primary" size="md" leftIcon={<CameraIcon size={16} />}>
+                <Button variant="outline" size="md" leftIcon={<CameraIcon size={16} />} className="text-white border-white/20 hover:bg-white/10">
                   Scan Another Meal
                 </Button>
               </Link>
@@ -500,6 +506,30 @@ function ResultsContent() {
             </div>
           </div>
         </section>
+
+        {/* Re-analyze Action Callout */}
+        <div className="card-3d p-6 bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 className="text-base font-bold text-stone-900 dark:text-stone-100">
+              Want to analyze another dish or meal?
+            </h3>
+            <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+              Re-analyze a freshly captured camera photo or upload an image to identify actual meal items.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <Link href="/scan?reanalyze=true" className="flex-1 sm:flex-none">
+              <Button fullWidth variant="primary" size="md" leftIcon={<RefreshCwIcon size={16} />}>
+                Re-analyze
+              </Button>
+            </Link>
+            <Link href="/scan" className="flex-1 sm:flex-none">
+              <Button fullWidth variant="outline" size="md" leftIcon={<CameraIcon size={16} />}>
+                New Scan
+              </Button>
+            </Link>
+          </div>
+        </div>
 
         {/* Disclaimer Notice */}
         <DisclaimerBanner variant="subtle" />
