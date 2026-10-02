@@ -210,9 +210,9 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
       {/* 1. TOP TOOLBAR & VIEW CONTROLS (Hidden during print) */}
       <div className="print:hidden space-y-4">
         {/* Navigation Selector & Export Action */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-200 dark:border-[#23382b]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-200 dark:border-[#38312A]">
           {/* Segmented Mode Selector */}
-          <div className="inline-flex p-1 rounded-xl bg-stone-100 dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] text-xs font-semibold overflow-x-auto max-w-full">
+          <div className="inline-flex p-1 rounded-xl bg-stone-100 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-xs font-semibold overflow-x-auto max-w-full">
             <button
               type="button"
               onClick={() => setViewMode('report')}
@@ -270,7 +270,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
               </Button>
 
               {showExportMenu && (
-                <div className="absolute right-0 mt-1 w-48 bg-white dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] rounded-xl shadow-lg z-20 py-1 text-xs text-stone-800 dark:text-stone-200">
+                <div className="absolute right-0 mt-1 w-48 bg-white dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] rounded-xl shadow-lg z-20 py-1 text-xs text-stone-800 dark:text-stone-200">
                   <button
                     type="button"
                     onClick={() => handleDownloadExport('csv')}
@@ -287,7 +287,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
                     <span>Download JSON</span>
                     <span className="text-3xs text-stone-400 dark:text-stone-500 font-mono">.json</span>
                   </button>
-                  <div className="border-t border-stone-100 dark:border-[#23382b] my-1" />
+                  <div className="border-t border-stone-100 dark:border-[#38312A] my-1" />
                   <button
                     type="button"
                     onClick={handlePrintReport}
@@ -314,7 +314,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
 
         {/* Date Range Selector Toolbar (Active on Report View) */}
         {viewMode === 'report' && (
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-stone-50 dark:bg-[#131d16]/80 border border-stone-200/90 dark:border-[#23382b] text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-stone-50 dark:bg-[#1D1A17]/80 border border-stone-200/90 dark:border-[#38312A] text-xs">
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-2xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mr-1">Period:</span>
               {[
@@ -331,7 +331,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
                   className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
                     rangePreset === opt.key
                       ? 'bg-emerald-800 dark:bg-emerald-700 text-white font-semibold'
-                      : 'bg-white dark:bg-[#19271e] border border-stone-200 dark:border-[#23382b] text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#203327]'
+                      : 'bg-white dark:bg-[#19271e] border border-stone-200 dark:border-[#38312A] text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#203327]'
                   }`}
                 >
                   {opt.label}
@@ -346,7 +346,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
                 aria-label="Start Date"
                 value={customStart}
                 onChange={e => setCustomStart(e.target.value)}
-                className="px-2 py-1 bg-white dark:bg-[#19271e] border border-stone-200 dark:border-[#23382b] rounded text-xs text-stone-700 dark:text-stone-200"
+                className="px-2 py-1 bg-white dark:bg-[#19271e] border border-stone-200 dark:border-[#38312A] rounded text-xs text-stone-700 dark:text-stone-200"
               />
               <span className="text-stone-400">to</span>
               <input
@@ -354,7 +354,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
                 aria-label="End Date"
                 value={customEnd}
                 onChange={e => setCustomEnd(e.target.value)}
-                className="px-2 py-1 bg-white dark:bg-[#19271e] border border-stone-200 dark:border-[#23382b] rounded text-xs text-stone-700 dark:text-stone-200"
+                className="px-2 py-1 bg-white dark:bg-[#19271e] border border-stone-200 dark:border-[#38312A] rounded text-xs text-stone-700 dark:text-stone-200"
               />
               <button
                 type="button"
@@ -408,7 +408,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
         <div className="space-y-6">
           {/* Empty History State */}
           {rangeReport.totalMeals === 0 ? (
-            <div className="py-12 px-4 text-center rounded-2xl bg-white dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] shadow-2xs space-y-3">
+            <div className="py-12 px-4 text-center rounded-2xl bg-white dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] shadow-2xs space-y-3">
               <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 flex items-center justify-center mx-auto text-xl font-bold">
                 🍽️
               </div>
@@ -438,7 +438,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
               )}
 
               {/* OVERALL SCORE */}
-              <Card className="bg-gradient-to-br from-emerald-50/70 via-white to-stone-50 dark:from-[#132219] dark:via-[#131d16] dark:to-[#0f1812] border-emerald-200/80 dark:border-emerald-900/50">
+              <Card className="bg-white dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] shadow-xs">
                 <CardContent className="p-5 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <span className="text-2xs font-bold tracking-wider text-emerald-800 dark:text-emerald-400 uppercase">
@@ -474,7 +474,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
                 <h3 className="text-xs font-bold text-stone-600 dark:text-stone-400 uppercase tracking-wider">
                   Key Nutritional Metrics
                 </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 rounded-2xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] shadow-2xs">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 rounded-2xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] shadow-2xs">
                   <div>
                     <span className="block text-2xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">
                       Avg. Calories / Day
@@ -540,7 +540,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
                   </span>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] shadow-2xs space-y-4">
+                <div className="p-5 rounded-2xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] shadow-2xs space-y-4">
                   {/* Calories Progress */}
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-baseline text-xs">
@@ -638,7 +638,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
                     rangeReport.insights.map(item => (
                       <div
                         key={item.id}
-                        className="p-4 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] shadow-2xs space-y-2 text-xs"
+                        className="p-4 rounded-xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] shadow-2xs space-y-2 text-xs"
                       >
                         <div className="flex items-center justify-between gap-2">
                           <span className="font-bold text-sm text-stone-900 dark:text-stone-100">{item.title}</span>
@@ -669,7 +669,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
                       </div>
                     ))
                   ) : (
-                    <div className="col-span-2 p-4 rounded-xl bg-stone-50 dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] text-xs text-stone-600 dark:text-stone-400">
+                    <div className="col-span-2 p-4 rounded-xl bg-stone-50 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-xs text-stone-600 dark:text-stone-400">
                       No critical nutritional variances detected for this date range. Maintain regular scanning to track ongoing consistency.
                     </div>
                   )}
@@ -692,7 +692,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
                   </div>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] shadow-2xs">
+                <div className="p-5 rounded-2xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] shadow-2xs">
                   <div className="overflow-x-auto pb-2">
                     <div className="min-w-[450px] flex items-end gap-2 h-44 border-b border-stone-200 dark:border-stone-800 px-2">
                       {rangeReport.trends.map(t => {
@@ -734,7 +734,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
                   {recommendations.map(rec => (
                     <div
                       key={rec.id}
-                      className="p-4 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] hover:border-emerald-300 dark:hover:border-emerald-700 transition-all space-y-2 flex flex-col justify-between"
+                      className="p-4 rounded-xl bg-white dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] hover:border-emerald-300 dark:hover:border-emerald-700 transition-all space-y-2 flex flex-col justify-between"
                     >
                       <div className="space-y-1.5">
                         <div className="flex items-center justify-between">
@@ -747,7 +747,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
                         <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">{rec.reason}</p>
                       </div>
 
-                      <div className="pt-2 border-t border-stone-100 dark:border-[#23382b] space-y-1.5">
+                      <div className="pt-2 border-t border-stone-100 dark:border-[#38312A] space-y-1.5">
                         <div className="flex items-center justify-between text-2xs text-stone-500 dark:text-stone-400">
                           <span>Est. Protein</span>
                           <strong className="text-emerald-800 dark:text-emerald-400">{rec.estimatedNutrition.protein}g</strong>
@@ -768,7 +768,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
               </div>
 
               {/* EXPORT & REPORT ACTION SECTION */}
-              <div className="p-5 rounded-2xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] shadow-2xs space-y-4 print:hidden">
+              <div className="p-5 rounded-2xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] shadow-2xs space-y-4 print:hidden">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                   <div>
                     <h3 className="text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
@@ -823,7 +823,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
       {/* 4. VIEW MODE: TODAY'S INTAKE */}
       {viewMode === 'today' && (
         <div className="space-y-6">
-          <Card className="bg-gradient-to-br from-emerald-50/60 via-white to-stone-50 dark:from-[#132219] dark:via-[#131d16] dark:to-[#0f1812] border-emerald-200/80 dark:border-emerald-900/50">
+          <Card className="bg-white dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] shadow-xs">
             <CardContent className="p-5 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="space-y-1">
                 <span className="text-2xs font-bold tracking-wider text-emerald-800 dark:text-emerald-400 uppercase">
@@ -867,7 +867,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
 
           {/* Today Macros Progress Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] shadow-2xs space-y-2">
+            <div className="p-4 rounded-xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] shadow-2xs space-y-2">
               <div className="flex justify-between items-baseline">
                 <span className="text-2xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider">Calories</span>
                 <span className="text-2xs font-bold text-stone-700 dark:text-stone-300">{todaySummary.calorieProgressPercent}%</span>
@@ -883,7 +883,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] shadow-2xs space-y-2">
+            <div className="p-4 rounded-xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] shadow-2xs space-y-2">
               <div className="flex justify-between items-baseline">
                 <span className="text-2xs font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">Protein</span>
                 <span className="text-2xs font-bold text-emerald-800 dark:text-emerald-400">{todaySummary.proteinProgressPercent}%</span>
@@ -899,7 +899,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] shadow-2xs space-y-2">
+            <div className="p-4 rounded-xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] shadow-2xs space-y-2">
               <div className="flex justify-between items-baseline">
                 <span className="text-2xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider">Carbs</span>
                 <span className="text-2xs font-bold text-amber-800 dark:text-amber-400">{todaySummary.carbsProgressPercent}%</span>
@@ -915,7 +915,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] shadow-2xs space-y-2">
+            <div className="p-4 rounded-xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] shadow-2xs space-y-2">
               <div className="flex justify-between items-baseline">
                 <span className="text-2xs font-bold text-teal-800 dark:text-teal-400 uppercase tracking-wider">Fats</span>
                 <span className="text-2xs font-bold text-teal-800 dark:text-teal-400">{todaySummary.fatProgressPercent}%</span>
@@ -933,7 +933,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
           </div>
 
           {/* Daily Hydration Tracking (Phase 8.7) */}
-          <div className="p-5 rounded-2xl bg-gradient-to-br from-sky-50/70 via-white to-stone-50 dark:from-[#0d1e28] dark:via-[#131d16] dark:to-[#0f1812] border border-sky-200/80 dark:border-sky-900/50 shadow-2xs space-y-4">
+          <div className="p-5 rounded-2xl bg-gradient-to-br from-sky-50/70 via-white to-stone-50 dark:from-[#0d1e28] dark:via-[#1D1A17] dark:to-[#151311] border border-sky-200/80 dark:border-sky-900/50 shadow-2xs space-y-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
@@ -1005,7 +1005,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
                   min={50}
                   max={2500}
                   onChange={e => setCustomMl(e.target.value)}
-                  className="w-24 px-2.5 py-1 rounded-lg bg-white dark:bg-[#19271e] border border-stone-200 dark:border-[#23382b] text-xs text-stone-800 dark:text-stone-200 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-hidden focus:border-sky-400"
+                  className="w-24 px-2.5 py-1 rounded-lg bg-white dark:bg-[#19271e] border border-stone-200 dark:border-[#38312A] text-xs text-stone-800 dark:text-stone-200 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-hidden focus:border-sky-400"
                 />
                 <button
                   type="submit"
@@ -1028,7 +1028,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
 
           {/* Micronutrient Summary (Phase 8.7) */}
           {todaySummary.micronutrients && (
-            <div className="p-5 rounded-2xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] shadow-2xs space-y-4">
+            <div className="p-5 rounded-2xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] shadow-2xs space-y-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                 <div>
                   <div className="flex items-center gap-2">
@@ -1061,7 +1061,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
                 {Object.values(todaySummary.micronutrients.nutrients).map(item => (
                   <div
                     key={item.key}
-                    className="p-3.5 rounded-xl border border-stone-100 dark:border-[#23382b] bg-stone-50/60 dark:bg-[#19271e]/60 hover:bg-white dark:hover:bg-[#19271e] hover:border-stone-200 dark:hover:border-stone-700 transition-all space-y-2"
+                    className="p-3.5 rounded-xl border border-stone-100 dark:border-[#38312A] bg-stone-50/60 dark:bg-[#19271e]/60 hover:bg-white dark:hover:bg-[#19271e] hover:border-stone-200 dark:hover:border-stone-700 transition-all space-y-2"
                   >
                     <div className="flex justify-between items-baseline">
                       <span className="font-bold text-xs text-stone-800 dark:text-stone-200">{item.name}</span>
@@ -1122,7 +1122,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
                       ? 'bg-amber-50/60 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/40 text-amber-950 dark:text-amber-200'
                       : item.severity === 'positive'
                         ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/40 text-emerald-950 dark:text-emerald-200'
-                        : 'bg-stone-50 dark:bg-[#19271e] border-stone-200 dark:border-[#23382b] text-stone-900 dark:text-stone-200'
+                        : 'bg-stone-50 dark:bg-[#19271e] border-stone-200 dark:border-[#38312A] text-stone-900 dark:text-stone-200'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -1151,9 +1151,9 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
       {viewMode === 'monthly' && (
         <div className="space-y-6">
           {/* Month Banner */}
-          <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-900 to-stone-900 dark:from-[#0a1810] dark:to-[#121c15] text-white border border-transparent dark:border-[#23382b] flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+          <div className="p-5 rounded-2xl bg-gradient-to-r from-[#1D1A17] via-[#25211D] to-[#151311] text-white border border-[#38312A] flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-sm">
             <div>
-              <span className="text-2xs font-bold text-emerald-400 uppercase tracking-widest">
+              <span className="text-2xs font-bold text-[#F4A340] uppercase tracking-widest">
                 Comprehensive Monthly Evaluation
               </span>
               <h2 className="text-2xl font-black mt-0.5">{monthlyReport.monthName}</h2>
@@ -1169,19 +1169,19 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
 
           {/* Month Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b]">
+            <div className="p-4 rounded-xl bg-white dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A]">
               <span className="text-2xs text-stone-500 dark:text-stone-400 uppercase font-semibold">Avg. Calories</span>
               <div className="text-xl font-black text-stone-900 dark:text-stone-100 mt-1">{monthlyReport.averageCalories} kcal</div>
             </div>
-            <div className="p-4 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b]">
+            <div className="p-4 rounded-xl bg-white dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A]">
               <span className="text-2xs text-emerald-800 dark:text-emerald-400 uppercase font-semibold">Avg. Protein</span>
               <div className="text-xl font-black text-emerald-800 dark:text-emerald-400 mt-1">{monthlyReport.averageProteinG}g</div>
             </div>
-            <div className="p-4 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b]">
+            <div className="p-4 rounded-xl bg-white dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A]">
               <span className="text-2xs text-amber-800 dark:text-amber-400 uppercase font-semibold">Avg. Carbs</span>
               <div className="text-xl font-black text-amber-800 dark:text-amber-400 mt-1">{monthlyReport.averageCarbsG}g</div>
             </div>
-            <div className="p-4 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b]">
+            <div className="p-4 rounded-xl bg-white dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A]">
               <span className="text-2xs text-teal-800 dark:text-teal-400 uppercase font-semibold">Avg. Fiber</span>
               <div className="text-xl font-black text-teal-800 dark:text-teal-400 mt-1">{monthlyReport.averageFiberG}g</div>
             </div>
@@ -1189,7 +1189,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
 
           {/* Strongest & Weakest Days */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-white dark:bg-[#131d16] border border-emerald-200/90 dark:border-emerald-900/40 space-y-2">
+            <div className="p-4 rounded-xl bg-white dark:bg-[#1D1A17] border border-emerald-200/90 dark:border-emerald-900/40 space-y-2">
               <h4 className="text-xs font-bold text-emerald-900 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
                 <span>🌟</span> Highest Scoring Days
               </h4>
@@ -1207,7 +1207,7 @@ export function NutritionAnalyticsDashboard({ userId, initialMeals }: NutritionA
               )}
             </div>
 
-            <div className="p-4 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] space-y-2">
+            <div className="p-4 rounded-xl bg-white dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] space-y-2">
               <h4 className="text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider flex items-center gap-1.5">
                 <span>🎯</span> Focus &amp; Growth Days
               </h4>

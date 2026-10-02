@@ -32,7 +32,7 @@ export function DisclaimerBanner({ className, variant = 'subtle' }: DisclaimerBa
       role="note"
       aria-label="Nutritional estimates disclaimer"
       className={cn(
-        'p-3 rounded-xl bg-stone-100/90 dark:bg-[#131d16] border border-stone-200/80 dark:border-[#23382b] text-stone-600 dark:text-stone-400 text-xs flex items-start gap-2.5 leading-relaxed',
+        'p-3 rounded-xl bg-stone-100/90 dark:bg-[#1D1A17] border border-stone-200/80 dark:border-[#38312A] text-stone-600 dark:text-stone-400 text-xs flex items-start gap-2.5 leading-relaxed',
         className
       )}
     >

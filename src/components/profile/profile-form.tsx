@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   UserProfile,
   validateUserProfile,
+  NotificationPreferences,
 } from '../../lib/types/profile';
 import { userProfileService } from '../../lib/services/userProfileService';
 import { nutritionAnalyticsService } from '../../lib/services/nutritionAnalyticsService';
@@ -16,6 +17,7 @@ import {
   ArrowRightIcon,
   InfoIcon,
   SparklesIcon,
+  XIcon,
 } from '../ui/icons';
 import { useAuth } from '../auth/AuthProvider';
 
@@ -28,6 +30,24 @@ export interface ProfileFormProps {
 }
 
 type OnboardingStep = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
+interface HealthConditionItem {
+  id: string;
+  label: string;
+  desc: string;
+  icon: string;
+}
+
+const HEALTH_CONDITIONS_LIST: HealthConditionItem[] = [
+  { id: 'Diabetes', label: 'Diabetes', desc: 'Cautious glycemic & carb-density awareness', icon: '🩸' },
+  { id: 'Hypertension', label: 'Hypertension', desc: 'Cautious sodium & deep-fried snack balance', icon: '🫀' },
+  { id: 'High Cholesterol', label: 'High Cholesterol', desc: 'Saturated fat & trans fat moderation', icon: '🩺' },
+  { id: 'Thyroid', label: 'Thyroid', desc: 'Iodine & micronutrient density context', icon: '🦋' },
+  { id: 'Anemia', label: 'Anemia', desc: 'Iron & vitamin C bioavailability context', icon: '🔬' },
+  { id: 'Lactose Sensitivity', label: 'Lactose Sensitivity', desc: 'Milk & heavy dairy awareness', icon: '🥛' },
+  { id: 'Acid Reflux / Gastric Sensitivity', label: 'Acid Reflux / Gastric', desc: 'High spice & extreme acidity caution', icon: '🍵' },
+  { id: 'None', label: 'None', desc: 'No specific medical or dietary conditions', icon: '✨' },
+];
 
 export function ProfileForm({
   mode,
@@ -47,16 +67,26 @@ export function ProfileForm({
 
   const [step, setStep] = useState<OnboardingStep>(mode === 'onboarding' ? 1 : 2);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [otherConditionText, setOtherConditionText] = useState<string>(() => {
-    const current = profile.healthCondition || profile.healthConditions?.[0] || 'None';
-    if (!['None', 'Diabetes / Pre-diabetes', 'High blood pressure', 'Hypertension'].includes(current)) {
-      return current;
-    }
-    return '';
-  });
   const [isSuccessSaved, setIsSuccessSaved] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [syncNotice, setSyncNotice] = useState<string | null>(null);
+
+  // "Other" condition custom text input state
+  const [otherInputText, setOtherInputText] = useState<string>('');
+  const [showOtherInput, setShowOtherInput] = useState<boolean>(() => {
+    // If the profile contains conditions not in the predefined list, show other input open
+    const current = profile.healthConditions || [];
+    return current.some(
+      c => c !== 'None' && !HEALTH_CONDITIONS_LIST.some(item => item.id.toLowerCase() === c.toLowerCase())
+    );
+  });
+
+  // Safe accessor for conditions array
+  const currentConditions: string[] = Array.isArray(profile.healthConditions)
+    ? profile.healthConditions
+    : profile.healthCondition
+      ? [profile.healthCondition]
+      : ['None'];
 
   // Field change handler
   const handleFieldChange = <K extends keyof UserProfile>(key: K, value: UserProfile[K]) => {
@@ -70,6 +100,101 @@ export function ProfileForm({
       });
     }
     setIsSuccessSaved(false);
+  };
+
+  // Notification change handler
+  const handleNotificationToggle = (key: keyof NotificationPreferences) => {
+    setProfile(prev => {
+      const current = prev.notifications ?? {
+        mealReminders: true,
+        waterReminders: true,
+        weeklyReports: false,
+      };
+      return {
+        ...prev,
+        notifications: {
+          ...current,
+          [key]: !current[key],
+        },
+      };
+    });
+    setIsSuccessSaved(false);
+  };
+
+  // Condition toggle handler (multi-select + 'None' mutual exclusivity)
+  const toggleCondition = (conditionId: string) => {
+    setProfile(prev => {
+      let current = Array.isArray(prev.healthConditions) ? [...prev.healthConditions] : [];
+
+      if (conditionId === 'None') {
+        // Mutual exclusivity: selecting "None" clears all other conditions
+        return {
+          ...prev,
+          healthConditions: ['None'],
+          healthCondition: undefined,
+          disease: undefined,
+        };
+      }
+
+      // If selecting a specific condition, remove "None" and "Prefer not to say"
+      current = current.filter(c => c !== 'None' && c !== 'Prefer not to say');
+
+      // Check if this condition is already selected
+      const existsIndex = current.findIndex(c => c.toLowerCase() === conditionId.toLowerCase());
+      if (existsIndex >= 0) {
+        current.splice(existsIndex, 1);
+        // If all conditions are unselected, revert to 'None'
+        if (current.length === 0) {
+          current = ['None'];
+        }
+      } else {
+        current.push(conditionId);
+      }
+
+      const activeConditions = current.filter(c => c !== 'None');
+      const joined = activeConditions.length > 0 ? activeConditions.join(', ') : undefined;
+
+      return {
+        ...prev,
+        healthConditions: current,
+        healthCondition: joined,
+        disease: joined,
+      };
+    });
+    setIsSuccessSaved(false);
+  };
+
+  // Add custom condition from "Other" input
+  const addCustomCondition = () => {
+    const trimmed = otherInputText.trim();
+    if (!trimmed) return;
+
+    setProfile(prev => {
+      let current = Array.isArray(prev.healthConditions) ? [...prev.healthConditions] : [];
+      current = current.filter(c => c !== 'None' && c !== 'Prefer not to say');
+
+      if (!current.some(c => c.toLowerCase() === trimmed.toLowerCase())) {
+        current.push(trimmed);
+      }
+
+      const activeConditions = current.filter(c => c !== 'None');
+      const joined = activeConditions.length > 0 ? activeConditions.join(', ') : undefined;
+
+      return {
+        ...prev,
+        healthConditions: current,
+        healthCondition: joined,
+        disease: joined,
+      };
+    });
+
+    setOtherInputText('');
+    setIsSuccessSaved(false);
+  };
+
+  // Remove a specific condition
+  const removeCondition = (conditionToRemove: string) => {
+    toggleCondition(conditionToRemove);
   };
 
   // Step-by-step validations
@@ -100,25 +225,6 @@ export function ProfileForm({
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  // Health condition select
-  const handleHealthConditionSelect = (condition: string) => {
-    if (condition === 'Other') {
-      const conditionValue = otherConditionText.trim() || 'Other';
-      setProfile(prev => ({
-        ...prev,
-        healthCondition: conditionValue,
-        healthConditions: [conditionValue],
-      }));
-    } else {
-      setProfile(prev => ({
-        ...prev,
-        healthCondition: condition === 'None' ? undefined : condition,
-        healthConditions: [condition],
-      }));
-    }
-    setIsSuccessSaved(false);
   };
 
   // Complete profile submission
@@ -178,140 +284,92 @@ export function ProfileForm({
     }
   };
 
-  // Helper for current selected health category
-  const activeCondition = profile.healthCondition || profile.healthConditions?.[0] || 'None';
-  const isDiabetes = activeCondition.toLowerCase().includes('diabetes');
-  const isHypertension = activeCondition.toLowerCase().includes('pressure') || activeCondition.toLowerCase().includes('hypertension');
-  const isNone = activeCondition === 'None' || !activeCondition;
-  const isOther = !isNone && !isDiabetes && !isHypertension;
-
   // ---------------------------------------------------------------------------
-  // STEP RENDERERS (REUSABLE IN ONBOARDING & EDIT)
+  // 1. PERSONAL INFORMATION SECTION
   // ---------------------------------------------------------------------------
-
-  // Welcome Step (Step 1)
-  const renderWelcomeStep = () => (
-    <div className="space-y-6 text-center py-4 sm:py-8">
-      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto shadow-inner text-3xl sm:text-4xl">
-        🥗
-      </div>
-
-      <div className="space-y-2 max-w-md mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
-          Let&apos;s understand your plate.
-        </h1>
-        <p className="text-sm sm:text-base text-stone-600 leading-relaxed font-normal">
-          Tell us a little about yourself so Track-a-Bite can make your nutrition insights more useful.
-        </p>
-      </div>
-
-      {/* Feature Highlights */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 max-w-lg mx-auto text-left pt-2">
-        <div className="p-3 rounded-2xl bg-stone-50 border border-stone-200/80 flex items-center gap-2.5">
-          <span className="text-lg">🎯</span>
-          <div>
-            <span className="text-xs font-bold text-stone-900 block">Personalized</span>
-            <span className="text-3xs text-stone-500">Based on student baselines</span>
-          </div>
-        </div>
-        <div className="p-3 rounded-2xl bg-stone-50 border border-stone-200/80 flex items-center gap-2.5">
-          <span className="text-lg">🏠</span>
-          <div>
-            <span className="text-xs font-bold text-stone-900 block">Hostel Friendly</span>
-            <span className="text-3xs text-stone-500">Canteen & room staples</span>
-          </div>
-        </div>
-        <div className="p-3 rounded-2xl bg-stone-50 border border-stone-200/80 flex items-center gap-2.5">
-          <span className="text-lg">🛡️</span>
-          <div>
-            <span className="text-xs font-bold text-stone-900 block">Private & Safe</span>
-            <span className="text-3xs text-stone-500">Zero medical diagnoses</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="pt-4 max-w-xs mx-auto">
-        <Button
-          fullWidth
-          size="lg"
-          onClick={() => setStep(2)}
-          rightIcon={<ArrowRightIcon size={18} />}
-          className="font-bold py-3.5 text-base"
-        >
-          Let&apos;s start
-        </Button>
-      </div>
-    </div>
-  );
-
-  // About You (Step 2)
-  const renderAboutYouStep = () => (
+  const renderPersonalInfoSection = () => (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">
-          Tell us about you
+      <div className="border-b border-[#E8DED2] dark:border-[#38312A] pb-4">
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className="text-2xs font-extrabold uppercase tracking-wider text-[#E86A33] px-2.5 py-0.5 rounded-full bg-[#FEF7EE] dark:bg-[#2A1C14] border border-[#E86A33]/20">
+            Section 1
+          </span>
+          <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">Baseline Metrics</span>
+        </div>
+        <h2 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-100 tracking-tight">
+          Personal Information
         </h2>
-        <p className="text-xs sm:text-sm text-stone-600 mt-1">
-          Activity level helps estimate daily energy needs.
+        <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 mt-1">
+          Age, gender, and daily movement baseline for calibrating your estimated metabolic burn.
         </p>
       </div>
 
       {/* Age */}
       <div className="space-y-1.5">
-        <label htmlFor="input-age" className="block text-xs font-bold uppercase tracking-wider text-stone-700">
-          Age <span className="text-rose-500">*</span>
+        <label htmlFor="input-age" className="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+          Age (Years) <span className="text-rose-500">*</span>
         </label>
-        <input
-          id="input-age"
-          type="number"
-          min="1"
-          max="120"
-          value={profile.age ?? ''}
-          onChange={e => handleFieldChange('age', e.target.value === '' ? undefined : Number(e.target.value))}
-          placeholder="e.g. 20"
-          className={`w-full rounded-2xl bg-white border text-stone-900 text-sm py-3 px-4 transition-all focus:outline-none focus:ring-2 ${
-            errors.age ? 'border-rose-400 focus:ring-rose-200' : 'border-stone-200 focus:border-emerald-700 focus:ring-emerald-100'
-          }`}
-          aria-invalid={Boolean(errors.age)}
-          aria-describedby={errors.age ? 'error-age' : undefined}
-        />
-        {errors.age && (
+        <div className="max-w-xs">
+          <input
+            id="input-age"
+            type="number"
+            min="1"
+            max="120"
+            value={profile.age ?? ''}
+            onChange={e => handleFieldChange('age', e.target.value === '' ? undefined : Number(e.target.value))}
+            placeholder="e.g. 21"
+            className={`w-full min-h-[46px] rounded-xl bg-white dark:bg-[#1D1A17] border text-stone-900 dark:text-stone-100 text-sm py-3 px-4 transition-all focus:outline-none focus:ring-2 ${
+              errors.age
+                ? 'border-rose-400 focus:ring-rose-200'
+                : 'border-[#E8DED2] dark:border-[#38312A] focus:border-[#E86A33] focus:ring-[#E86A33]/20'
+            }`}
+            aria-invalid={Boolean(errors.age)}
+            aria-describedby={errors.age ? 'error-age' : undefined}
+          />
+        </div>
+        {errors.age ? (
           <p id="error-age" className="text-xs text-rose-600 font-medium pt-0.5">
             {errors.age}
           </p>
+        ) : (
+          <p className="text-2xs text-stone-400">Realistic age between 1 and 120.</p>
         )}
       </div>
 
-      {/* Gender (Optional) */}
-      <div className="space-y-1.5">
+      {/* Gender */}
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700">
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
             Gender
           </label>
-          <span className="text-2xs text-stone-400 font-medium">Optional</span>
+          <span className="text-2xs text-stone-400 font-medium">Used for ICMR baseline formula</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {(['male', 'female', 'other'] as const).map(g => (
-            <button
-              key={g}
-              type="button"
-              onClick={() => handleFieldChange('gender', profile.gender === g ? undefined : g)}
-              className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer capitalize ${
-                profile.gender === g
-                  ? 'bg-emerald-800 text-white border-emerald-900 shadow-2xs'
-                  : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
-              }`}
-            >
-              {g}
-            </button>
-          ))}
+          {(['male', 'female', 'other'] as const).map(g => {
+            const isSelected = profile.gender === g;
+            return (
+              <button
+                key={g}
+                type="button"
+                onClick={() => handleFieldChange('gender', isSelected ? undefined : g)}
+                className={`min-h-[46px] py-2.5 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer capitalize flex items-center justify-center gap-1.5 ${
+                  isSelected
+                    ? 'bg-[#E86A33] text-white border-[#E86A33] shadow-xs'
+                    : 'bg-white dark:bg-[#1D1A17] text-stone-700 dark:text-stone-300 border-[#E8DED2] dark:border-[#38312A] hover:bg-[#FAF7F2] dark:hover:bg-[#25211D]'
+                }`}
+              >
+                {isSelected && <CheckIcon size={14} />}
+                <span>{g}</span>
+              </button>
+            );
+          })}
           <button
             type="button"
             onClick={() => handleFieldChange('gender', undefined)}
-            className={`py-2.5 px-3 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
+            className={`min-h-[46px] py-2.5 px-3 rounded-xl text-xs font-medium border transition-all cursor-pointer flex items-center justify-center ${
               profile.gender === undefined
-                ? 'bg-stone-800 text-white border-stone-900 shadow-2xs'
-                : 'bg-white text-stone-500 border-stone-200 hover:bg-stone-50'
+                ? 'bg-stone-800 dark:bg-stone-200 text-white dark:text-stone-900 border-stone-800 shadow-xs font-bold'
+                : 'bg-white dark:bg-[#1D1A17] text-stone-500 dark:text-stone-400 border-[#E8DED2] dark:border-[#38312A] hover:bg-[#FAF7F2] dark:hover:bg-[#25211D]'
             }`}
           >
             Prefer not to say
@@ -321,18 +379,18 @@ export function ProfileForm({
 
       {/* Activity Level */}
       <div className="space-y-2">
-        <label className="block text-xs font-bold uppercase tracking-wider text-stone-700">
-          How active are you?
+        <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+          Daily Physical Activity
         </label>
-        <p className="text-2xs text-stone-500">
-          This helps calculate your estimated baseline calorie requirements.
+        <p className="text-2xs text-stone-500 dark:text-stone-400">
+          Multiplies your Basal Metabolic Rate (BMR) to estimate daily maintenance calories.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
           {[
-            { id: 'sedentary', icon: '🪑', title: 'Sedentary', desc: 'Desk study, lectures, minimal walking' },
-            { id: 'lightly_active', icon: '🚶', title: 'Lightly active', desc: 'Walking between campus blocks, light daily movement' },
-            { id: 'moderately_active', icon: '🏃', title: 'Moderately active', desc: 'Regular sports, gym, or walking 5k+ steps daily' },
-            { id: 'very_active', icon: '⚡', title: 'Very active', desc: 'Daily athletic training, team sports, high physical exertion' },
+            { id: 'sedentary', icon: '🪑', title: 'Sedentary', desc: 'Desk study, lectures, minimal walking (< 3k steps)' },
+            { id: 'lightly_active', icon: '🚶', title: 'Lightly Active', desc: 'Walking between campus blocks, light daily movement (3k–6k steps)' },
+            { id: 'moderately_active', icon: '🏃', title: 'Moderately Active', desc: 'Regular sports, gym, or walking 7k+ steps daily' },
+            { id: 'very_active', icon: '⚡', title: 'Very Active', desc: 'Daily athletic training, team sports, high physical exertion' },
           ].map(opt => {
             const isSelected = (profile.activityLevel || 'moderately_active') === opt.id;
             return (
@@ -340,18 +398,21 @@ export function ProfileForm({
                 key={opt.id}
                 type="button"
                 onClick={() => handleFieldChange('activityLevel', opt.id as UserProfile['activityLevel'])}
-                className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 ${
+                className={`min-h-[68px] p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 ${
                   isSelected
-                    ? 'bg-emerald-50/90 border-emerald-500 text-emerald-950 ring-1 ring-emerald-500'
-                    : 'bg-white border-stone-200 text-stone-700 hover:bg-stone-50'
+                    ? 'bg-[#FEF7EE] dark:bg-[#2A1C14] border-[#E86A33] text-stone-900 dark:text-stone-100 ring-2 ring-[#E86A33]/30 shadow-xs'
+                    : 'bg-white dark:bg-[#1D1A17] border-[#E8DED2] dark:border-[#38312A] text-stone-700 dark:text-stone-300 hover:bg-[#FAF7F2] dark:hover:bg-[#25211D]'
                 }`}
               >
-                <span className="text-2xl">{opt.icon}</span>
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold block text-stone-900">
-                    {opt.title}
-                  </span>
-                  <span className="text-2xs text-stone-500 block leading-tight">
+                <span className="text-2xl shrink-0 mt-0.5">{opt.icon}</span>
+                <div className="space-y-0.5 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-stone-900 dark:text-stone-100">
+                      {opt.title}
+                    </span>
+                    {isSelected && <span className="w-2 h-2 rounded-full bg-[#E86A33]" />}
+                  </div>
+                  <span className="text-2xs text-stone-500 dark:text-stone-400 block leading-tight">
                     {opt.desc}
                   </span>
                 </div>
@@ -363,433 +424,335 @@ export function ProfileForm({
     </div>
   );
 
-  // Body Details (Step 3)
-  const renderBodyDetailsStep = () => (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">
-          Your body details
-        </h2>
-        <p className="text-xs sm:text-sm text-stone-600 mt-1">
-          Used strictly to calibrate your estimated daily energy requirements.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Height */}
-        <div className="space-y-1.5">
-          <label htmlFor="input-height" className="block text-xs font-bold uppercase tracking-wider text-stone-700">
-            Height (cm) <span className="text-rose-500">*</span>
-          </label>
-          <div className="relative flex items-center">
-            <input
-              id="input-height"
-              type="number"
-              min="40"
-              max="260"
-              value={profile.heightCm ?? ''}
-              onChange={e => handleFieldChange('heightCm', e.target.value === '' ? undefined : Number(e.target.value))}
-              placeholder="e.g. 172"
-              className={`w-full rounded-2xl bg-white border text-stone-900 text-sm py-3 px-4 pr-12 transition-all focus:outline-none focus:ring-2 ${
-                errors.heightCm ? 'border-rose-400 focus:ring-rose-200' : 'border-stone-200 focus:border-emerald-700 focus:ring-emerald-100'
-              }`}
-              aria-invalid={Boolean(errors.heightCm)}
-              aria-describedby={errors.heightCm ? 'error-height' : undefined}
-            />
-            <span className="absolute right-4 text-xs font-bold text-stone-400 pointer-events-none">
-              cm
-            </span>
-          </div>
-          {errors.heightCm ? (
-            <p id="error-height" className="text-xs text-rose-600 font-medium pt-0.5">
-              {errors.heightCm}
-            </p>
-          ) : (
-            <p className="text-2xs text-stone-400">Between 40 and 260 cm</p>
-          )}
-        </div>
-
-        {/* Weight */}
-        <div className="space-y-1.5">
-          <label htmlFor="input-weight" className="block text-xs font-bold uppercase tracking-wider text-stone-700">
-            Weight (kg) <span className="text-rose-500">*</span>
-          </label>
-          <div className="relative flex items-center">
-            <input
-              id="input-weight"
-              type="number"
-              min="10"
-              max="350"
-              value={profile.weightKg ?? ''}
-              onChange={e => handleFieldChange('weightKg', e.target.value === '' ? undefined : Number(e.target.value))}
-              placeholder="e.g. 65"
-              className={`w-full rounded-2xl bg-white border text-stone-900 text-sm py-3 px-4 pr-12 transition-all focus:outline-none focus:ring-2 ${
-                errors.weightKg ? 'border-rose-400 focus:ring-rose-200' : 'border-stone-200 focus:border-emerald-700 focus:ring-emerald-100'
-              }`}
-              aria-invalid={Boolean(errors.weightKg)}
-              aria-describedby={errors.weightKg ? 'error-weight' : undefined}
-            />
-            <span className="absolute right-4 text-xs font-bold text-stone-400 pointer-events-none">
-              kg
-            </span>
-          </div>
-          {errors.weightKg ? (
-            <p id="error-weight" className="text-xs text-rose-600 font-medium pt-0.5">
-              {errors.weightKg}
-            </p>
-          ) : (
-            <p className="text-2xs text-stone-400">Between 10 and 350 kg</p>
-          )}
-        </div>
-      </div>
-
-      <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200/80 text-xs text-stone-600 flex items-start gap-2.5">
-        <InfoIcon size={16} className="text-stone-500 shrink-0 mt-0.5" />
-        <p className="leading-relaxed text-2xs">
-          <strong>Privacy note:</strong> We use height and weight strictly in mathematical formulas (Mifflin-St Jeor / ICMR standard) to calculate your estimated daily energy needs. We never share or sell this data.
-        </p>
-      </div>
-    </div>
-  );
-
-  // Lifestyle & Budget (Step 4)
-  const renderLifestyleStep = () => (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">
-          Your lifestyle
-        </h2>
-        <p className="text-xs sm:text-sm text-stone-600 mt-1">
-          Tailor suggestions to your campus realities and cooking access.
-        </p>
-      </div>
-
-      {/* Hostel Question */}
-      <div className="space-y-2">
-        <label className="block text-xs font-bold uppercase tracking-wider text-stone-700">
-          Are you a hostelite?
-        </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <button
-            type="button"
-            onClick={() => handleFieldChange('isHostelite', true)}
-            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between ${
-              profile.isHostelite
-                ? 'bg-emerald-800 text-white border-emerald-900 shadow-2xs'
-                : 'bg-white text-stone-800 border-stone-200 hover:bg-stone-50'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">🏠</span>
-              <div>
-                <span className="text-sm font-bold block">Yes, I&apos;m a hostelite</span>
-                <span className={`text-2xs block ${profile.isHostelite ? 'text-emerald-200' : 'text-stone-500'}`}>
-                  Canteens, mess & no personal kitchen
-                </span>
-              </div>
-            </div>
-            {profile.isHostelite && <CheckIcon size={18} className="text-white shrink-0" />}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleFieldChange('isHostelite', false)}
-            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between ${
-              !profile.isHostelite
-                ? 'bg-emerald-800 text-white border-emerald-900 shadow-2xs'
-                : 'bg-white text-stone-800 border-stone-200 hover:bg-stone-50'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">🏡</span>
-              <div>
-                <span className="text-sm font-bold block">No, I live at home</span>
-                <span className={`text-2xs block ${!profile.isHostelite ? 'text-emerald-200' : 'text-stone-500'}`}>
-                  Kitchen access and home-cooked meals
-                </span>
-              </div>
-            </div>
-            {!profile.isHostelite && <CheckIcon size={18} className="text-white shrink-0" />}
-          </button>
-        </div>
-
-        {/* Dynamic callout for hostelite */}
-        {profile.isHostelite && (
-          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs font-semibold flex items-center gap-2 animate-in fade-in duration-200">
-            <span>✨</span>
-            <span>Got it. We&apos;ll prioritize practical campus-friendly foods (sprouts, eggs, curd, bananas).</span>
-          </div>
-        )}
-      </div>
-
-      {/* Food Budget */}
-      <div className="space-y-2 pt-2 border-t border-stone-100">
-        <label className="block text-xs font-bold uppercase tracking-wider text-stone-700">
-          What&apos;s your usual food budget?
-        </label>
-        <p className="text-2xs text-stone-500">
-          This is only a preference to prioritize affordable food additions, not an income check.
-        </p>
-        <div className="grid grid-cols-3 gap-2 pt-1">
-          {[
-            { id: 'budget', icon: '💰', title: 'Budget', desc: '₹10–₹25 staples' },
-            { id: 'moderate', icon: '⚖️', title: 'Moderate', desc: 'Balanced campus' },
-            { id: 'flexible', icon: '✨', title: 'Flexible', desc: 'Any healthy item' },
-          ].map(opt => {
-            const isSelected = (profile.budgetPreference || 'budget') === opt.id;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => handleFieldChange('budgetPreference', opt.id as UserProfile['budgetPreference'])}
-                className={`p-3 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center space-y-1 ${
-                  isSelected
-                    ? 'bg-emerald-50 border-emerald-500 text-emerald-950 ring-1 ring-emerald-500 font-bold'
-                    : 'bg-white border-stone-200 text-stone-700 hover:bg-stone-50'
-                }`}
-              >
-                <span className="text-2xl">{opt.icon}</span>
-                <span className="text-xs font-bold block">{opt.title}</span>
-                <span className="text-3xs text-stone-500 block">{opt.desc}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-
-  // Health Information (Step 5)
-  const renderHealthStep = () => (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">
-          Anything we should be careful about?
-        </h2>
-        <p className="text-xs sm:text-sm text-stone-600 mt-1">
-          Helps us provide more cautious nutritional guidance.
-        </p>
-      </div>
-
-      <div className="space-y-2">
-        {[
-          { id: 'None', title: 'No specific condition', desc: 'Standard student nutrition guidance' },
-          { id: 'Diabetes / Pre-diabetes', title: 'Diabetes', desc: 'Cautious carb-heavy flagging and glycemic awareness' },
-          { id: 'High blood pressure', title: 'Hypertension', desc: 'Cautious sodium & deep-fried snack awareness' },
-          { id: 'Other', title: 'Other', desc: 'Specify an allergy or personal digestive consideration' },
-        ].map(opt => {
-          let isSelected = false;
-          if (opt.id === 'None') isSelected = isNone;
-          else if (opt.id === 'Diabetes / Pre-diabetes') isSelected = isDiabetes;
-          else if (opt.id === 'High blood pressure') isSelected = isHypertension;
-          else if (opt.id === 'Other') isSelected = isOther;
-
-          return (
-            <div key={opt.id} className="space-y-2">
-              <button
-                type="button"
-                onClick={() => handleHealthConditionSelect(opt.id)}
-                className={`w-full p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between ${
-                  isSelected
-                    ? 'bg-emerald-800 text-white border-emerald-900 shadow-2xs font-bold'
-                    : 'bg-white text-stone-800 border-stone-200 hover:bg-stone-50'
-                }`}
-              >
-                <div>
-                  <span className="text-xs font-bold block">{opt.title}</span>
-                  <span className={`text-2xs block ${isSelected ? 'text-emerald-200' : 'text-stone-500'}`}>
-                    {opt.desc}
-                  </span>
-                </div>
-                {isSelected && <CheckIcon size={18} className="text-white shrink-0" />}
-              </button>
-
-              {/* Optional text input for Other */}
-              {opt.id === 'Other' && isSelected && (
-                <div className="pl-4 pr-1 animate-in fade-in duration-200">
-                  <input
-                    type="text"
-                    value={otherConditionText}
-                    onChange={e => {
-                      setOtherConditionText(e.target.value);
-                      handleFieldChange('healthCondition', e.target.value || 'Other');
-                      handleFieldChange('healthConditions', [e.target.value || 'Other']);
-                    }}
-                    placeholder="e.g. Lactose sensitivity, Gluten sensitivity..."
-                    className="w-full px-3.5 py-2.5 bg-white border border-stone-300 rounded-xl text-xs text-stone-900 focus:outline-none focus:border-emerald-700"
-                  />
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Safety & Non-Diagnostic Disclaimer */}
-      <div className="p-3.5 rounded-2xl bg-blue-50/80 border border-blue-200 text-blue-950 text-xs flex items-start gap-2.5">
-        <ShieldCheckIcon size={16} className="text-blue-700 shrink-0 mt-0.5" />
-        <p className="leading-relaxed text-2xs">
-          <strong>Important Health Note:</strong> Your health information is used only to make nutrition guidance more cautious. Track-a-Bite does not diagnose, treat, or manage medical conditions. Consider discussing dietary changes with a qualified healthcare professional.
-        </p>
-      </div>
-    </div>
-  );
-
-  // Review & Confirmation (Step 6)
-  const renderReviewStep = () => {
-    const activityLabels: Record<string, string> = {
-      sedentary: 'Sedentary',
-      lightly_active: 'Lightly active',
-      moderately_active: 'Moderately active',
-      very_active: 'Very active',
-    };
+  // ---------------------------------------------------------------------------
+  // 2. BODY INFORMATION SECTION
+  // ---------------------------------------------------------------------------
+  const renderBodyInfoSection = () => {
+    // Dynamic BMI calculation if both values provided
+    let calculatedBmi: string | null = null;
+    let bmiLabel: string | null = null;
+    if (profile.heightCm && profile.weightKg && profile.heightCm > 0) {
+      const heightM = profile.heightCm / 100;
+      const bmiVal = profile.weightKg / (heightM * heightM);
+      if (bmiVal >= 10 && bmiVal <= 60) {
+        calculatedBmi = bmiVal.toFixed(1);
+        if (bmiVal < 18.5) bmiLabel = 'Lower baseline weight';
+        else if (bmiVal < 25) bmiLabel = 'Healthy reference range';
+        else if (bmiVal < 30) bmiLabel = 'Higher baseline weight';
+        else bmiLabel = 'Substantial reserve';
+      }
+    }
 
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">
-            Review your profile
+        <div className="border-b border-[#E8DED2] dark:border-[#38312A] pb-4">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-2xs font-extrabold uppercase tracking-wider text-[#E86A33] px-2.5 py-0.5 rounded-full bg-[#FEF7EE] dark:bg-[#2A1C14] border border-[#E86A33]/20">
+              Section 2
+            </span>
+            <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">Anthropometric Data</span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-100 tracking-tight">
+            Body Information
           </h2>
-          <p className="text-xs sm:text-sm text-stone-600 mt-1">
-            Ensure your details are accurate before finishing setup.
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 mt-1">
+            Height and weight are strictly used to compute baseline caloric and macronutrient reference ranges.
           </p>
         </div>
 
-        <Card className="border-stone-200 shadow-2xs overflow-hidden">
-          <div className="p-4 sm:p-5 bg-gradient-to-r from-emerald-900 to-stone-900 text-white flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-emerald-300">
-              YOUR PROFILE
-            </span>
-            <span className="text-3xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30">
-              {profile.isHostelite ? 'Hostel Mode Active' : 'Home Access'}
-            </span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Height */}
+          <div className="space-y-1.5">
+            <label htmlFor="input-height" className="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+              Height (cm) <span className="text-rose-500">*</span>
+            </label>
+            <div className="relative flex items-center">
+              <input
+                id="input-height"
+                type="number"
+                min="40"
+                max="260"
+                value={profile.heightCm ?? ''}
+                onChange={e => handleFieldChange('heightCm', e.target.value === '' ? undefined : Number(e.target.value))}
+                placeholder="e.g. 172"
+                className={`w-full min-h-[46px] rounded-xl bg-white dark:bg-[#1D1A17] border text-stone-900 dark:text-stone-100 text-sm py-3 px-4 pr-12 transition-all focus:outline-none focus:ring-2 ${
+                  errors.heightCm
+                    ? 'border-rose-400 focus:ring-rose-200'
+                    : 'border-[#E8DED2] dark:border-[#38312A] focus:border-[#E86A33] focus:ring-[#E86A33]/20'
+                }`}
+                aria-invalid={Boolean(errors.heightCm)}
+                aria-describedby={errors.heightCm ? 'error-height' : undefined}
+              />
+              <span className="absolute right-4 text-xs font-bold text-stone-400 pointer-events-none">
+                cm
+              </span>
+            </div>
+            {errors.heightCm ? (
+              <p id="error-height" className="text-xs text-rose-600 font-medium pt-0.5">
+                {errors.heightCm}
+              </p>
+            ) : (
+              <p className="text-2xs text-stone-400">Between 40 and 260 cm</p>
+            )}
           </div>
 
-          <CardContent className="p-4 sm:p-6 divide-y divide-stone-100 text-xs">
-            <div className="py-2.5 flex items-center justify-between">
-              <span className="text-stone-500 font-medium">Age</span>
-              <span className="font-bold text-stone-900">{profile.age} years</span>
-            </div>
-
-            <div className="py-2.5 flex items-center justify-between">
-              <span className="text-stone-500 font-medium">Height</span>
-              <span className="font-bold text-stone-900">{profile.heightCm} cm</span>
-            </div>
-
-            <div className="py-2.5 flex items-center justify-between">
-              <span className="text-stone-500 font-medium">Weight</span>
-              <span className="font-bold text-stone-900">{profile.weightKg} kg</span>
-            </div>
-
-            <div className="py-2.5 flex items-center justify-between">
-              <span className="text-stone-500 font-medium">Activity level</span>
-              <span className="font-bold text-stone-900">
-                {activityLabels[profile.activityLevel || 'moderately_active'] || 'Moderately active'}
+          {/* Weight */}
+          <div className="space-y-1.5">
+            <label htmlFor="input-weight" className="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+              Weight (kg) <span className="text-rose-500">*</span>
+            </label>
+            <div className="relative flex items-center">
+              <input
+                id="input-weight"
+                type="number"
+                min="10"
+                max="350"
+                value={profile.weightKg ?? ''}
+                onChange={e => handleFieldChange('weightKg', e.target.value === '' ? undefined : Number(e.target.value))}
+                placeholder="e.g. 68"
+                className={`w-full min-h-[46px] rounded-xl bg-white dark:bg-[#1D1A17] border text-stone-900 dark:text-stone-100 text-sm py-3 px-4 pr-12 transition-all focus:outline-none focus:ring-2 ${
+                  errors.weightKg
+                    ? 'border-rose-400 focus:ring-rose-200'
+                    : 'border-[#E8DED2] dark:border-[#38312A] focus:border-[#E86A33] focus:ring-[#E86A33]/20'
+                }`}
+                aria-invalid={Boolean(errors.weightKg)}
+                aria-describedby={errors.weightKg ? 'error-weight' : undefined}
+              />
+              <span className="absolute right-4 text-xs font-bold text-stone-400 pointer-events-none">
+                kg
               </span>
             </div>
+            {errors.weightKg ? (
+              <p id="error-weight" className="text-xs text-rose-600 font-medium pt-0.5">
+                {errors.weightKg}
+              </p>
+            ) : (
+              <p className="text-2xs text-stone-400">Between 10 and 350 kg</p>
+            )}
+          </div>
+        </div>
 
-            <div className="py-2.5 flex items-center justify-between">
-              <span className="text-stone-500 font-medium">Hostelite</span>
-              <span className="font-bold text-stone-900">
-                {profile.isHostelite ? 'Yes (Campus Staples)' : 'No (Kitchen Access)'}
-              </span>
-            </div>
-
-            <div className="py-2.5 flex items-center justify-between">
-              <span className="text-stone-500 font-medium">Food budget</span>
-              <span className="font-bold text-stone-900 capitalize">
-                {profile.budgetPreference || 'Budget'}
-              </span>
-            </div>
-
-            <div className="py-2.5 flex items-center justify-between">
-              <span className="text-stone-500 font-medium">Health information</span>
-              <span className="font-bold text-stone-900">
-                {profile.healthCondition ? `You indicated: ${profile.healthCondition}` : 'No specific condition'}
-              </span>
-            </div>
-
-            {profile.healthGoal && (
-              <div className="py-2.5 flex items-center justify-between">
-                <span className="text-stone-500 font-medium">Health goal</span>
-                <span className="font-bold text-stone-900 capitalize">
-                  {profile.healthGoal.replace('_', ' ')}
+        {/* Dynamic Anthropometric Baseline Card */}
+        {calculatedBmi && (
+          <div className="p-4 rounded-2xl bg-[#FEF7EE] dark:bg-[#2A1C14] border border-[#E8DED2] dark:border-[#38312A] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs animate-in fade-in duration-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] flex items-center justify-center text-lg font-black text-[#E86A33]">
+                ⚖️
+              </div>
+              <div>
+                <span className="font-bold text-stone-900 dark:text-stone-100 block">
+                  Calculated BMI: {calculatedBmi}
+                </span>
+                <span className="text-2xs text-stone-500 dark:text-stone-400 block">
+                  {bmiLabel} (General educational indicator)
                 </span>
               </div>
-            )}
+            </div>
+            <span className="text-3xs text-stone-400 dark:text-stone-500 max-w-xs">
+              Mifflin-St Jeor formula calibrates your daily baseline energy against this metric.
+            </span>
+          </div>
+        )}
 
-            {profile.targetCalories && (
-              <div className="py-2.5 flex items-center justify-between">
-                <span className="text-stone-500 font-medium">Daily targets</span>
-                <span className="font-bold text-stone-900">
-                  {profile.targetCalories} kcal (P: {profile.targetProteinG ?? '--'}g, C: {profile.targetCarbsG ?? '--'}g, F: {profile.targetFatG ?? '--'}g)
-                </span>
-              </div>
-            )}
-
-            {profile.dietaryRestrictions && (
-              <div className="py-2.5 flex items-center justify-between">
-                <span className="text-stone-500 font-medium">Dietary preference</span>
-                <span className="font-bold text-stone-900 capitalize">
-                  {profile.dietaryRestrictions.replace('_', ' ')}
-                </span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <p className="text-3xs text-center text-stone-400">
-          You can update these details anytime from your Profile page.
-        </p>
+        <div className="p-3.5 rounded-2xl bg-[#FAF7F2] dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] text-xs text-stone-600 dark:text-stone-400 flex items-start gap-2.5">
+          <InfoIcon size={16} className="text-stone-500 shrink-0 mt-0.5" />
+          <p className="leading-relaxed text-2xs">
+            <strong>Privacy Guarantee:</strong> Height and weight are processed mathematically on your device and never sold or shared. This application provides educational nutrition planning estimates and does not provide clinical diagnosis.
+          </p>
+        </div>
       </div>
     );
   };
 
-  // Celebration Success State (Step 7)
-  const renderCelebrationStep = () => (
-    <div className="space-y-6 text-center py-6 sm:py-10 animate-in fade-in duration-300">
-      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto text-3xl sm:text-4xl shadow-inner">
-        🎉
-      </div>
+  // ---------------------------------------------------------------------------
+  // 3. HEALTH CONDITIONS SECTION (MULTI-SELECT SUPPORT)
+  // ---------------------------------------------------------------------------
+  const renderHealthConditionsSection = () => {
+    const selectedActiveCount = currentConditions.filter(c => c !== 'None').length;
 
-      <div className="space-y-2 max-w-sm mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
-          You&apos;re all set!
-        </h2>
-        <p className="text-sm text-stone-600 font-normal">
-          Your nutrition insights and 5-star richness scoring are now personalized to your campus lifestyle.
-        </p>
-      </div>
+    return (
+      <div className="space-y-6">
+        <div className="border-b border-[#E8DED2] dark:border-[#38312A] pb-4">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-2xs font-extrabold uppercase tracking-wider text-[#E86A33] px-2.5 py-0.5 rounded-full bg-[#FEF7EE] dark:bg-[#2A1C14] border border-[#E86A33]/20">
+              Section 3
+            </span>
+            <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">Dietary Context</span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-100 tracking-tight">
+            Health Conditions &amp; Sensitivities
+          </h2>
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 mt-1">
+            Select any conditions that apply. You can select multiple conditions. These act strictly as dietary-context information for personalizing alerts and recommendations.
+          </p>
+        </div>
 
-      <div className="pt-4 max-w-xs mx-auto space-y-2">
-        <Button
-          fullWidth
-          size="lg"
-          onClick={() => {
-            if (onComplete) {
-              onComplete(profile);
-            } else {
-              router.push('/dashboard');
-            }
-          }}
-          rightIcon={<ArrowRightIcon size={18} />}
-          className="font-bold py-3.5 text-base"
-        >
-          Go to My Dashboard
-        </Button>
-        <button
-          type="button"
-          onClick={() => router.push('/scan')}
-          className="w-full text-xs font-semibold text-stone-500 hover:text-stone-800 py-1.5 transition-colors cursor-pointer"
-        >
-          Or jump straight to food scanner →
-        </button>
-      </div>
-    </div>
-  );
+        {/* Selected Conditions Active Chips Bar */}
+        {selectedActiveCount > 0 && (
+          <div className="p-3.5 rounded-2xl bg-[#FEF7EE] dark:bg-[#2A1C14] border border-[#E8DED2] dark:border-[#38312A] space-y-2">
+            <div className="flex items-center justify-between text-2xs">
+              <span className="font-bold text-[#E86A33] uppercase tracking-wider">
+                Active Dietary Context ({selectedActiveCount})
+              </span>
+              <button
+                type="button"
+                onClick={() => toggleCondition('None')}
+                className="text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 underline cursor-pointer"
+              >
+                Clear all to None
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {currentConditions
+                .filter(c => c !== 'None')
+                .map(cond => (
+                  <span
+                    key={cond}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#1D1A17] border border-[#E86A33]/40 text-stone-900 dark:text-stone-100 text-xs font-semibold shadow-2xs"
+                  >
+                    <span>{cond}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeCondition(cond)}
+                      className="w-4 h-4 rounded-full hover:bg-stone-200 dark:hover:bg-stone-800 flex items-center justify-center text-stone-500 hover:text-rose-600 transition-colors cursor-pointer"
+                      aria-label={`Remove ${cond}`}
+                    >
+                      <XIcon size={12} />
+                    </button>
+                  </span>
+                ))}
+            </div>
+          </div>
+        )}
 
-  // Nutrition Goals & Macro Tuning (Phase 8.6)
-  const renderNutritionGoalsSection = () => {
+        {/* Multi-Condition Grid */}
+        <div className="space-y-2.5">
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+            Select All That Apply
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="group" aria-label="Health Conditions Multi-Select">
+            {HEALTH_CONDITIONS_LIST.map(opt => {
+              const isSelected = currentConditions.some(
+                c => c.toLowerCase() === opt.id.toLowerCase()
+              );
+
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  role="checkbox"
+                  aria-checked={isSelected}
+                  tabIndex={0}
+                  onClick={() => toggleCondition(opt.id)}
+                  onKeyDown={e => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                      e.preventDefault();
+                      toggleCondition(opt.id);
+                    }
+                  }}
+                  className={`min-h-[58px] p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E86A33] ${
+                    isSelected
+                      ? opt.id === 'None'
+                        ? 'bg-stone-100 dark:bg-stone-800 border-stone-400 dark:border-stone-600 text-stone-900 dark:text-stone-100 font-bold shadow-xs'
+                        : 'bg-[#FEF7EE] dark:bg-[#2A1C14] border-[#E86A33] text-stone-900 dark:text-stone-100 ring-2 ring-[#E86A33]/30 font-bold shadow-xs'
+                      : 'bg-white dark:bg-[#1D1A17] text-stone-700 dark:text-stone-300 border-[#E8DED2] dark:border-[#38312A] hover:bg-[#FAF7F2] dark:hover:bg-[#25211D]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* Visual Checkbox Indicator */}
+                    <div
+                      className={`w-5 h-5 rounded-lg border flex items-center justify-center shrink-0 transition-colors ${
+                        isSelected
+                          ? 'bg-[#E86A33] border-[#E86A33] text-white shadow-2xs'
+                          : 'border-stone-300 dark:border-stone-600 bg-stone-50 dark:bg-[#25211D]'
+                      }`}
+                    >
+                      {isSelected && <CheckIcon size={13} className="stroke-[3]" />}
+                    </div>
+                    <div className="min-w-0 space-y-0.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm shrink-0">{opt.icon}</span>
+                        <span className="text-xs font-bold text-stone-900 dark:text-stone-100 truncate">
+                          {opt.label}
+                        </span>
+                      </div>
+                      <span className="text-3xs text-stone-500 dark:text-stone-400 block truncate">
+                        {opt.desc}
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* "Other" Condition Custom Input */}
+        <div className="space-y-3 pt-2 border-t border-[#E8DED2] dark:border-[#38312A]">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+              Have another condition or dietary sensitivity?
+            </label>
+            {!showOtherInput && (
+              <button
+                type="button"
+                onClick={() => setShowOtherInput(true)}
+                className="text-xs font-semibold text-[#E86A33] dark:text-[#F4A340] hover:underline cursor-pointer"
+              >
+                + Add Custom Condition
+              </button>
+            )}
+          </div>
+
+          {showOtherInput && (
+            <div className="p-3.5 rounded-2xl bg-white dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] space-y-3 animate-in fade-in duration-200">
+              <p className="text-2xs text-stone-500 dark:text-stone-400">
+                Specify any custom dietary requirement (e.g. Celiac / Gluten Sensitivity, Gout, PCOS, Migraine Trigger).
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={otherInputText}
+                  onChange={e => setOtherInputText(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addCustomCondition();
+                    }
+                  }}
+                  placeholder="e.g. Celiac, Gout, PCOS..."
+                  className="flex-1 min-h-[44px] px-3.5 py-2 bg-[#FAF7F2] dark:bg-[#151311] border border-[#E8DED2] dark:border-[#38312A] rounded-xl text-xs text-stone-900 dark:text-stone-100 focus:outline-none focus:border-[#E86A33]"
+                />
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="sm"
+                  onClick={addCustomCondition}
+                  disabled={!otherInputText.trim()}
+                  className="min-h-[44px] px-4 font-bold"
+                >
+                  Add
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Ethical Non-Diagnostic Medical Notice */}
+        <div className="p-3.5 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/50 text-amber-950 dark:text-amber-200 text-xs flex items-start gap-2.5 leading-relaxed">
+          <ShieldCheckIcon size={18} className="text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-2xs">
+            <strong>Dietary Context Notice:</strong> Selected conditions serve only as heuristic dietary context to assist with food personalization. Track-a-Bite does not diagnose, treat, prevent, or medically manage clinical diseases. Consult a certified medical doctor or clinical nutritionist for medical therapy.
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  // ---------------------------------------------------------------------------
+  // 4. NUTRITION PREFERENCES SECTION
+  // ---------------------------------------------------------------------------
+  const renderNutritionPreferencesSection = () => {
     const curCal = profile.targetCalories ?? 0;
     const curProt = profile.targetProteinG ?? 0;
     const curCarbs = profile.targetCarbsG ?? 0;
@@ -843,37 +806,35 @@ export function ProfileForm({
     };
 
     const healthGoalOptions = [
-      { id: 'general_health', title: 'General Health', icon: '🥗', desc: 'Balanced everyday energy & vitality' },
-      { id: 'fat_loss', title: 'Weight Loss', icon: '🏃', desc: 'Caloric deficit with high-protein satiety' },
+      { id: 'general_health', title: 'General Vitality', icon: '🥗', desc: 'Balanced everyday energy & micronutrient adequacy' },
+      { id: 'fat_loss', title: 'Fat Loss', icon: '🏃', desc: 'Caloric deficit with high-protein satiety' },
       { id: 'maintenance', title: 'Maintenance', icon: '⚖️', desc: 'Caloric equilibrium & bodyweight stability' },
-      { id: 'muscle_gain', title: 'Muscle Gain', icon: '💪', desc: 'Caloric surplus with targeted protein' },
+      { id: 'muscle_gain', title: 'Muscle Gain', icon: '💪', desc: 'Caloric surplus with targeted muscle protein synthesis' },
     ] as const;
 
     return (
       <div className="space-y-6">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-2xs font-extrabold uppercase tracking-widest text-emerald-800 px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-200">
-              Personalized Targets
+        <div className="border-b border-[#E8DED2] dark:border-[#38312A] pb-4">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-2xs font-extrabold uppercase tracking-wider text-[#E86A33] px-2.5 py-0.5 rounded-full bg-[#FEF7EE] dark:bg-[#2A1C14] border border-[#E86A33]/20">
+              Section 4
             </span>
-            <span className="text-2xs font-bold text-stone-500">
-              {isCustomActive ? 'Custom Targets Active' : 'Recommended Targets Active'}
-            </span>
+            <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">Macronutrient Tuning</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">
-            Nutrition Goals & Macro Tuning
+          <h2 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-100 tracking-tight">
+            Nutrition Preferences
           </h2>
-          <p className="text-xs sm:text-sm text-stone-600 mt-1">
-            Set your target daily calories and macronutrient proportions. Changes immediately update your dashboard, recommendations, and reports.
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 mt-1">
+            Configure your overall health goals, daily caloric target, and macronutrient proportions.
           </p>
         </div>
 
         {/* Goal Selector */}
         <div className="space-y-2">
-          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700">
-            Health & Body Goal
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+            Primary Health Goal
           </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {healthGoalOptions.map(opt => {
               const isSelected = (profile.healthGoal || 'general_health') === opt.id;
               return (
@@ -895,17 +856,17 @@ export function ProfileForm({
                       }));
                     }
                   }}
-                  className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+                  className={`min-h-[64px] p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${
                     isSelected
-                      ? 'bg-emerald-800 text-white border-emerald-900 shadow-2xs font-bold'
-                      : 'bg-white text-stone-800 border-stone-200 hover:bg-stone-50'
+                      ? 'bg-[#E86A33] text-white border-[#E86A33] shadow-xs font-bold'
+                      : 'bg-white dark:bg-[#1D1A17] text-stone-800 dark:text-stone-200 border-[#E8DED2] dark:border-[#38312A] hover:bg-[#FAF7F2] dark:hover:bg-[#25211D]'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{opt.icon}</span>
-                    <div>
-                      <span className="text-xs font-bold block">{opt.title}</span>
-                      <span className={`text-2xs block ${isSelected ? 'text-emerald-200' : 'text-stone-500'}`}>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-2xl shrink-0">{opt.icon}</span>
+                    <div className="min-w-0">
+                      <span className="text-xs font-bold block truncate">{opt.title}</span>
+                      <span className={`text-3xs block leading-tight truncate ${isSelected ? 'text-white/80' : 'text-stone-500 dark:text-stone-400'}`}>
                         {opt.desc}
                       </span>
                     </div>
@@ -917,27 +878,27 @@ export function ProfileForm({
           </div>
         </div>
 
-        {/* Auto-Calculate vs Custom Targets Action Toggle (Section 7) */}
-        <div className="p-1 rounded-2xl bg-stone-100 border border-stone-200/80 flex gap-1">
+        {/* Auto vs Custom Toggle */}
+        <div className="p-1 rounded-2xl bg-stone-100 dark:bg-[#151311] border border-[#E8DED2] dark:border-[#38312A] flex gap-1">
           <button
             type="button"
             onClick={handleUseRecommendedTargets}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`min-h-[44px] flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
               !isCustomActive
-                ? 'bg-white text-emerald-900 shadow-xs border border-stone-200/60'
-                : 'text-stone-600 hover:text-stone-900'
+                ? 'bg-white dark:bg-[#25211D] text-[#E86A33] dark:text-[#F4A340] shadow-xs border border-stone-200/60 dark:border-[#38312A]'
+                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
             }`}
           >
             <span>⚡</span>
-            <span>Use Recommended Targets</span>
+            <span>Recommended Targets</span>
           </button>
           <button
             type="button"
             onClick={handleEnableCustomTargets}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`min-h-[44px] flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
               isCustomActive
-                ? 'bg-white text-emerald-900 shadow-xs border border-stone-200/60'
-                : 'text-stone-600 hover:text-stone-900'
+                ? 'bg-white dark:bg-[#25211D] text-[#E86A33] dark:text-[#F4A340] shadow-xs border border-stone-200/60 dark:border-[#38312A]'
+                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
             }`}
           >
             <span>✏️</span>
@@ -950,7 +911,7 @@ export function ProfileForm({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {/* Calories */}
             <div className="space-y-1.5">
-              <label htmlFor="input-target-calories" className="block text-2xs font-bold uppercase tracking-wider text-stone-700">
+              <label htmlFor="input-target-calories" className="block text-2xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
                 Daily Calories (kcal)
               </label>
               <div className="relative flex items-center">
@@ -965,9 +926,11 @@ export function ProfileForm({
                     setProfile(prev => ({ ...prev, targetCalories: val, customTargetsActive: true }));
                     setIsSuccessSaved(false);
                   }}
-                  placeholder="e.g. 2000"
-                  className={`w-full rounded-xl bg-white border text-stone-900 text-sm py-2.5 px-3 pr-12 transition-all focus:outline-none focus:ring-2 ${
-                    errors.targetCalories ? 'border-rose-400 focus:ring-rose-200' : 'border-stone-200 focus:border-emerald-700 focus:ring-emerald-100'
+                  placeholder="e.g. 2100"
+                  className={`w-full min-h-[44px] rounded-xl bg-white dark:bg-[#1D1A17] border text-stone-900 dark:text-stone-100 text-sm py-2.5 px-3 pr-12 transition-all focus:outline-none focus:ring-2 ${
+                    errors.targetCalories
+                      ? 'border-rose-400 focus:ring-rose-200'
+                      : 'border-[#E8DED2] dark:border-[#38312A] focus:border-[#E86A33] focus:ring-[#E86A33]/20'
                   }`}
                 />
                 <span className="absolute right-3 text-2xs font-bold text-stone-400 pointer-events-none">
@@ -981,7 +944,7 @@ export function ProfileForm({
 
             {/* Protein */}
             <div className="space-y-1.5">
-              <label htmlFor="input-target-protein" className="block text-2xs font-bold uppercase tracking-wider text-emerald-800">
+              <label htmlFor="input-target-protein" className="block text-2xs font-bold uppercase tracking-wider text-[#E86A33]">
                 Protein Target (g)
               </label>
               <div className="relative flex items-center">
@@ -996,12 +959,14 @@ export function ProfileForm({
                     setProfile(prev => ({ ...prev, targetProteinG: val, customTargetsActive: true }));
                     setIsSuccessSaved(false);
                   }}
-                  placeholder="e.g. 80"
-                  className={`w-full rounded-xl bg-white border text-stone-900 text-sm py-2.5 px-3 pr-10 transition-all focus:outline-none focus:ring-2 ${
-                    errors.targetProteinG ? 'border-rose-400 focus:ring-rose-200' : 'border-emerald-200 focus:border-emerald-700 focus:ring-emerald-100'
+                  placeholder="e.g. 75"
+                  className={`w-full min-h-[44px] rounded-xl bg-white dark:bg-[#1D1A17] border text-stone-900 dark:text-stone-100 text-sm py-2.5 px-3 pr-10 transition-all focus:outline-none focus:ring-2 ${
+                    errors.targetProteinG
+                      ? 'border-rose-400 focus:ring-rose-200'
+                      : 'border-[#E8DED2] dark:border-[#38312A] focus:border-[#E86A33] focus:ring-[#E86A33]/20'
                   }`}
                 />
-                <span className="absolute right-3 text-2xs font-bold text-emerald-700 pointer-events-none">
+                <span className="absolute right-3 text-2xs font-bold text-[#E86A33] pointer-events-none">
                   g
                 </span>
               </div>
@@ -1012,7 +977,7 @@ export function ProfileForm({
 
             {/* Carbs */}
             <div className="space-y-1.5">
-              <label htmlFor="input-target-carbs" className="block text-2xs font-bold uppercase tracking-wider text-amber-800">
+              <label htmlFor="input-target-carbs" className="block text-2xs font-bold uppercase tracking-wider text-[#F4A340]">
                 Carbohydrates (g)
               </label>
               <div className="relative flex items-center">
@@ -1027,12 +992,14 @@ export function ProfileForm({
                     setProfile(prev => ({ ...prev, targetCarbsG: val, customTargetsActive: true }));
                     setIsSuccessSaved(false);
                   }}
-                  placeholder="e.g. 250"
-                  className={`w-full rounded-xl bg-white border text-stone-900 text-sm py-2.5 px-3 pr-10 transition-all focus:outline-none focus:ring-2 ${
-                    errors.targetCarbsG ? 'border-rose-400 focus:ring-rose-200' : 'border-amber-200 focus:border-amber-700 focus:ring-amber-100'
+                  placeholder="e.g. 260"
+                  className={`w-full min-h-[44px] rounded-xl bg-white dark:bg-[#1D1A17] border text-stone-900 dark:text-stone-100 text-sm py-2.5 px-3 pr-10 transition-all focus:outline-none focus:ring-2 ${
+                    errors.targetCarbsG
+                      ? 'border-rose-400 focus:ring-rose-200'
+                      : 'border-[#E8DED2] dark:border-[#38312A] focus:border-[#F4A340] focus:ring-[#F4A340]/20'
                   }`}
                 />
-                <span className="absolute right-3 text-2xs font-bold text-amber-700 pointer-events-none">
+                <span className="absolute right-3 text-2xs font-bold text-[#F4A340] pointer-events-none">
                   g
                 </span>
               </div>
@@ -1043,7 +1010,7 @@ export function ProfileForm({
 
             {/* Fat */}
             <div className="space-y-1.5">
-              <label htmlFor="input-target-fat" className="block text-2xs font-bold uppercase tracking-wider text-teal-800">
+              <label htmlFor="input-target-fat" className="block text-2xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
                 Fat Target (g)
               </label>
               <div className="relative flex items-center">
@@ -1059,11 +1026,13 @@ export function ProfileForm({
                     setIsSuccessSaved(false);
                   }}
                   placeholder="e.g. 55"
-                  className={`w-full rounded-xl bg-white border text-stone-900 text-sm py-2.5 px-3 pr-10 transition-all focus:outline-none focus:ring-2 ${
-                    errors.targetFatG ? 'border-rose-400 focus:ring-rose-200' : 'border-teal-200 focus:border-teal-700 focus:ring-teal-100'
+                  className={`w-full min-h-[44px] rounded-xl bg-white dark:bg-[#1D1A17] border text-stone-900 dark:text-stone-100 text-sm py-2.5 px-3 pr-10 transition-all focus:outline-none focus:ring-2 ${
+                    errors.targetFatG
+                      ? 'border-rose-400 focus:ring-rose-200'
+                      : 'border-[#E8DED2] dark:border-[#38312A] focus:border-amber-600 focus:ring-amber-500/20'
                   }`}
                 />
-                <span className="absolute right-3 text-2xs font-bold text-teal-700 pointer-events-none">
+                <span className="absolute right-3 text-2xs font-bold text-amber-700 dark:text-amber-400 pointer-events-none">
                   g
                 </span>
               </div>
@@ -1073,60 +1042,52 @@ export function ProfileForm({
             </div>
           </div>
 
-          {/* Macro Consistency Breakdown & Live Calculation (Section 5) */}
-          <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200/90 text-xs space-y-2">
+          {/* Macro Calorie Breakdown */}
+          <div className="p-3.5 rounded-2xl bg-[#FAF7F2] dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] text-xs space-y-2">
             <div className="flex flex-wrap items-center justify-between gap-2 text-2xs">
-              <span className="font-bold text-stone-700 uppercase tracking-wider">
+              <span className="font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider">
                 Macro Energy Breakdown:
               </span>
               <div className="flex flex-wrap items-center gap-3 font-semibold">
-                <span className="text-emerald-800">Protein: {macroStats.proteinCalories} kcal (×4)</span>
-                <span className="text-amber-800">Carbs: {macroStats.carbsCalories} kcal (×4)</span>
-                <span className="text-teal-800">Fat: {macroStats.fatCalories} kcal (×9)</span>
-                <span className="text-stone-900 font-black">Sum: {macroStats.totalMacroCalories} kcal</span>
+                <span className="text-[#E86A33]">Protein: {macroStats.proteinCalories} kcal (×4)</span>
+                <span className="text-[#F4A340]">Carbs: {macroStats.carbsCalories} kcal (×4)</span>
+                <span className="text-amber-700 dark:text-amber-400">Fat: {macroStats.fatCalories} kcal (×9)</span>
+                <span className="text-stone-900 dark:text-stone-100 font-black">Sum: {macroStats.totalMacroCalories} kcal</span>
               </div>
             </div>
 
-            {/* Non-medical warning banner if variance is significant */}
             {macroStats.hasSignificantVariance && profile.targetCalories && profile.targetCalories > 0 && (
-              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200/90 text-amber-900 flex items-start gap-2 text-2xs leading-relaxed animate-in fade-in duration-200">
-                <InfoIcon size={16} className="text-amber-700 shrink-0 mt-0.5" />
+              <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/90 dark:border-amber-800/50 text-amber-900 dark:text-amber-200 flex items-start gap-2 text-2xs leading-relaxed animate-in fade-in duration-200">
+                <InfoIcon size={16} className="text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold">
-                    Your macro targets currently add up to approximately {macroStats.totalMacroCalories} kcal, while your calorie target is {profile.targetCalories} kcal.
+                    Macro targets total {macroStats.totalMacroCalories} kcal, while calorie goal is {profile.targetCalories} kcal.
                   </p>
-                  <p className="text-3xs text-amber-800 mt-0.5">
-                    This is an informational calculation. You can fine-tune protein, carbs, and fat to align with your overall energy target, or leave them as configured.
+                  <p className="text-3xs text-amber-800 dark:text-amber-300 mt-0.5">
+                    This is informational. You can adjust your macro grams to match your total energy or leave them as configured.
                   </p>
                 </div>
               </div>
             )}
           </div>
         </div>
-
-        {/* Informational Guidance Note */}
-        <div className="p-3 rounded-xl bg-stone-50 border border-stone-200/80 text-2xs text-stone-500 flex items-start gap-2">
-          <InfoIcon size={14} className="text-stone-400 shrink-0 mt-0.5" />
-          <span>
-            Track-a-Bite calculates recommended targets using the Mifflin-St Jeor formula adjusted for student physical activity. These numbers are non-medical planning estimates.
-          </span>
-        </div>
       </div>
     );
   };
 
-  // Dietary Preferences & Allergies Section
-  const renderDietarySection = () => {
+  // ---------------------------------------------------------------------------
+  // 5. FOOD PREFERENCES SECTION
+  // ---------------------------------------------------------------------------
+  const renderFoodPreferencesSection = () => {
     const dietaryOptions = [
-      { id: 'vegetarian', title: 'Vegetarian', desc: 'Plant foods & dairy, no meat or egg' },
-      { id: 'eggetarian', title: 'Eggetarian', desc: 'Vegetarian plus eggs' },
-      { id: 'non_vegetarian', title: 'Non-Vegetarian', desc: 'All campus food options' },
-      { id: 'vegan', title: 'Vegan', desc: 'Strictly plant-based, no dairy or honey' },
-      { id: 'jain', title: 'Jain', desc: 'Vegetarian without root vegetables' },
+      { id: 'vegetarian', title: 'Vegetarian', desc: 'Plant foods & dairy, no meat or egg', icon: '🥦' },
+      { id: 'eggetarian', title: 'Eggetarian', desc: 'Vegetarian plus whole eggs', icon: '🥚' },
+      { id: 'non_vegetarian', title: 'Non-Vegetarian', desc: 'Full dietary freedom across regional dishes', icon: '🍗' },
+      { id: 'vegan', title: 'Vegan', desc: 'Strictly plant-based, no dairy or animal products', icon: '🌱' },
+      { id: 'jain', title: 'Jain', desc: 'Vegetarian without onion, garlic, or root tubers', icon: '🪷' },
     ] as const;
 
     const commonAllergies = ['Dairy', 'Peanuts', 'Gluten', 'Egg', 'Soy', 'Shellfish'];
-
     const currentAllergies = profile.allergies || [];
 
     const toggleAllergy = (allergy: string) => {
@@ -1143,21 +1104,27 @@ export function ProfileForm({
 
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">
-            Dietary Preferences & Allergies
+        <div className="border-b border-[#E8DED2] dark:border-[#38312A] pb-4">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-2xs font-extrabold uppercase tracking-wider text-[#E86A33] px-2.5 py-0.5 rounded-full bg-[#FEF7EE] dark:bg-[#2A1C14] border border-[#E86A33]/20">
+              Section 5
+            </span>
+            <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">Dietary Style &amp; Cooking Access</span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-100 tracking-tight">
+            Food Preferences &amp; Living Realities
           </h2>
-          <p className="text-xs sm:text-sm text-stone-600 mt-1">
-            Ensure next-meal suggestions and nutrient gaps respect your food choices and safety limits.
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 mt-1">
+            Ensure next-meal suggestions and nutrient gaps respect your food choices, budget, and kitchen access.
           </p>
         </div>
 
-        {/* Dietary Restriction */}
+        {/* Dietary Style */}
         <div className="space-y-2">
-          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700">
-            Dietary Preference
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+            Dietary Style
           </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {dietaryOptions.map(opt => {
               const isSelected = (profile.dietaryRestrictions || 'vegetarian') === opt.id;
               return (
@@ -1165,17 +1132,20 @@ export function ProfileForm({
                   key={opt.id}
                   type="button"
                   onClick={() => handleFieldChange('dietaryRestrictions', opt.id)}
-                  className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+                  className={`min-h-[56px] p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
                     isSelected
-                      ? 'bg-emerald-800 text-white border-emerald-900 shadow-2xs font-bold'
-                      : 'bg-white text-stone-800 border-stone-200 hover:bg-stone-50'
+                      ? 'bg-[#E86A33] text-white border-[#E86A33] shadow-xs font-bold'
+                      : 'bg-white dark:bg-[#1D1A17] text-stone-800 dark:text-stone-200 border-[#E8DED2] dark:border-[#38312A] hover:bg-[#FAF7F2] dark:hover:bg-[#25211D]'
                   }`}
                 >
-                  <div>
-                    <span className="text-xs font-bold block">{opt.title}</span>
-                    <span className={`text-2xs block ${isSelected ? 'text-emerald-200' : 'text-stone-500'}`}>
-                      {opt.desc}
-                    </span>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="text-xl shrink-0">{opt.icon}</span>
+                    <div className="min-w-0">
+                      <span className="text-xs font-bold block truncate">{opt.title}</span>
+                      <span className={`text-3xs block leading-tight truncate ${isSelected ? 'text-white/80' : 'text-stone-500 dark:text-stone-400'}`}>
+                        {opt.desc}
+                      </span>
+                    </div>
                   </div>
                   {isSelected && <CheckIcon size={16} className="text-white shrink-0" />}
                 </button>
@@ -1185,12 +1155,12 @@ export function ProfileForm({
         </div>
 
         {/* Allergies Chips */}
-        <div className="space-y-2 pt-2 border-t border-stone-100">
-          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700">
-            Food Allergies & Sensitivities
+        <div className="space-y-2 pt-2 border-t border-[#E8DED2] dark:border-[#38312A]">
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+            Food Allergies &amp; Sensitivities
           </label>
-          <p className="text-2xs text-stone-500">
-            Selected allergens are strictly filtered out from next-meal recommendations.
+          <p className="text-2xs text-stone-500 dark:text-stone-400">
+            Selected allergens are strictly filtered out from next-meal upgrade suggestions.
           </p>
           <div className="flex flex-wrap gap-2 pt-1">
             {commonAllergies.map(allergy => {
@@ -1200,10 +1170,10 @@ export function ProfileForm({
                   key={allergy}
                   type="button"
                   onClick={() => toggleAllergy(allergy)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                  className={`min-h-[44px] px-4 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-rose-100 text-rose-900 border-rose-300 ring-1 ring-rose-300'
-                      : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
+                      ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800 ring-2 ring-rose-500/20 font-bold'
+                      : 'bg-white dark:bg-[#1D1A17] text-stone-600 dark:text-stone-300 border-[#E8DED2] dark:border-[#38312A] hover:bg-[#FAF7F2] dark:hover:bg-[#25211D]'
                   }`}
                 >
                   {isSelected ? `✓ ${allergy}` : `+ ${allergy}`}
@@ -1213,16 +1183,98 @@ export function ProfileForm({
           </div>
         </div>
 
-        {/* Hostel / Mess & Kitchen Amenities */}
-        <div className="space-y-2 pt-2 border-t border-stone-100">
-          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700">
-            Campus Food Facilities
+        {/* Living Situation & Hostel Mode */}
+        <div className="space-y-3 pt-2 border-t border-[#E8DED2] dark:border-[#38312A]">
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+            Living Environment
           </label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => handleFieldChange('isHostelite', true)}
+              className={`min-h-[58px] p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+                profile.isHostelite
+                  ? 'bg-[#E86A33] text-white border-[#E86A33] shadow-xs font-bold'
+                  : 'bg-white dark:bg-[#1D1A17] text-stone-800 dark:text-stone-200 border-[#E8DED2] dark:border-[#38312A] hover:bg-[#FAF7F2] dark:hover:bg-[#25211D]'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🏠</span>
+                <div>
+                  <span className="text-xs font-bold block">Hostelite / Dorm Living</span>
+                  <span className={`text-3xs block ${profile.isHostelite ? 'text-white/80' : 'text-stone-500 dark:text-stone-400'}`}>
+                    Canteen, mess, zero-cooking staples
+                  </span>
+                </div>
+              </div>
+              {profile.isHostelite && <CheckIcon size={18} className="text-white shrink-0" />}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleFieldChange('isHostelite', false)}
+              className={`min-h-[58px] p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+                !profile.isHostelite
+                  ? 'bg-[#E86A33] text-white border-[#E86A33] shadow-xs font-bold'
+                  : 'bg-white dark:bg-[#1D1A17] text-stone-800 dark:text-stone-200 border-[#E8DED2] dark:border-[#38312A] hover:bg-[#FAF7F2] dark:hover:bg-[#25211D]'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🏡</span>
+                <div>
+                  <span className="text-xs font-bold block">Home / Kitchen Access</span>
+                  <span className={`text-3xs block ${!profile.isHostelite ? 'text-white/80' : 'text-stone-500 dark:text-stone-400'}`}>
+                    Home-cooked thalis &amp; fresh cooking
+                  </span>
+                </div>
+              </div>
+              {!profile.isHostelite && <CheckIcon size={18} className="text-white shrink-0" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Food Budget Preference */}
+        <div className="space-y-2 pt-2 border-t border-[#E8DED2] dark:border-[#38312A]">
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+            Food Budget Preference
+          </label>
+          <div className="grid grid-cols-3 gap-2.5">
             {[
-              { key: 'hasMessFood' as const, label: 'Mess / Tiffin Service', icon: '🍲' },
+              { id: 'budget', icon: '💰', title: 'Budget', desc: '₹10–₹25 additions' },
+              { id: 'moderate', icon: '⚖️', title: 'Moderate', desc: 'Standard campus' },
+              { id: 'flexible', icon: '✨', title: 'Flexible', desc: 'Any healthy item' },
+            ].map(opt => {
+              const isSelected = (profile.budgetPreference || 'budget') === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => handleFieldChange('budgetPreference', opt.id as UserProfile['budgetPreference'])}
+                  className={`min-h-[64px] p-3 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5 ${
+                    isSelected
+                      ? 'bg-[#FEF7EE] dark:bg-[#2A1C14] border-[#E86A33] text-stone-900 dark:text-stone-100 ring-2 ring-[#E86A33]/30 font-bold shadow-xs'
+                      : 'bg-white dark:bg-[#1D1A17] border-[#E8DED2] dark:border-[#38312A] text-stone-700 dark:text-stone-300 hover:bg-[#FAF7F2] dark:hover:bg-[#25211D]'
+                  }`}
+                >
+                  <span className="text-xl">{opt.icon}</span>
+                  <span className="text-xs font-bold block">{opt.title}</span>
+                  <span className="text-3xs text-stone-500 dark:text-stone-400 block">{opt.desc}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Cooking & Storage Amenities */}
+        <div className="space-y-2 pt-2 border-t border-[#E8DED2] dark:border-[#38312A]">
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+            Food &amp; Storage Facilities
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            {[
+              { key: 'hasMessFood' as const, label: 'Mess / Tiffin Subscription', icon: '🍲' },
               { key: 'hasCookingAccess' as const, label: 'Induction / Kettle Access', icon: '🍳' },
-              { key: 'hasFridge' as const, label: 'Refrigerator Access', icon: '❄️' },
+              { key: 'hasFridge' as const, label: 'Refrigerator Storage', icon: '❄️' },
             ].map(facility => {
               const isActive = Boolean(profile[facility.key]);
               return (
@@ -1230,15 +1282,15 @@ export function ProfileForm({
                   key={facility.key}
                   type="button"
                   onClick={() => handleFieldChange(facility.key, !isActive)}
-                  className={`p-3 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                  className={`min-h-[58px] p-3 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
                     isActive
-                      ? 'bg-emerald-50 border-emerald-500 text-emerald-950 ring-1 ring-emerald-500 font-bold'
-                      : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'
+                      ? 'bg-[#FEF7EE] dark:bg-[#2A1C14] border-[#E86A33] text-stone-900 dark:text-stone-100 ring-2 ring-[#E86A33]/30 font-bold'
+                      : 'bg-white dark:bg-[#1D1A17] border-[#E8DED2] dark:border-[#38312A] text-stone-600 dark:text-stone-400 hover:bg-[#FAF7F2] dark:hover:bg-[#25211D]'
                   }`}
                 >
                   <span className="text-xl">{facility.icon}</span>
                   <span className="text-2xs font-bold block">{facility.label}</span>
-                  <span className="text-3xs text-stone-400 block">{isActive ? 'Available' : 'No access'}</span>
+                  <span className="text-3xs text-stone-400 block">{isActive ? '✓ Available' : 'No access'}</span>
                 </button>
               );
             })}
@@ -1249,98 +1301,311 @@ export function ProfileForm({
   };
 
   // ---------------------------------------------------------------------------
+  // 6. NOTIFICATION PREFERENCES SECTION
+  // ---------------------------------------------------------------------------
+  const renderNotificationPreferencesSection = () => {
+    const notifications = profile.notifications ?? {
+      mealReminders: true,
+      waterReminders: true,
+      weeklyReports: false,
+    };
+
+    const notificationOptions = [
+      {
+        key: 'mealReminders' as const,
+        icon: '🍽️',
+        title: 'Meal Logging Reminders',
+        desc: 'Receive gentle prompts around breakfast, lunch, and dinner to scan your plate.',
+        enabled: Boolean(notifications.mealReminders),
+      },
+      {
+        key: 'waterReminders' as const,
+        icon: '💧',
+        title: 'Hydration Reminders',
+        desc: 'Helpful water tracking nudges throughout study, work, and commute hours.',
+        enabled: Boolean(notifications.waterReminders),
+      },
+      {
+        key: 'weeklyReports' as const,
+        icon: '📊',
+        title: 'Weekly Nutrition Digest',
+        desc: 'A weekly summary of your macronutrient consistency, protein hits, and nutrient balance.',
+        enabled: Boolean(notifications.weeklyReports),
+      },
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div className="border-b border-[#E8DED2] dark:border-[#38312A] pb-4">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-2xs font-extrabold uppercase tracking-wider text-[#E86A33] px-2.5 py-0.5 rounded-full bg-[#FEF7EE] dark:bg-[#2A1C14] border border-[#E86A33]/20">
+              Section 6
+            </span>
+            <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">Timely Nudges</span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-100 tracking-tight">
+            Notification Preferences
+          </h2>
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 mt-1">
+            Configure how and when Track-a-Bite reminds you to log meals, drink water, and review your weekly trends.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          {notificationOptions.map(item => (
+            <div
+              key={item.key}
+              className="p-4 rounded-2xl bg-white dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] flex items-center justify-between gap-4 transition-colors"
+            >
+              <div className="flex items-start gap-3 min-w-0">
+                <span className="text-2xl shrink-0 mt-0.5">{item.icon}</span>
+                <div className="min-w-0 space-y-0.5">
+                  <span className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-100 block">
+                    {item.title}
+                  </span>
+                  <span className="text-2xs text-stone-500 dark:text-stone-400 block leading-relaxed">
+                    {item.desc}
+                  </span>
+                </div>
+              </div>
+
+              {/* Accessible Toggle Switch */}
+              <button
+                type="button"
+                role="switch"
+                aria-checked={item.enabled}
+                onClick={() => handleNotificationToggle(item.key)}
+                className={`w-12 h-7 rounded-full p-1 transition-colors cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E86A33] ${
+                  item.enabled ? 'bg-[#E86A33]' : 'bg-stone-300 dark:bg-stone-700'
+                }`}
+              >
+                <div
+                  className={`w-5 h-5 rounded-full bg-white shadow-xs transform transition-transform ${
+                    item.enabled ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // ---------------------------------------------------------------------------
+  // ONBOARDING REVIEW & CELEBRATION STEPS
+  // ---------------------------------------------------------------------------
+  const renderOnboardingReviewStep = () => {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
+            Review your profile
+          </h2>
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 mt-1">
+            Ensure your details are accurate before finishing setup.
+          </p>
+        </div>
+
+        <Card className="border-[#E8DED2] dark:border-[#38312A] shadow-xs overflow-hidden">
+          <div className="p-4 sm:p-5 bg-gradient-to-r from-stone-900 to-[#1D1A17] text-white flex items-center justify-between">
+            <span className="text-xs font-black uppercase tracking-wider text-[#F4A340]">
+              YOUR PROFILE SUMMARY
+            </span>
+            <span className="text-3xs font-semibold px-2 py-0.5 rounded-full bg-[#E86A33]/30 text-[#F4A340] border border-[#E86A33]/40">
+              {profile.isHostelite ? 'Hostel Mode Active' : 'Home Access'}
+            </span>
+          </div>
+
+          <CardContent className="p-4 sm:p-6 divide-y divide-stone-100 dark:divide-stone-800 text-xs">
+            <div className="py-2.5 flex items-center justify-between">
+              <span className="text-stone-500 dark:text-stone-400 font-medium">Age</span>
+              <span className="font-bold text-stone-900 dark:text-stone-100">{profile.age} years</span>
+            </div>
+
+            <div className="py-2.5 flex items-center justify-between">
+              <span className="text-stone-500 dark:text-stone-400 font-medium">Height &amp; Weight</span>
+              <span className="font-bold text-stone-900 dark:text-stone-100">{profile.heightCm} cm • {profile.weightKg} kg</span>
+            </div>
+
+            <div className="py-2.5 flex items-center justify-between">
+              <span className="text-stone-500 dark:text-stone-400 font-medium">Health conditions</span>
+              <span className="font-bold text-stone-900 dark:text-stone-100 text-right max-w-xs truncate">
+                {currentConditions.filter(c => c !== 'None').length > 0
+                  ? currentConditions.filter(c => c !== 'None').join(', ')
+                  : 'None reported'}
+              </span>
+            </div>
+
+            <div className="py-2.5 flex items-center justify-between">
+              <span className="text-stone-500 dark:text-stone-400 font-medium">Dietary preference</span>
+              <span className="font-bold text-stone-900 dark:text-stone-100 capitalize">
+                {profile.dietaryRestrictions || 'Vegetarian'}
+              </span>
+            </div>
+
+            <div className="py-2.5 flex items-center justify-between">
+              <span className="text-stone-500 dark:text-stone-400 font-medium">Living setup</span>
+              <span className="font-bold text-stone-900 dark:text-stone-100">
+                {profile.isHostelite ? 'Hostelite' : 'Home access'}
+              </span>
+            </div>
+
+            {profile.targetCalories && (
+              <div className="py-2.5 flex items-center justify-between">
+                <span className="text-stone-500 dark:text-stone-400 font-medium">Target calories</span>
+                <span className="font-bold text-stone-900 dark:text-stone-100">
+                  {profile.targetCalories} kcal (P: {profile.targetProteinG ?? '--'}g)
+                </span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  const renderOnboardingCelebrationStep = () => (
+    <div className="space-y-6 text-center py-6 sm:py-10 animate-in fade-in duration-300">
+      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#FEF7EE] dark:bg-[#2A1C14] text-[#E86A33] border border-[#E86A33]/30 flex items-center justify-center mx-auto text-3xl sm:text-4xl shadow-inner">
+        🎉
+      </div>
+
+      <div className="space-y-2 max-w-sm mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
+          You&apos;re all set!
+        </h2>
+        <p className="text-sm text-stone-600 dark:text-stone-400 font-normal leading-relaxed">
+          Your nutrition insights and 5-star richness scoring are now personalized to your lifestyle.
+        </p>
+      </div>
+
+      <div className="pt-4 max-w-xs mx-auto space-y-2">
+        <Button
+          fullWidth
+          size="lg"
+          onClick={() => {
+            if (onComplete) {
+              onComplete(profile);
+            } else {
+              router.push('/dashboard');
+            }
+          }}
+          rightIcon={<ArrowRightIcon size={18} />}
+          className="font-bold py-3.5 text-base"
+        >
+          Go to My Dashboard
+        </Button>
+        <button
+          type="button"
+          onClick={() => router.push('/scan')}
+          className="w-full text-xs font-semibold text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 py-1.5 transition-colors cursor-pointer"
+        >
+          Or jump straight to food scanner →
+        </button>
+      </div>
+    </div>
+  );
+
+  // ---------------------------------------------------------------------------
   // MAIN RENDER SWITCH
   // ---------------------------------------------------------------------------
 
-  // If in edit mode, render a unified multi-section form with Save Profile action
+  // If in EDIT MODE, render all 6 clear, spacious sections
   if (mode === 'edit') {
     return (
       <div className={`space-y-8 ${className}`}>
         {isSuccessSaved && (
-          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs font-bold flex items-center justify-between animate-in fade-in duration-200">
+          <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-200 text-xs font-bold flex items-center justify-between animate-in fade-in duration-200">
             <span className="flex items-center gap-2">
-              <CheckIcon size={18} className="text-emerald-700" />
+              <CheckIcon size={18} className="text-emerald-700 dark:text-emerald-400" />
               <span>
                 {syncNotice
                   ? `Profile updated! ${syncNotice}`
-                  : 'Profile updated & synced to cloud! ✨'}
+                  : 'Profile successfully updated & synced! ✨'}
               </span>
             </span>
             <button
               type="button"
               onClick={() => setIsSuccessSaved(false)}
-              className="text-stone-400 hover:text-stone-700 text-xs font-normal cursor-pointer"
+              className="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 text-xs font-normal cursor-pointer"
             >
               ✕
             </button>
           </div>
         )}
 
-        <div className="space-y-8">
-          {/* Section 1: About You */}
-          <Card className="border-stone-200/90 shadow-2xs">
-            <CardContent className="p-5 sm:p-6">
-              {renderAboutYouStep()}
+        <div className="space-y-6 sm:space-y-8">
+          {/* Section 1: Personal Information */}
+          <Card className="border-[#E8DED2] dark:border-[#38312A] shadow-xs">
+            <CardContent className="p-6 sm:p-8">
+              {renderPersonalInfoSection()}
             </CardContent>
           </Card>
 
-          {/* Section 2: Body Details */}
-          <Card className="border-stone-200/90 shadow-2xs">
-            <CardContent className="p-5 sm:p-6">
-              {renderBodyDetailsStep()}
+          {/* Section 2: Body Information */}
+          <Card className="border-[#E8DED2] dark:border-[#38312A] shadow-xs">
+            <CardContent className="p-6 sm:p-8">
+              {renderBodyInfoSection()}
             </CardContent>
           </Card>
 
-          {/* Section 3: Nutrition Goals & Macro Tuning (Phase 8.6) */}
-          <Card className="border-stone-200/90 shadow-2xs">
-            <CardContent className="p-5 sm:p-6">
-              {renderNutritionGoalsSection()}
+          {/* Section 3: Health Conditions (Multi-select) */}
+          <Card className="border-[#E8DED2] dark:border-[#38312A] shadow-xs">
+            <CardContent className="p-6 sm:p-8">
+              {renderHealthConditionsSection()}
             </CardContent>
           </Card>
 
-          {/* Section 4: Dietary Preferences & Allergies */}
-          <Card className="border-stone-200/90 shadow-2xs">
-            <CardContent className="p-5 sm:p-6">
-              {renderDietarySection()}
+          {/* Section 4: Nutrition Preferences */}
+          <Card className="border-[#E8DED2] dark:border-[#38312A] shadow-xs">
+            <CardContent className="p-6 sm:p-8">
+              {renderNutritionPreferencesSection()}
             </CardContent>
           </Card>
 
-          {/* Section 5: Lifestyle & Budget */}
-          <Card className="border-stone-200/90 shadow-2xs">
-            <CardContent className="p-5 sm:p-6">
-              {renderLifestyleStep()}
+          {/* Section 5: Food Preferences */}
+          <Card className="border-[#E8DED2] dark:border-[#38312A] shadow-xs">
+            <CardContent className="p-6 sm:p-8">
+              {renderFoodPreferencesSection()}
             </CardContent>
           </Card>
 
-          {/* Section 6: Health Considerations */}
-          <Card className="border-stone-200/90 shadow-2xs">
-            <CardContent className="p-5 sm:p-6">
-              {renderHealthStep()}
+          {/* Section 6: Notification Preferences */}
+          <Card className="border-[#E8DED2] dark:border-[#38312A] shadow-xs">
+            <CardContent className="p-6 sm:p-8">
+              {renderNotificationPreferencesSection()}
             </CardContent>
           </Card>
 
-          {/* Save Action */}
-          <div className="flex items-center justify-between pt-2">
-            {onCancel ? (
-              <Button variant="outline" size="md" onClick={onCancel}>
-                Cancel
-              </Button>
-            ) : (
-              <span className="text-2xs text-stone-500">
-                Changes take effect across all food scans immediately.
+          {/* Bottom Save Action Bar */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+            <div className="text-center sm:text-left">
+              <span className="text-xs font-semibold text-stone-900 dark:text-stone-100 block">
+                Ready to apply your updates?
               </span>
-            )}
+              <span className="text-2xs text-stone-500 dark:text-stone-400">
+                Changes calibrate recommendations across all future food scans instantly.
+              </span>
+            </div>
 
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={handleComplete}
-              disabled={isSubmitting}
-              leftIcon={<SparklesIcon size={16} />}
-              className="px-6 font-bold"
-            >
-              {isSubmitting ? 'Saving...' : 'Save Profile'}
-            </Button>
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              {onCancel && (
+                <Button variant="outline" size="md" onClick={onCancel} className="flex-1 sm:flex-none">
+                  Cancel
+                </Button>
+              )}
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={handleComplete}
+                disabled={isSubmitting}
+                leftIcon={<SparklesIcon size={16} />}
+                className="w-full sm:w-auto px-8 font-bold min-h-[48px]"
+              >
+                {isSubmitting ? 'Saving Profile...' : 'Save Profile'}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -1350,27 +1615,25 @@ export function ProfileForm({
   // ---------------------------------------------------------------------------
   // ONBOARDING MODE WIZARD
   // ---------------------------------------------------------------------------
-
   const stepTotal = 5;
   const currentStepNumber = step === 1 ? 0 : step === 6 ? 5 : step === 7 ? 5 : step - 1;
 
   return (
     <div className={`max-w-xl mx-auto ${className}`}>
-      <Card className="border-stone-200 shadow-sm overflow-hidden bg-white">
-        {/* Header with Step Indicator (Steps 2 to 6) */}
+      <Card className="border-[#E8DED2] dark:border-[#38312A] shadow-md overflow-hidden bg-white dark:bg-[#1D1A17]">
+        {/* Onboarding Header with Progress Bar */}
         {step >= 2 && step <= 6 && (
-          <div className="px-6 pt-6 pb-2 space-y-2 border-b border-stone-100">
-            <div className="flex items-center justify-between text-2xs font-extrabold uppercase tracking-widest text-stone-500">
+          <div className="px-6 pt-6 pb-2 space-y-2 border-b border-[#E8DED2] dark:border-[#38312A]">
+            <div className="flex items-center justify-between text-2xs font-extrabold uppercase tracking-widest text-stone-500 dark:text-stone-400">
               <span>TRACK-A-BITE ONBOARDING</span>
               <span>
                 STEP {currentStepNumber} OF {stepTotal}
               </span>
             </div>
 
-            {/* Visual Progress Bar */}
-            <div className="w-full bg-stone-100 h-1.5 rounded-full overflow-hidden">
+            <div className="w-full bg-stone-100 dark:bg-[#25211D] h-1.5 rounded-full overflow-hidden">
               <div
-                className="bg-emerald-700 h-full rounded-full transition-all duration-300"
+                className="bg-[#E86A33] h-full rounded-full transition-all duration-300"
                 style={{ width: `${(currentStepNumber / stepTotal) * 100}%` }}
               />
             </div>
@@ -1378,22 +1641,74 @@ export function ProfileForm({
         )}
 
         <CardContent className="p-6 sm:p-8">
-          {step === 1 && renderWelcomeStep()}
-          {step === 2 && renderAboutYouStep()}
-          {step === 3 && renderBodyDetailsStep()}
-          {step === 4 && renderLifestyleStep()}
-          {step === 5 && renderHealthStep()}
-          {step === 6 && renderReviewStep()}
-          {step === 7 && renderCelebrationStep()}
+          {step === 1 && (
+            <div className="space-y-6 text-center py-4 sm:py-8">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-[#FEF7EE] dark:bg-[#2A1C14] text-[#E86A33] border border-[#E86A33]/20 flex items-center justify-center mx-auto shadow-inner text-3xl sm:text-4xl">
+                🥗
+              </div>
+
+              <div className="space-y-2 max-w-md mx-auto">
+                <h1 className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
+                  Let&apos;s personalize your nutrition.
+                </h1>
+                <p className="text-sm sm:text-base text-stone-600 dark:text-stone-400 leading-relaxed font-normal">
+                  Tell us a little about your body and food lifestyle so Track-a-Bite can generate realistic nutritional scores.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 max-w-lg mx-auto text-left pt-2">
+                <div className="p-3 rounded-2xl bg-[#FAF7F2] dark:bg-[#25211D] border border-[#E8DED2] dark:border-[#38312A] flex items-center gap-2.5">
+                  <span className="text-lg">🎯</span>
+                  <div>
+                    <span className="text-xs font-bold text-stone-900 dark:text-stone-100 block">Personalized</span>
+                    <span className="text-3xs text-stone-500 dark:text-stone-400">Baseline formulas</span>
+                  </div>
+                </div>
+                <div className="p-3 rounded-2xl bg-[#FAF7F2] dark:bg-[#25211D] border border-[#E8DED2] dark:border-[#38312A] flex items-center gap-2.5">
+                  <span className="text-lg">🍽️</span>
+                  <div>
+                    <span className="text-xs font-bold text-stone-900 dark:text-stone-100 block">Practical</span>
+                    <span className="text-3xs text-stone-500 dark:text-stone-400">Real affordable foods</span>
+                  </div>
+                </div>
+                <div className="p-3 rounded-2xl bg-[#FAF7F2] dark:bg-[#25211D] border border-[#E8DED2] dark:border-[#38312A] flex items-center gap-2.5">
+                  <span className="text-lg">🛡️</span>
+                  <div>
+                    <span className="text-xs font-bold text-stone-900 dark:text-stone-100 block">Private</span>
+                    <span className="text-3xs text-stone-500 dark:text-stone-400">Never shared</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 max-w-xs mx-auto">
+                <Button
+                  fullWidth
+                  size="lg"
+                  onClick={() => setStep(2)}
+                  rightIcon={<ArrowRightIcon size={18} />}
+                  className="font-bold py-3.5 text-base"
+                >
+                  Let&apos;s start
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {step === 2 && renderPersonalInfoSection()}
+          {step === 3 && renderBodyInfoSection()}
+          {step === 4 && renderHealthConditionsSection()}
+          {step === 5 && renderFoodPreferencesSection()}
+          {step === 6 && renderOnboardingReviewStep()}
+          {step === 7 && renderOnboardingCelebrationStep()}
 
           {/* Navigation Controls (Steps 2 to 6) */}
           {step >= 2 && step <= 6 && (
-            <div className="flex items-center justify-between pt-8 border-t border-stone-100 mt-8">
+            <div className="flex items-center justify-between pt-6 border-t border-[#E8DED2] dark:border-[#38312A] mt-8">
               <Button
                 variant="ghost"
                 size="md"
-                onClick={() => setStep((prev) => (prev - 1) as OnboardingStep)}
-                className="text-stone-600 font-semibold"
+                onClick={() => setStep(prev => (prev - 1) as OnboardingStep)}
+                className="text-stone-600 dark:text-stone-400 font-semibold"
               >
                 ← Back
               </Button>
@@ -1405,7 +1720,7 @@ export function ProfileForm({
                   onClick={() => {
                     if (step === 2 && !validateStep2()) return;
                     if (step === 3 && !validateStep3()) return;
-                    setStep((prev) => (prev + 1) as OnboardingStep);
+                    setStep(prev => (prev + 1) as OnboardingStep);
                   }}
                   rightIcon={<ArrowRightIcon size={16} />}
                   className="font-bold px-6"
@@ -1419,7 +1734,7 @@ export function ProfileForm({
                   onClick={handleComplete}
                   disabled={isSubmitting}
                   rightIcon={<CheckIcon size={16} />}
-                  className="font-bold px-7 bg-emerald-800 hover:bg-emerald-900"
+                  className="font-bold px-7"
                 >
                   {isSubmitting ? 'Saving...' : 'Complete Profile'}
                 </Button>

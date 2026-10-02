@@ -2,14 +2,21 @@
  * User Profile & Validation Model (Phase 6.4)
  */
 
+export interface NotificationPreferences {
+  mealReminders?: boolean;
+  waterReminders?: boolean;
+  weeklyReports?: boolean;
+}
+
 export interface UserProfile {
   age?: number;
   heightCm?: number;
   weightKg?: number;
   gender?: 'male' | 'female' | 'other';
   activityLevel?: 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active';
-  healthCondition?: string; // Singular convenient accessor
-  healthConditions: string[]; // e.g. ['None'], ['Diabetes'], etc.
+  disease?: string; // Legacy single-value compatibility alias
+  healthCondition?: string; // Singular convenient accessor (joined string of active conditions)
+  healthConditions: string[]; // e.g. ['Diabetes', 'Hypertension'] or ['None']
   healthGoal?: 'muscle_gain' | 'fat_loss' | 'maintenance' | 'general_health';
   dietaryRestrictions?: 'vegetarian' | 'vegan' | 'non_vegetarian' | 'eggetarian' | 'jain';
   allergies?: string[];
@@ -25,16 +32,18 @@ export interface UserProfile {
   targetFatG?: number;
   targetHydrationMl?: number;
   customTargetsActive?: boolean;
+  notifications?: NotificationPreferences;
 }
 
 export const PREDEFINED_HEALTH_CONDITIONS = [
   'None',
-  'Diabetes / Pre-diabetes',
-  'High blood pressure',
-  'High cholesterol',
-  'Lactose sensitivity',
-  'Acid reflux / Gastric sensitivity',
-  'Prefer not to say',
+  'Diabetes',
+  'Hypertension',
+  'High Cholesterol',
+  'Thyroid',
+  'Anemia',
+  'Lactose Sensitivity',
+  'Acid Reflux / Gastric Sensitivity',
 ] as const;
 
 export type PredefinedHealthCondition = typeof PREDEFINED_HEALTH_CONDITIONS[number];
@@ -46,6 +55,11 @@ export const DEFAULT_USER_PROFILE: UserProfile = {
   isHostelite: true,
   healthConditions: ['None'],
   onboardingCompleted: false,
+  notifications: {
+    mealReminders: true,
+    waterReminders: true,
+    weeklyReports: false,
+  },
 };
 
 export interface ProfileValidationResult {
@@ -152,12 +166,34 @@ export function validateUserProfile(profile?: Partial<UserProfile> | null): Prof
     }
   }
 
-  // Health condition normalization
-  const healthConditions: string[] = Array.isArray(profile.healthConditions)
-    ? profile.healthConditions
-    : profile.healthCondition && profile.healthCondition !== 'none'
-      ? [profile.healthCondition]
-      : ['None'];
+  // Health condition normalization with multi-condition support
+  let rawConditions: string[] = [];
+  if (Array.isArray(profile.healthConditions) && profile.healthConditions.length > 0) {
+    rawConditions = profile.healthConditions;
+  } else if (profile.disease && profile.disease.toLowerCase() !== 'none') {
+    rawConditions = [profile.disease];
+  } else if (profile.healthCondition && profile.healthCondition.toLowerCase() !== 'none') {
+    rawConditions = profile.healthCondition.split(',').map(s => s.trim()).filter(Boolean);
+  }
+
+  // Deduplicate and enforce 'None' mutual exclusivity
+  let healthConditions: string[] = [];
+  if (rawConditions.some(c => c.toLowerCase() === 'none')) {
+    if (rawConditions.length > 1) {
+      healthConditions = rawConditions.filter(c => c.toLowerCase() !== 'none' && c !== 'Prefer not to say');
+    } else {
+      healthConditions = ['None'];
+    }
+  } else {
+    healthConditions = Array.from(new Set(rawConditions.filter(Boolean)));
+  }
+
+  if (healthConditions.length === 0) {
+    healthConditions = ['None'];
+  }
+
+  const activeNonNone = healthConditions.filter(c => c !== 'None' && c !== 'Prefer not to say');
+  const joinedCondition = activeNonNone.length > 0 ? activeNonNone.join(', ') : undefined;
 
   const hasSufficientData = Boolean(
     profile.age &&
@@ -178,7 +214,8 @@ export function validateUserProfile(profile?: Partial<UserProfile> | null): Prof
     weightKg: profile.weightKg,
     gender: profile.gender,
     activityLevel: profile.activityLevel,
-    healthCondition: profile.healthCondition || (healthConditions[0] !== 'None' ? healthConditions[0] : undefined),
+    disease: joinedCondition,
+    healthCondition: joinedCondition,
     healthConditions,
     healthGoal: profile.healthGoal,
     dietaryRestrictions: profile.dietaryRestrictions,
@@ -211,6 +248,11 @@ export function validateUserProfile(profile?: Partial<UserProfile> | null): Prof
         : undefined,
     customTargetsActive:
       profile.customTargetsActive !== undefined ? Boolean(profile.customTargetsActive) : undefined,
+    notifications: profile.notifications ?? {
+      mealReminders: true,
+      waterReminders: true,
+      weeklyReports: false,
+    },
   };
 
   return {

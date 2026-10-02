@@ -611,17 +611,17 @@ function ScanContent() {
         <Container size="lg">
         {/* Unified 3D SCAN FOOD Switcher */}
         <div className="flex flex-col items-center justify-center mb-6 space-y-2">
-          <span className="text-3xs font-extrabold uppercase tracking-widest text-emerald-800 dark:text-emerald-400">
+          <span className="text-3xs font-extrabold uppercase tracking-widest text-[#E86A33] dark:text-[#F4A340]">
             SCAN FOOD
           </span>
-          <div className="card-3d inline-flex items-center p-1.5 bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] rounded-2xl shadow-sm">
+          <div className="card-3d inline-flex items-center p-1.5 bg-white dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] rounded-2xl shadow-sm">
             <button
               type="button"
               onClick={() => setScanCategory('cooked')}
               className={`px-5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
                 scanCategory === 'cooked'
-                  ? 'bg-emerald-800 dark:bg-emerald-600 text-white shadow-xs'
-                  : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-50 dark:hover:bg-[#19271e]'
+                  ? 'bg-[#E86A33] text-white shadow-xs'
+                  : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-[#FAF7F2] dark:hover:bg-[#25211D]'
               }`}
             >
               <span>🍽️</span> <span>Meal</span>
@@ -631,8 +631,8 @@ function ScanContent() {
               onClick={() => setScanCategory('packaged')}
               className={`px-5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
                 scanCategory === 'packaged'
-                  ? 'bg-emerald-800 dark:bg-emerald-600 text-white shadow-xs'
-                  : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-50 dark:hover:bg-[#19271e]'
+                  ? 'bg-[#E86A33] text-white shadow-xs'
+                  : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-[#FAF7F2] dark:hover:bg-[#25211D]'
               }`}
             >
               <span>📦</span> <span>Barcode</span>
@@ -644,8 +644,8 @@ function ScanContent() {
           <>
             {/* Re-analyze Active Notice */}
             {isReanalyze && (
-              <div className="max-w-xl mx-auto mb-4 p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/60 text-xs text-emerald-900 dark:text-emerald-200 flex items-center justify-center gap-2 shadow-xs">
-                <RefreshCwIcon size={14} className="text-emerald-700 dark:text-emerald-400 shrink-0 animate-spin" />
+              <div className="max-w-xl mx-auto mb-4 p-3 rounded-2xl bg-[#FEF7EE] dark:bg-[#2A1C14] border border-[#F4A340]/40 text-[#C85320] dark:text-[#F4A340] flex items-center justify-center gap-2 shadow-xs">
+                <RefreshCwIcon size={14} className="text-[#E86A33] dark:text-[#F4A340] shrink-0 animate-spin" />
                 <span className="font-semibold">Re-analyzing: Previous meal cleared. Capture your new plate to analyze.</span>
               </div>
             )}
@@ -653,13 +653,13 @@ function ScanContent() {
             {/* Header */}
             <div className="text-center max-w-xl mx-auto mb-6">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="text-2xs font-bold tracking-widest text-emerald-800 dark:text-emerald-300 uppercase px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 inline-block">
+            <span className="text-2xs font-bold tracking-widest text-[#E86A33] dark:text-[#F4A340] uppercase px-3 py-1 rounded-full bg-[#F3EDE4] dark:bg-[#25211D] border border-[#E8DED2] dark:border-[#38312A] inline-block">
               Perception Pipeline • Phase 3
             </span>
           </div>
 
           {/* Mode Switcher: Gemini AI Vision vs Mock Simulation */}
-          <div className="inline-flex items-center gap-1 p-1 bg-stone-100 dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] rounded-full mb-3 shadow-2xs">
+          <div className="inline-flex items-center gap-1 p-1 bg-[#F3EDE4] dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] rounded-full mb-3 shadow-2xs">
             <button
               type="button"
               onClick={() => {
@@ -668,7 +668,7 @@ function ScanContent() {
               }}
               className={`px-3 py-1 text-xs font-semibold rounded-full transition-all cursor-pointer ${
                 recognitionMode === 'gemini'
-                  ? 'bg-emerald-700 text-white shadow-xs'
+                  ? 'bg-[#7C6CE7] text-white shadow-xs'
                   : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
               }`}
             >
@@ -739,7 +739,7 @@ function ScanContent() {
             />
 
             {/* Architecture Separation & Confidence Notice */}
-            <div className="p-3.5 rounded-2xl bg-stone-100 dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] text-xs text-stone-600 dark:text-stone-400 flex items-start gap-2.5">
+            <div className="p-3.5 rounded-2xl bg-stone-100 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-xs text-stone-600 dark:text-stone-400 flex items-start gap-2.5">
               <InfoIcon size={16} className="text-stone-500 shrink-0 mt-0.5" />
               <div className="space-y-0.5 leading-relaxed">
                 <span className="font-semibold text-stone-800 dark:text-stone-200">
@@ -754,9 +754,9 @@ function ScanContent() {
           <div className="lg:col-span-5 space-y-4">
             {/* Stage: Idle - Require New Image */}
             {stage === 'idle' && (
-              <Card className="border-stone-200/90 dark:border-[#23382b] bg-white dark:bg-[#131d16] shadow-sm">
+              <Card className="border-stone-200/90 dark:border-[#38312A] bg-white dark:bg-[#1D1A17] shadow-sm">
                 <CardContent className="p-6 sm:p-8 text-center space-y-4">
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-center mx-auto shadow-inner">
+                  <div className="w-14 h-14 rounded-2xl bg-[#FEF7EE] dark:bg-[#2A1C14] text-[#E86A33] flex items-center justify-center mx-auto shadow-inner">
                     <CameraIcon size={26} />
                   </div>
                   <div className="space-y-1">
@@ -1014,9 +1014,9 @@ function ScanContent() {
                 </div>
 
                 {/* Aggregated Macro Preview & Proceed */}
-                <Card className="border-stone-200 dark:border-[#23382b] bg-white dark:bg-[#131d16] shadow-sm">
+                <Card className="border-stone-200 dark:border-[#38312A] bg-white dark:bg-[#1D1A17] shadow-sm">
                   <CardContent className="p-4 sm:p-5 space-y-4">
-                    <div className="flex items-center justify-between pb-2 border-b border-stone-100 dark:border-[#23382b]">
+                    <div className="flex items-center justify-between pb-2 border-b border-stone-100 dark:border-[#38312A]">
                       <div>
                         <span className="text-xs font-bold text-stone-800 dark:text-stone-200 block">
                           Total Meal Estimation
@@ -1025,15 +1025,15 @@ function ScanContent() {
                           {items.length} item{items.length > 1 ? 's' : ''} combined
                         </span>
                       </div>
-                      <span className="text-sm font-extrabold text-emerald-800 dark:text-emerald-400">
+                      <span className="text-sm font-extrabold text-[#E86A33] dark:text-[#F4A340]">
                         {totalNutrition.calories} kcal
                       </span>
                     </div>
 
                     <div className="grid grid-cols-4 gap-1.5 text-center text-xs">
-                      <div className="p-2 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40">
-                        <span className="block text-3xs text-emerald-700 dark:text-emerald-400 font-semibold uppercase">Protein</span>
-                        <span className="text-sm font-bold text-emerald-900 dark:text-emerald-200">{totalNutrition.protein}g</span>
+                      <div className="p-2 rounded-xl bg-[#FEF7EE] dark:bg-[#251A14] border border-[#FBD5BD] dark:border-[#4D2918]">
+                        <span className="block text-3xs text-[#E86A33] font-semibold uppercase">Protein</span>
+                        <span className="text-sm font-bold text-[#E86A33] dark:text-[#F4A340]">{totalNutrition.protein}g</span>
                       </div>
                       <div className="p-2 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/40">
                         <span className="block text-3xs text-amber-700 dark:text-amber-400 font-semibold uppercase">Carbs</span>
@@ -1043,9 +1043,9 @@ function ScanContent() {
                         <span className="block text-3xs text-rose-700 dark:text-rose-400 font-semibold uppercase">Fat</span>
                         <span className="text-sm font-bold text-rose-900 dark:text-rose-200">{totalNutrition.fat}g</span>
                       </div>
-                      <div className="p-2 rounded-xl bg-teal-50/70 dark:bg-teal-950/30 border border-teal-100 dark:border-teal-900/40">
-                        <span className="block text-3xs text-teal-700 dark:text-teal-400 font-semibold uppercase">Fiber</span>
-                        <span className="text-sm font-bold text-teal-900 dark:text-teal-200">{totalNutrition.fiber}g</span>
+                      <div className="p-2 rounded-xl bg-[#F0FDF4] dark:bg-[#15251C] border border-[#3F8F68]/30 dark:border-[#3F8F68]/40">
+                        <span className="block text-3xs text-[#3F8F68] dark:text-[#5FA77F] font-semibold uppercase">Fiber</span>
+                        <span className="text-sm font-bold text-[#2E6B4E] dark:text-[#5FA77F]">{totalNutrition.fiber}g</span>
                       </div>
                     </div>
 
@@ -1053,8 +1053,8 @@ function ScanContent() {
 
                     {/* Saving Status Feedback Banner */}
                     {isProcessingFinal && (
-                      <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-emerald-900 dark:text-emerald-200 text-xs flex items-center gap-2 animate-pulse" role="status">
-                        <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping shrink-0" />
+                      <div className="p-3 rounded-xl bg-[#FEF7EE] dark:bg-[#2A1C14] border border-[#FBD5BD] dark:border-[#4D2918] text-[#E86A33] text-xs flex items-center gap-2 animate-pulse" role="status">
+                        <span className="w-2 h-2 rounded-full bg-[#E86A33] animate-ping shrink-0" />
                         <span className="font-semibold">
                           {user?.uid ? 'Syncing meal to your cloud nutrition journal...' : 'Saving meal to local nutrition journal...'}
                         </span>
@@ -1100,7 +1100,7 @@ function ScanContent() {
           <div className="space-y-6">
             <div className="text-center max-w-xl mx-auto mb-6">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-2xs font-bold tracking-widest text-emerald-800 dark:text-emerald-300 uppercase px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 inline-block">
+                <span className="text-2xs font-bold tracking-widest text-[#E86A33] uppercase px-3 py-1 rounded-full bg-[#FEF7EE] dark:bg-[#2A1C14] border border-[#FBD5BD] dark:border-[#4D2918] inline-block">
                   Barcode &amp; Package Intelligence
                 </span>
               </div>
@@ -1137,7 +1137,7 @@ function ScanContent() {
                     </div>
                   )}
 
-                  <div className="p-4 rounded-2xl bg-stone-100 dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] text-xs text-stone-600 dark:text-stone-400 flex items-start gap-2.5">
+                  <div className="p-4 rounded-2xl bg-stone-100 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-xs text-stone-600 dark:text-stone-400 flex items-start gap-2.5">
                     <InfoIcon size={16} className="text-stone-500 shrink-0 mt-0.5" />
                     <div className="space-y-0.5 leading-relaxed">
                       <span className="font-semibold text-stone-800 dark:text-stone-200">

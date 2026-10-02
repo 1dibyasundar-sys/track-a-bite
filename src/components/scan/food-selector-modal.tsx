@@ -53,7 +53,7 @@ export function FoodSelectorModal({
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search rice, dal, roti, poha, sabzi..."
-            className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] rounded-xl text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:border-emerald-700 focus:bg-white dark:focus:bg-[#19271e]"
+            className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-[#25211D] border border-stone-200 dark:border-[#38312A] rounded-xl text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:border-[#E86A33] focus:bg-white dark:focus:bg-[#25211D]"
           />
         </div>
 
@@ -62,7 +62,7 @@ export function FoodSelectorModal({
           {filteredFoods.map(food => (
             <div
               key={food.id}
-              className="p-3 rounded-xl border border-stone-200 dark:border-[#23382b] hover:border-emerald-500 dark:hover:border-emerald-600 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20 transition-all flex items-center justify-between gap-3 cursor-pointer group"
+              className="p-3 rounded-xl border border-stone-200 dark:border-[#38312A] hover:border-[#E86A33] dark:hover:border-[#E86A33] hover:bg-[#FEF7EE] dark:hover:bg-[#2A1C14] transition-all flex items-center justify-between gap-3 cursor-pointer group"
               onClick={() => {
                 onSelectFood(food);
                 onClose();

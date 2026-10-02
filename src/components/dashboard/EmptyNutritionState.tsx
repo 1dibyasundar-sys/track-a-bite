@@ -12,17 +12,17 @@ interface EmptyNutritionStateProps {
 
 export function EmptyNutritionState({ onQuickDrink }: EmptyNutritionStateProps) {
   return (
-    <Card className="border border-emerald-200/70 bg-gradient-to-br from-emerald-50/50 via-white to-white shadow-xs text-center">
+    <Card className="border border-[#E8DED2] dark:border-[#38312A] bg-white dark:bg-[#1D1A17] shadow-xs text-center">
       <CardContent className="p-8 sm:p-10 max-w-md mx-auto space-y-5">
-        <div className="w-16 h-16 rounded-3xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center mx-auto text-3xl shadow-xs">
+        <div className="w-16 h-16 rounded-3xl bg-[#FEF7EE] dark:bg-[#2A1C14] text-[#E86A33] border border-[#E86A33]/20 flex items-center justify-center mx-auto text-3xl shadow-xs">
           🥗
         </div>
 
         <div className="space-y-2">
-          <h2 className="text-lg sm:text-xl font-bold text-stone-900">
+          <h2 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100">
             No meals scanned today yet.
           </h2>
-          <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 leading-relaxed">
             Scan your first meal to start today&apos;s nutrition journey and track your calories, protein, and micronutrients.
           </p>
         </div>

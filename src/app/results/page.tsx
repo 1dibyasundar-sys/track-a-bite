@@ -168,8 +168,8 @@ function ResultsContent() {
     return (
       <div className="py-20">
         <Container size="md">
-          <div className="text-center space-y-4 max-w-md mx-auto p-8 rounded-3xl bg-white dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] shadow-sm">
-            <div className="w-16 h-16 rounded-full bg-stone-100 dark:bg-[#19271e] text-stone-600 dark:text-stone-300 flex items-center justify-center mx-auto">
+          <div className="text-center space-y-4 max-w-md mx-auto p-8 rounded-3xl bg-white dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] shadow-sm">
+            <div className="w-16 h-16 rounded-full bg-stone-100 dark:bg-[#25211D] text-stone-600 dark:text-stone-300 flex items-center justify-center mx-auto">
               <InfoIcon size={28} />
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-100">Meal result not found.</h2>
@@ -179,7 +179,7 @@ function ResultsContent() {
             <div className="pt-2">
               <Link
                 href="/scan"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm transition-colors shadow-xs"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E86A33] hover:bg-[#d65f2c] text-white font-semibold text-sm transition-colors shadow-xs"
               >
                 <CameraIcon size={16} />
                 <span>Back to Scan</span>
@@ -201,14 +201,14 @@ function ResultsContent() {
         {/* =====================================================================
             HERO CARD WITH FLOATING INSIGHT ANNOTATION CARDS
             ===================================================================== */}
-        <div className="card-3d p-6 sm:p-8 bg-gradient-to-br from-emerald-950 via-[#101913] to-stone-950 text-white border-2 border-emerald-800/60 shadow-xl relative overflow-hidden">
-          {/* Ambient glow */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="card-3d p-6 sm:p-8 bg-gradient-to-br from-[#1D1A17] via-[#151311] to-[#25211D] text-white border border-[#38312A] shadow-xl relative overflow-hidden">
+          {/* Ambient warm glow */}
+          <div className="absolute top-0 right-0 w-80 h-80 bg-[#E86A33]/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-3">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-2xs font-extrabold tracking-widest uppercase px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-mono">
+                <span className="text-2xs font-extrabold tracking-widest uppercase px-3 py-1 rounded-full bg-[#E86A33]/15 text-[#F4A340] border border-[#E86A33]/30 font-mono">
                   Meal Analysis Complete
                 </span>
                 <span className="text-2xs text-stone-400 font-medium">
@@ -220,7 +220,7 @@ function ResultsContent() {
                   </span>
                 )}
                 {cloudStatus === 'synced' && (
-                  <span className="text-2xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1">
+                  <span className="text-2xs font-bold px-2.5 py-0.5 rounded-full bg-[#3F8F68]/20 text-[#5FA77F] border border-[#3F8F68]/30 flex items-center gap-1">
                     <CheckIcon size={12} /> Saved to Journal
                   </span>
                 )}
@@ -232,17 +232,17 @@ function ResultsContent() {
 
               {/* FLOATING INSIGHT ANNOTATIONS */}
               <div className="flex flex-wrap items-center gap-2 pt-1">
-                <span className="card-float px-3 py-1 text-2xs font-bold text-emerald-300 bg-black/60 border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
+                <span className="card-float px-3 py-1 text-2xs font-bold text-[#9185E8] bg-black/60 border border-[#7C6CE7]/40 flex items-center gap-1.5 shadow-sm">
                   <span>✨</span> {meal.items.length} foods detected
                 </span>
-                <span className="card-float px-3 py-1 text-2xs font-bold text-emerald-300 bg-black/60 border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
+                <span className="card-float px-3 py-1 text-2xs font-bold text-[#F4A340] bg-black/60 border border-[#E86A33]/40 flex items-center gap-1.5 shadow-sm">
                   <span>💪</span> {meal.totalNutrition.protein}g protein
                 </span>
-                <span className="card-float px-3 py-1 text-2xs font-bold text-stone-200 bg-black/60 border-stone-700/60 flex items-center gap-1.5 shadow-sm">
+                <span className="card-float px-3 py-1 text-2xs font-bold text-stone-200 bg-black/60 border border-stone-700/60 flex items-center gap-1.5 shadow-sm">
                   <span>🔥</span> {meal.totalNutrition.calories} kcal
                 </span>
                 {meal.hostelFriendlyUpgrades.length > 0 && (
-                  <span className="card-float px-3 py-1 text-2xs font-bold text-amber-300 bg-black/60 border-amber-500/30 flex items-center gap-1.5 shadow-sm">
+                  <span className="card-float px-3 py-1 text-2xs font-bold text-amber-300 bg-black/60 border border-amber-500/30 flex items-center gap-1.5 shadow-sm">
                     <span>💡</span> {meal.hostelFriendlyUpgrades[0].approximatePriceRange || '₹15'} affordable upgrade available
                   </span>
                 )}
@@ -275,7 +275,7 @@ function ResultsContent() {
             ===================================================================== */}
         <section className="space-y-4">
           <div className="flex items-center gap-2.5">
-            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#F3EDE4] dark:bg-[#25211D] text-[#E86A33] border border-[#E8DED2] dark:border-[#38312A]">
               Step 01
             </span>
             <h2 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100">
@@ -297,7 +297,7 @@ function ResultsContent() {
               return (
                 <div
                   key={item.detectionId || idx}
-                  className="card-3d-interactive overflow-hidden bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] flex flex-col justify-between"
+                  className="card-3d-interactive overflow-hidden bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] flex flex-col justify-between"
                 >
                   <div className="relative w-full aspect-16/10 bg-stone-900 overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -308,7 +308,7 @@ function ResultsContent() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
                     <div className="absolute top-2.5 left-2.5">
-                      <span className="text-3xs font-extrabold px-2 py-0.5 rounded-full bg-black/60 text-emerald-300 backdrop-blur-md border border-emerald-500/40">
+                      <span className="text-3xs font-extrabold px-2 py-0.5 rounded-full bg-black/60 text-[#5FA77F] backdrop-blur-md border border-[#3F8F68]/40">
                         {confPct}% Confidence
                       </span>
                     </div>
@@ -328,13 +328,13 @@ function ResultsContent() {
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-2 pt-1 text-center">
-                      <div className="p-2 rounded-lg bg-stone-50 dark:bg-[#19271e] text-2xs">
+                      <div className="p-2 rounded-lg bg-stone-50 dark:bg-[#25211D] text-2xs">
                         <span className="text-stone-500 dark:text-stone-400 block font-medium">Calories</span>
                         <span className="font-bold text-stone-900 dark:text-stone-100">{item.nutrition.calories} kcal</span>
                       </div>
-                      <div className="p-2 rounded-lg bg-stone-50 dark:bg-[#19271e] text-2xs">
+                      <div className="p-2 rounded-lg bg-stone-50 dark:bg-[#25211D] text-2xs">
                         <span className="text-stone-500 dark:text-stone-400 block font-medium">Protein</span>
-                        <span className="font-bold text-emerald-700 dark:text-emerald-400">{item.nutrition.protein}g</span>
+                        <span className="font-bold text-[#E86A33] dark:text-[#F4A340]">{item.nutrition.protein}g</span>
                       </div>
                     </div>
                   </div>
@@ -349,7 +349,7 @@ function ResultsContent() {
             ===================================================================== */}
         <section className="space-y-4">
           <div className="flex items-center gap-2.5">
-            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#F3EDE4] dark:bg-[#25211D] text-[#E86A33] border border-[#E8DED2] dark:border-[#38312A]">
               Step 02
             </span>
             <h2 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100">
@@ -359,17 +359,17 @@ function ResultsContent() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Visual Score Card */}
-            <div className="lg:col-span-5 card-3d p-6 sm:p-8 bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] flex flex-col items-center justify-center text-center space-y-4">
-              <span className="text-3xs font-extrabold uppercase tracking-widest text-emerald-800 dark:text-emerald-400">
+            <div className="lg:col-span-5 card-3d p-6 sm:p-8 bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] flex flex-col items-center justify-center text-center space-y-4">
+              <span className="text-3xs font-extrabold uppercase tracking-widest text-[#3F8F68] dark:text-[#5FA77F]">
                 MEAL NUTRITION SCORE
               </span>
-              <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border-4 border-emerald-500/80 flex flex-col items-center justify-center shadow-inner">
-                <span className="text-4xl sm:text-5xl font-black text-emerald-800 dark:text-emerald-300 tracking-tight">
+              <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-[#F0FDF4] dark:bg-[#15251C] border-4 border-[#3F8F68] flex flex-col items-center justify-center shadow-inner">
+                <span className="text-4xl sm:text-5xl font-black text-[#22543D] dark:text-[#5FA77F] tracking-tight">
                   {scoreValue}
                 </span>
                 <span className="text-3xs text-stone-500 dark:text-stone-400 font-bold">/ 10.0</span>
               </div>
-              <div className="w-16 h-0.5 bg-emerald-500/40 rounded-full" />
+              <div className="w-16 h-0.5 bg-[#3F8F68]/30 rounded-full" />
               <div>
                 <h3 className="text-base font-extrabold text-stone-900 dark:text-stone-100 uppercase tracking-wide">
                   {meal.balanceAssessment.label}
@@ -381,7 +381,7 @@ function ResultsContent() {
             </div>
 
             {/* Macro Distribution Breakdown */}
-            <div className="lg:col-span-7 card-3d p-6 sm:p-8 bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] flex flex-col justify-between space-y-6">
+            <div className="lg:col-span-7 card-3d p-6 sm:p-8 bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] flex flex-col justify-between space-y-6">
               <NutritionBreakdown
                 nutrition={meal.totalNutrition}
                 servingDescription={primaryItem ? `${primaryItem.portionMultiplier} ${primaryItem.portionUnit} (~${primaryItem.estimatedGrams}g)` : undefined}
@@ -397,11 +397,11 @@ function ResultsContent() {
         </section>
 
         {/* =====================================================================
-            STEP 3: "WHAT'S WORKING" — POSITIVE INSIGHTS
+            STEP 3: "WHAT'S WORKING" — POSITIVE INSIGHTS (GREEN ACCENT)
             ===================================================================== */}
         <section className="space-y-4">
           <div className="flex items-center gap-2.5">
-            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#EBF7F0] dark:bg-[#1A2E22] text-[#2E6B4E] dark:text-[#5FA77F] border border-[#3F8F68]/30 dark:border-[#3F8F68]/40">
               Step 03
             </span>
             <h2 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100">
@@ -409,14 +409,14 @@ function ResultsContent() {
             </h2>
           </div>
 
-          <div className="card-3d p-5 sm:p-6 bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/40">
+          <div className="card-3d p-5 sm:p-6 bg-[#F0FDF4]/70 dark:bg-[#14231A]/30 border border-[#3F8F68]/20 dark:border-[#3F8F68]/30">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {meal.positiveHighlights.map((hl, idx) => (
-                <div key={idx} className="flex items-start gap-3 p-3 rounded-xl bg-white/80 dark:bg-[#131d16]/80 border border-emerald-200/60 dark:border-emerald-800/40">
-                  <div className="w-5 h-5 rounded-full bg-emerald-700 text-white flex items-center justify-center shrink-0 mt-0.5">
+                <div key={idx} className="flex items-start gap-3 p-3 rounded-xl bg-white/90 dark:bg-[#1D1A17]/90 border border-[#3F8F68]/20 dark:border-[#3F8F68]/30">
+                  <div className="w-5 h-5 rounded-full bg-[#3F8F68] text-white flex items-center justify-center shrink-0 mt-0.5">
                     <CheckIcon size={12} />
                   </div>
-                  <span className="text-xs sm:text-sm font-semibold text-emerald-950 dark:text-emerald-200">{hl}</span>
+                  <span className="text-xs sm:text-sm font-semibold text-[#1C4332] dark:text-[#88D4A8]">{hl}</span>
                 </div>
               ))}
               {meal.positiveHighlights.length === 0 && (
@@ -429,11 +429,11 @@ function ResultsContent() {
         </section>
 
         {/* =====================================================================
-            STEP 4: "WHAT YOU'RE MISSING" — NUTRIENT GAPS
+            STEP 4: "WHAT YOU'RE MISSING" — NUTRIENT GAPS (ORANGE ACCENT)
             ===================================================================== */}
         <section className="space-y-4">
           <div className="flex items-center gap-2.5">
-            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
+            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#FEF3C7] dark:bg-[#2D2115] text-[#D97706] dark:text-[#F4A340] border border-[#FDE68A] dark:border-[#523B22]">
               Step 04
             </span>
             <h2 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100">
@@ -445,11 +445,11 @@ function ResultsContent() {
         </section>
 
         {/* =====================================================================
-            STEP 5: "YOUR NEXT MOVE" — HOSTEL UPGRADES & PERSONALIZED RECOMMENDATIONS
+            STEP 5: "YOUR NEXT MOVE" — HOSTEL UPGRADES & PERSONALIZED RECOMMENDATIONS (TERRACOTTA ACCENT)
             ===================================================================== */}
         <section className="space-y-4">
           <div className="flex items-center gap-2.5">
-            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#FEF7EE] dark:bg-[#2A1C14] text-[#E86A33] border border-[#FBD5BD] dark:border-[#4D2918]">
               Step 05
             </span>
             <h2 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100">
@@ -466,7 +466,7 @@ function ResultsContent() {
             </div>
 
             <div className="lg:col-span-6 space-y-4">
-              <div className="card-3d p-5 sm:p-6 bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] space-y-4">
+              <div className="card-3d p-5 sm:p-6 bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] space-y-4">
                 <div>
                   <h3 className="text-sm font-bold text-stone-900 dark:text-stone-100">
                     What You Can Realistically Add
@@ -497,8 +497,8 @@ function ResultsContent() {
               </div>
 
               {/* Campus Reality Context */}
-              <div className="card-3d p-4 bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 text-xs text-amber-950 dark:text-amber-200 flex items-start gap-2.5">
-                <InfoIcon size={16} className="text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div className="card-3d p-4 bg-[#FEF7EE]/80 dark:bg-[#2A1C14]/40 border border-[#FBD5BD]/60 dark:border-[#4D2918]/60 text-xs text-stone-800 dark:text-stone-300 flex items-start gap-2.5">
+                <InfoIcon size={16} className="text-[#E86A33] shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
                   No food choice is &quot;bad&quot; or forbidden. Deep-fried snacks or quick noodles provide high energy. To prevent sluggish afternoon lectures, balance them with ₹10–₹20 zero-cooking protein sides like roasted chana, dahi, or sprouts.
                 </p>
@@ -508,7 +508,7 @@ function ResultsContent() {
         </section>
 
         {/* Re-analyze Action Callout */}
-        <div className="card-3d p-6 bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="card-3d p-6 bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <h3 className="text-base font-bold text-stone-900 dark:text-stone-100">
               Want to analyze another dish or meal?
@@ -544,7 +544,7 @@ export default function ResultsPage() {
       <Suspense
         fallback={
           <div className="py-24 text-center">
-            <div className="inline-block w-8 h-8 border-3 border-emerald-700 dark:border-emerald-400 border-t-transparent rounded-full animate-spin mb-4" />
+            <div className="inline-block w-8 h-8 border-3 border-[#E86A33] border-t-transparent rounded-full animate-spin mb-4" />
             <p className="text-sm text-stone-600 dark:text-stone-400 font-medium">Loading nutritional assessment...</p>
           </div>
         }

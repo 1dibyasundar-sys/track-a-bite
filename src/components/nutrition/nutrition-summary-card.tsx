@@ -17,15 +17,15 @@ export function NutritionSummaryCard({
   compact = false,
 }: NutritionSummaryCardProps) {
   const macros = [
-    { label: 'Calories', value: `${nutrition.calories}`, unit: 'kcal', color: 'text-stone-900 dark:text-stone-100', bg: 'bg-stone-50 dark:bg-[#16231a] border-stone-200 dark:border-[#23382b]' },
-    { label: 'Protein', value: formatNutrient(nutrition.protein, 'g'), unit: '', color: 'text-emerald-800 dark:text-emerald-300', bg: 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-200/60 dark:border-emerald-800/60' },
+    { label: 'Calories', value: `${nutrition.calories}`, unit: 'kcal', color: 'text-stone-900 dark:text-stone-100', bg: 'bg-stone-50 dark:bg-[#25211D] border-stone-200 dark:border-[#38312A]' },
+    { label: 'Protein', value: formatNutrient(nutrition.protein, 'g'), unit: '', color: 'text-[#E86A33] dark:text-[#F4A340]', bg: 'bg-[#FEF7EE] dark:bg-[#251A14] border-[#FBD5BD] dark:border-[#4D2918]' },
     { label: 'Carbs', value: formatNutrient(nutrition.carbohydrates, 'g'), unit: '', color: 'text-amber-800 dark:text-amber-300', bg: 'bg-amber-50/70 dark:bg-amber-950/40 border-amber-200/60 dark:border-amber-800/60' },
     { label: 'Fat', value: formatNutrient(nutrition.fat, 'g'), unit: '', color: 'text-rose-800 dark:text-rose-300', bg: 'bg-rose-50/70 dark:bg-rose-950/40 border-rose-200/60 dark:border-rose-800/60' },
-    { label: 'Fiber', value: formatNutrient(nutrition.fiber, 'g'), unit: '', color: 'text-teal-800 dark:text-teal-300', bg: 'bg-teal-50/70 dark:bg-teal-950/40 border-teal-200/60 dark:border-teal-800/60' },
+    { label: 'Fiber', value: formatNutrient(nutrition.fiber, 'g'), unit: '', color: 'text-[#3F8F68] dark:text-[#5FA77F]', bg: 'bg-[#F0FDF4] dark:bg-[#15251C] border-[#3F8F68]/30 dark:border-[#3F8F68]/40' },
   ];
 
   return (
-    <Card className="border-stone-200/80 dark:border-[#23382b]">
+    <Card className="border-stone-200/80 dark:border-[#38312A]">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base sm:text-lg">{title}</CardTitle>
@@ -83,7 +83,7 @@ export function NutritionSummaryCard({
               {nutrition.micronutrients.map((micro, idx) => (
                 <div
                   key={idx}
-                  className="p-2.5 rounded-lg bg-stone-50 dark:bg-[#16231a] border border-stone-200/60 dark:border-[#23382b] text-xs flex flex-col justify-between"
+                  className="p-2.5 rounded-lg bg-stone-50 dark:bg-[#25211D] border border-stone-200/60 dark:border-[#38312A] text-xs flex flex-col justify-between"
                 >
                   <div className="flex items-center justify-between font-medium">
                     <span className="text-stone-900 dark:text-stone-100">{micro.name}</span>

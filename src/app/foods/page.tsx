@@ -60,7 +60,7 @@ export default function FoodsPage() {
         {/* Loading / Results Grid */}
         {isLoading ? (
           <div className="py-20 text-center">
-            <div className="inline-block w-8 h-8 border-3 border-emerald-700 border-t-transparent rounded-full animate-spin mb-3" />
+            <div className="inline-block w-8 h-8 border-3 border-[#E86A33] border-t-transparent rounded-full animate-spin mb-3" />
             <p className="text-xs text-stone-500 font-medium">Filtering regional foods...</p>
           </div>
         ) : foods.length === 0 ? (

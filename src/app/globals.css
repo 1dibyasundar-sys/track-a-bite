@@ -7,93 +7,103 @@
    ========================================================================== */
 
 :root {
-  /* Core Foundation */
-  --background: #faf8f5;
-  --foreground: #1c1917;
-  --surface: #ffffff;
-  --surface-elevated: #ffffff;
-  --surface-muted: #f5f2eb;
-  --surface-warm: #f5f2eb;
-  --surface-border: #e7e5e0;
-  --border: #e7e5e0;
-  --border-subtle: #f2efe9;
+  /* Core Foundation — Warm Ivory & Cream */
+  --background: #FAF7F2;
+  --foreground: #171717;
+  --surface: #FFFFFF;
+  --surface-elevated: #FFFFFF;
+  --surface-muted: #F3EDE4;
+  --surface-warm: #F3EDE4;
+  --surface-border: #E8DED2;
+  --border: #E8DED2;
+  --border-subtle: #F3EDE4;
 
-  /* Primary Brand (Campus Forest Green) */
-  --primary: #047857;
-  --primary-foreground: #ffffff;
-  --primary-deep: #064e3b;
-  --primary-forest: #047857;
-  --primary-leaf: #059669;
-  --primary-mint: #10b981;
-  --primary-light: #ecfdf5;
+  /* Primary Brand (Warm Terracotta / Roasted-Orange) */
+  --primary: #E86A33;
+  --primary-foreground: #FFFFFF;
+  --primary-deep: #C85320;
+  --primary-forest: #E86A33;
+  --primary-leaf: #F4A340;
+  --primary-mint: #F8B868;
+  --primary-light: #FDF3ED;
 
   /* Secondary & Muted */
-  --secondary: #ecfdf5;
-  --secondary-foreground: #064e3b;
-  --muted: #f5f2eb;
-  --muted-foreground: #57534e;
+  --secondary: #F3EDE4;
+  --secondary-foreground: #6B6258;
+  --muted: #F3EDE4;
+  --muted-foreground: #6B6258;
 
-  /* Accent (Warm Turmeric / Earth Tone) */
-  --accent: #d97706;
-  --accent-foreground: #ffffff;
-  --accent-earth: #92400e;
-  --accent-turmeric: #d97706;
-  --accent-warm-light: #fef3c7;
+  /* Secondary Accent (Golden Mango / Harvest Orange) */
+  --accent: #F4A340;
+  --accent-foreground: #171717;
+  --accent-earth: #C85320;
+  --accent-turmeric: #F4A340;
+  --accent-warm-light: #FEF7EE;
+
+  /* Health & AI Accents */
+  --health: #3F8F68;
+  --ai: #7C6CE7;
+  --ai-light: #EEECFB;
 
   /* Status Colors */
-  --success: #059669;
-  --warning: #d97706;
-  --danger: #e11d48;
-  --info: #0284c7;
+  --success: #3F8F68;
+  --warning: #F4A340;
+  --danger: #D9534F;
+  --info: #7C6CE7;
 
   /* Controls & Focus */
-  --input: #ffffff;
-  --ring: #047857;
+  --input: #FFFFFF;
+  --ring: #E86A33;
 }
 
 .dark {
-  /* Core Foundation — Deep Slate Forest Charcoal Hierarchy */
-  --background: #0c130e;
-  --foreground: #f2f4f2;
-  --surface: #131d16;
-  --surface-elevated: #19271e;
-  --surface-muted: #101812;
-  --surface-warm: #152219;
-  --surface-border: #23382b;
-  --border: #23382b;
-  --border-subtle: #192a20;
+  /* Core Foundation — Warm Charcoal Food-Tech Environment */
+  --background: #151311;
+  --foreground: #F7F3ED;
+  --surface: #1D1A17;
+  --surface-elevated: #25211D;
+  --surface-muted: #1D1A17;
+  --surface-warm: #25211D;
+  --surface-border: #38312A;
+  --border: #38312A;
+  --border-subtle: #25211D;
 
-  /* Primary Brand — Controlled Radiant Emerald */
-  --primary: #10b981;
-  --primary-foreground: #062a1e;
-  --primary-deep: #059669;
-  --primary-forest: #10b981;
-  --primary-leaf: #34d399;
-  --primary-mint: #6ee7b7;
-  --primary-light: #0d281a;
+  /* Primary Brand — Warm Terracotta */
+  --primary: #E86A33;
+  --primary-foreground: #FFFFFF;
+  --primary-deep: #D45B26;
+  --primary-forest: #E86A33;
+  --primary-leaf: #F4A340;
+  --primary-mint: #F8B868;
+  --primary-light: #2A1C14;
 
   /* Secondary & Muted */
-  --secondary: #172e22;
-  --secondary-foreground: #a7f3d0;
-  --muted: #18241d;
-  --muted-foreground: #9ca89f;
+  --secondary: #25211D;
+  --secondary-foreground: #F7F3ED;
+  --muted: #1D1A17;
+  --muted-foreground: #A9A096;
 
-  /* Accent — Warm Amber/Turmeric Glow */
-  --accent: #f59e0b;
-  --accent-foreground: #1a1003;
-  --accent-earth: #d97706;
-  --accent-turmeric: #fbbf24;
-  --accent-warm-light: #2c1a07;
+  /* Secondary Accent — Golden Mango / Harvest Orange */
+  --accent: #F4A340;
+  --accent-foreground: #151311;
+  --accent-earth: #E86A33;
+  --accent-turmeric: #F4A340;
+  --accent-warm-light: #2A1F13;
+
+  /* Health & AI Accents */
+  --health: #5FA77F;
+  --ai: #9185E8;
+  --ai-light: #211E38;
 
   /* Status Colors */
-  --success: #34d399;
-  --warning: #fbbf24;
-  --danger: #f87171;
-  --info: #38bdf8;
+  --success: #5FA77F;
+  --warning: #F4A340;
+  --danger: #D9534F;
+  --info: #9185E8;
 
   /* Controls & Focus */
-  --input: #16231a;
-  --ring: #10b981;
+  --input: #1D1A17;
+  --ring: #E86A33;
 
   color-scheme: dark;
 }
@@ -114,6 +124,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-health: var(--health);
+  --color-ai: var(--ai);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
@@ -126,6 +138,10 @@
    BASE & TYPOGRAPHY
    ========================================================================== */
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
@@ -133,6 +149,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.2s ease, color 0.2s ease;
+  overflow-x: hidden;
 }
 
 /* Accessible focus ring */
@@ -150,22 +167,22 @@ body {
   background: var(--surface-muted);
 }
 ::-webkit-scrollbar-thumb {
-  background: #d6d3d1;
+  background: #d6cfc5;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a29e;
+  background: #b5aba0;
 }
 
 .dark ::-webkit-scrollbar-track {
-  background: #0f1812;
+  background: #151311;
 }
 .dark ::-webkit-scrollbar-thumb {
-  background: #23382b;
+  background: #38312A;
   border-radius: 4px;
 }
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #34523f;
+  background: #4d443b;
 }
 
 /* ==========================================================================
@@ -173,63 +190,63 @@ body {
    ========================================================================== */
 
 .glass-panel {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(231, 226, 215, 0.7);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(232, 222, 210, 0.8);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
 }
 
 .glass-panel-interactive {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(231, 226, 215, 0.7);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(232, 222, 210, 0.8);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
   transition: all 0.2s ease-in-out;
 }
 
 .glass-panel-interactive:hover {
-  border-color: rgba(4, 120, 87, 0.3);
-  box-shadow: 0 8px 30px -4px rgba(4, 120, 87, 0.1);
-  transform: translateY(-1px);
+  border-color: rgba(232, 106, 51, 0.35);
+  box-shadow: 0 8px 30px -4px rgba(232, 106, 51, 0.1);
+  transform: translateY(-2px);
 }
 
 .glass-header {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(250, 247, 242, 0.94);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(231, 226, 215, 0.8);
+  border-bottom: 1px solid rgba(232, 222, 210, 0.9);
 }
 
 .dark .glass-panel {
-  background: rgba(19, 29, 22, 0.85);
+  background: rgba(29, 26, 23, 0.88);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(52, 211, 153, 0.14);
-  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(56, 49, 42, 0.8);
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.5);
 }
 
 .dark .glass-panel-interactive {
-  background: rgba(19, 29, 22, 0.85);
+  background: rgba(29, 26, 23, 0.88);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(52, 211, 153, 0.14);
-  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(56, 49, 42, 0.8);
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.5);
   transition: all 0.2s ease-in-out;
 }
 
 .dark .glass-panel-interactive:hover {
-  border-color: rgba(52, 211, 153, 0.35);
-  box-shadow: 0 8px 30px -4px rgba(16, 185, 129, 0.2);
-  transform: translateY(-1px);
+  border-color: rgba(232, 106, 51, 0.4);
+  box-shadow: 0 8px 30px -4px rgba(232, 106, 51, 0.15);
+  transform: translateY(-2px);
 }
 
 .dark .glass-header {
-  background: rgba(12, 19, 14, 0.9);
+  background: rgba(21, 19, 17, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(35, 56, 43, 0.9);
+  border-bottom: 1px solid rgba(56, 49, 42, 0.9);
 }
 
 /* ==========================================================================
@@ -240,9 +257,9 @@ body {
   background-color: var(--surface);
   border: 1px solid var(--border);
   box-shadow: 
-    0 1px 3px 0 rgba(0, 0, 0, 0.04),
-    0 6px 16px -2px rgba(4, 120, 87, 0.05),
-    0 12px 28px -4px rgba(0, 0, 0, 0.04);
+    0 1px 3px 0 rgba(0, 0, 0, 0.03),
+    0 6px 16px -2px rgba(0, 0, 0, 0.04),
+    0 12px 28px -4px rgba(0, 0, 0, 0.03);
   border-radius: 1.25rem;
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
 }
@@ -251,29 +268,29 @@ body {
   background-color: var(--surface);
   border: 1px solid var(--border);
   box-shadow: 
-    0 1px 3px 0 rgba(0, 0, 0, 0.04),
-    0 6px 16px -2px rgba(4, 120, 87, 0.05),
-    0 12px 28px -4px rgba(0, 0, 0, 0.04);
+    0 1px 3px 0 rgba(0, 0, 0, 0.03),
+    0 6px 16px -2px rgba(0, 0, 0, 0.04),
+    0 12px 28px -4px rgba(0, 0, 0, 0.03);
   border-radius: 1.25rem;
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
 }
 
 .card-3d-interactive:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px) scale(1.01);
   box-shadow: 
-    0 2px 6px 0 rgba(0, 0, 0, 0.05),
-    0 12px 28px -4px rgba(4, 120, 87, 0.12),
-    0 20px 40px -6px rgba(0, 0, 0, 0.08);
-  border-color: rgba(4, 120, 87, 0.35);
+    0 2px 6px 0 rgba(0, 0, 0, 0.04),
+    0 12px 28px -4px rgba(232, 106, 51, 0.1),
+    0 20px 40px -6px rgba(0, 0, 0, 0.06);
+  border-color: rgba(232, 106, 51, 0.3);
 }
 
 .card-float {
-  background-color: rgba(255, 255, 255, 0.94);
+  background-color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(231, 229, 224, 0.9);
+  border: 1px solid rgba(232, 222, 210, 0.9);
   box-shadow: 
-    0 4px 12px -1px rgba(0, 0, 0, 0.08),
-    0 10px 24px -2px rgba(4, 120, 87, 0.08);
+    0 4px 12px -1px rgba(0, 0, 0, 0.06),
+    0 10px 24px -2px rgba(232, 106, 51, 0.06);
   border-radius: 1rem;
 }
 
@@ -282,8 +299,8 @@ body {
   border: 1px solid var(--surface-border);
   box-shadow: 
     0 2px 6px 0 rgba(0, 0, 0, 0.4),
-    0 10px 24px -2px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(52, 211, 153, 0.06);
+    0 10px 24px -2px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.03);
 }
 
 .dark .card-3d-interactive {
@@ -291,26 +308,26 @@ body {
   border: 1px solid var(--surface-border);
   box-shadow: 
     0 2px 6px 0 rgba(0, 0, 0, 0.4),
-    0 10px 24px -2px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(52, 211, 153, 0.06);
+    0 10px 24px -2px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.03);
 }
 
 .dark .card-3d-interactive:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px) scale(1.01);
   box-shadow: 
-    0 4px 12px 0 rgba(0, 0, 0, 0.5),
-    0 16px 36px -4px rgba(0, 0, 0, 0.6),
-    0 0 20px -2px rgba(16, 185, 129, 0.2);
-  border-color: rgba(52, 211, 153, 0.35);
+    0 4px 14px 0 rgba(0, 0, 0, 0.5),
+    0 16px 36px -4px rgba(0, 0, 0, 0.55),
+    0 0 20px -2px rgba(232, 106, 51, 0.2);
+  border-color: rgba(232, 106, 51, 0.4);
 }
 
 .dark .card-float {
-  background-color: rgba(19, 29, 22, 0.92);
+  background-color: rgba(37, 33, 29, 0.94);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(52, 211, 153, 0.2);
+  border: 1px solid rgba(56, 49, 42, 0.9);
   box-shadow: 
-    0 6px 18px -2px rgba(0, 0, 0, 0.6),
-    0 0 24px -4px rgba(16, 185, 129, 0.15);
+    0 6px 18px -2px rgba(0, 0, 0, 0.5),
+    0 0 20px -4px rgba(232, 106, 51, 0.12);
 }
 
 /* Subtle gentle floating animation */

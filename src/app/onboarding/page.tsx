@@ -20,14 +20,14 @@ export default function OnboardingPage() {
   if (hasCompleted) {
     return (
       <div className="py-24 text-center">
-        <div className="inline-block w-8 h-8 border-3 border-emerald-700 border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-sm text-stone-600 font-medium">Redirecting to dashboard...</p>
+        <div className="inline-block w-8 h-8 border-3 border-[#E86A33] border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-sm text-stone-600 dark:text-stone-400 font-medium">Redirecting to dashboard...</p>
       </div>
     );
   }
 
   return (
-    <div className="py-8 sm:py-12 bg-gradient-to-b from-stone-50 via-emerald-50/20 to-stone-50 dark:from-[#0c130e] dark:via-[#131d16] dark:to-[#0c130e] min-h-[calc(100vh-4rem)]">
+    <div className="py-8 sm:py-12 bg-[#FAF7F2] dark:bg-[#151311] min-h-[calc(100vh-4rem)]">
       <Container size="md">
         <ProfileForm mode="onboarding" onComplete={() => router.push('/dashboard')} />
       </Container>

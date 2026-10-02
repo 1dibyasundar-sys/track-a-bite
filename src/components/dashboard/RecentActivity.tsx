@@ -68,7 +68,7 @@ export function RecentActivity({
           <div className="pt-1">
             <Link
               href="/scan"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-800 text-white text-xs font-semibold hover:bg-emerald-900 transition-colors shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#E86A33] text-white text-xs font-semibold hover:bg-[#d65f2c] transition-colors shadow-2xs"
             >
               <CameraIcon size={14} />
               <span>Scan Your First Meal</span>
@@ -91,7 +91,7 @@ export function RecentActivity({
             </span>
           </div>
           {latestScore !== undefined && (
-            <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/60">
+            <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-[#F0FDF4] text-[#2E6B4E] border border-[#3F8F68]/30">
               Score: {latestScore}/100
             </span>
           )}
@@ -109,7 +109,7 @@ export function RecentActivity({
             return (
               <div
                 key={meal.id}
-                className="p-3 rounded-xl bg-stone-50/80 border border-stone-200/70 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all flex items-center justify-between gap-3 group"
+                className="p-3 rounded-xl bg-stone-50/80 border border-stone-200/70 hover:border-[#E86A33]/40 hover:bg-[#FEF7EE]/30 transition-all flex items-center justify-between gap-3 group"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   {/* Thumbnail or Fallback Icon */}
@@ -124,7 +124,7 @@ export function RecentActivity({
                       />
                     </div>
                   ) : (
-                    <div className="w-11 h-11 rounded-lg bg-emerald-100/80 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-200/60">
+                    <div className="w-11 h-11 rounded-lg bg-[#FEF7EE] text-[#E86A33] flex items-center justify-center shrink-0 border border-[#FBD5BD]">
                       <CameraIcon size={18} />
                     </div>
                   )}
@@ -136,7 +136,7 @@ export function RecentActivity({
                         {meal.mealTitle || 'Scanned Meal'}
                       </h4>
                       {starScore !== undefined && (
-                        <span className="text-3xs font-extrabold px-1.5 py-0.2 rounded bg-emerald-100/80 text-emerald-800 shrink-0">
+                        <span className="text-3xs font-extrabold px-1.5 py-0.2 rounded bg-[#FEF7EE] text-[#E86A33] shrink-0">
                           {starScore}★ {scoreLabel ? `• ${scoreLabel}` : ''}
                         </span>
                       )}
@@ -146,7 +146,7 @@ export function RecentActivity({
                       <span>•</span>
                       <span className="font-semibold text-stone-700">{calories} kcal</span>
                       <span>•</span>
-                      <span className="font-semibold text-emerald-800">{protein}g protein</span>
+                      <span className="font-semibold text-[#E86A33]">{protein}g protein</span>
                     </div>
                   </div>
                 </div>
@@ -154,7 +154,7 @@ export function RecentActivity({
                 {/* View Details Link */}
                 <Link
                   href={`/results?id=${encodeURIComponent(meal.id)}`}
-                  className="shrink-0 px-3 py-1.5 text-2xs font-bold text-emerald-800 bg-white border border-stone-200/90 rounded-lg hover:bg-emerald-50 hover:border-emerald-300 transition-all flex items-center gap-1 shadow-2xs group-hover:bg-emerald-800 group-hover:text-white group-hover:border-emerald-800"
+                  className="shrink-0 px-3 py-1.5 text-2xs font-bold text-[#E86A33] bg-white border border-stone-200/90 rounded-lg hover:bg-[#E86A33] hover:text-white hover:border-[#E86A33] transition-all flex items-center gap-1 shadow-2xs group-hover:bg-[#E86A33] group-hover:text-white group-hover:border-[#E86A33]"
                   aria-label={`View full nutritional analysis for ${meal.mealTitle || 'meal'}`}
                 >
                   <span>View</span>
@@ -192,7 +192,7 @@ export function RecentActivity({
           </span>
           <Link
             href="/history"
-            className="font-bold text-emerald-800 hover:text-emerald-900 flex items-center gap-1"
+            className="font-bold text-[#E86A33] hover:text-[#d65f2c] flex items-center gap-1"
           >
             <span>Browse Full History</span>
             <ArrowRightIcon size={12} />

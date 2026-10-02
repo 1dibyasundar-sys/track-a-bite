@@ -174,7 +174,7 @@ export function ThemeToggle({ variant = 'dropdown', className = '' }: ThemeToggl
         <div
           role="menu"
           aria-label="Theme options"
-          className="absolute right-0 mt-1.5 w-36 rounded-2xl bg-white dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] shadow-xl z-50 p-1.5 space-y-0.5 animate-in fade-in slide-in-from-top-1 duration-150"
+          className="absolute right-0 mt-1.5 w-36 rounded-2xl bg-white dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] shadow-xl z-50 p-1.5 space-y-0.5 animate-in fade-in slide-in-from-top-1 duration-150"
         >
           {options.map((opt) => {
             const isSelected = theme === opt.value;
@@ -190,8 +190,8 @@ export function ThemeToggle({ variant = 'dropdown', className = '' }: ThemeToggl
                 className={cn(
                   'w-full flex items-center justify-between px-2.5 py-2 text-xs rounded-xl transition-colors cursor-pointer',
                   isSelected
-                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 font-bold'
-                    : 'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#19271e]'
+                    ? 'bg-[#FEF7EE] dark:bg-[#2A1C14] text-[#E86A33] font-bold'
+                    : 'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#25211D]'
                 )}
               >
                 <div className="flex items-center gap-2">

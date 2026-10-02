@@ -53,16 +53,16 @@ export function PackagedFoodResultCard({
   const fiberDisplay = nutrition.fiber ?? nutrition.fiberGrams;
 
   return (
-    <div className="bg-white dark:bg-[#131d16] rounded-3xl border border-stone-200 dark:border-[#23382b] text-stone-900 dark:text-stone-100 shadow-md overflow-hidden transition-all">
+    <div className="bg-white dark:bg-[#1D1A17] rounded-3xl border border-stone-200 dark:border-[#38312A] text-stone-900 dark:text-stone-100 shadow-md overflow-hidden transition-all">
       {/* Top Banner / Type Tag */}
-      <div className="bg-stone-900 dark:bg-[#0c130e] px-5 py-3 text-white flex items-center justify-between border-b border-stone-800 dark:border-[#23382b]">
+      <div className="bg-stone-900 dark:bg-[#151311] px-5 py-3 text-white flex items-center justify-between border-b border-stone-800 dark:border-[#38312A]">
         <div className="flex items-center gap-2">
           <span className="text-base">🔳</span>
-          <span className="text-xs font-extrabold tracking-wider uppercase text-emerald-400">
+          <span className="text-xs font-extrabold tracking-wider uppercase text-[#E86A33] dark:text-[#F4A340]">
             Packaged Food
           </span>
         </div>
-        <span className="text-2xs font-mono text-stone-400 bg-stone-800 dark:bg-stone-900 px-2.5 py-1 rounded-md">
+        <span className="text-2xs font-mono text-stone-400 bg-stone-800 dark:bg-[#25211D] px-2.5 py-1 rounded-md">
           GTIN / EAN: {product.barcode}
         </span>
       </div>
@@ -110,7 +110,7 @@ export function PackagedFoodResultCard({
         {/* Product Identity Header */}
         <div className="flex flex-col sm:flex-row items-start gap-4">
           {displayImage ? (
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-stone-50 dark:bg-[#16231a] border border-stone-200 dark:border-[#23382b] p-1 shrink-0 flex items-center justify-center overflow-hidden">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-stone-50 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] p-1 shrink-0 flex items-center justify-center overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={displayImage}
@@ -170,17 +170,17 @@ export function PackagedFoodResultCard({
             </div>
 
             {/* Protein */}
-            <div className="p-3 rounded-2xl bg-stone-50 dark:bg-[#16231a] border border-stone-200 dark:border-[#23382b] text-center">
+            <div className="p-3 rounded-2xl bg-stone-50 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-center">
               <span className="text-3xs font-semibold text-stone-600 dark:text-stone-400 uppercase tracking-wider block">
                 Protein
               </span>
-              <span className="text-lg font-black text-stone-900 dark:text-stone-100">
+              <span className="text-lg font-black text-[#E86A33] dark:text-[#F4A340]">
                 {proteinDisplay}g
               </span>
             </div>
 
             {/* Carbohydrates */}
-            <div className="p-3 rounded-2xl bg-stone-50 dark:bg-[#16231a] border border-stone-200 dark:border-[#23382b] text-center">
+            <div className="p-3 rounded-2xl bg-stone-50 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-center">
               <span className="text-3xs font-semibold text-stone-600 dark:text-stone-400 uppercase tracking-wider block">
                 Carbs
               </span>
@@ -190,7 +190,7 @@ export function PackagedFoodResultCard({
             </div>
 
             {/* Fat */}
-            <div className="p-3 rounded-2xl bg-stone-50 dark:bg-[#16231a] border border-stone-200 dark:border-[#23382b] text-center">
+            <div className="p-3 rounded-2xl bg-stone-50 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-center">
               <span className="text-3xs font-semibold text-stone-600 dark:text-stone-400 uppercase tracking-wider block">
                 Fat
               </span>
@@ -202,19 +202,19 @@ export function PackagedFoodResultCard({
 
           {/* Secondary Nutrients: Sugar, Sodium, Fiber */}
           <div className="grid grid-cols-3 gap-2 text-center pt-1">
-            <div className="p-2 rounded-xl bg-stone-50/70 dark:bg-[#16231a]/70 border border-stone-200/70 dark:border-[#23382b]/70">
+            <div className="p-2 rounded-xl bg-stone-50/70 dark:bg-[#1D1A17]/70 border border-stone-200/70 dark:border-[#38312A]/70">
               <span className="text-3xs text-stone-500 dark:text-stone-400 block">Sugar</span>
               <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
                 {sugarDisplay !== undefined && sugarDisplay !== null ? `${sugarDisplay}g` : '—'}
               </span>
             </div>
-            <div className="p-2 rounded-xl bg-stone-50/70 dark:bg-[#16231a]/70 border border-stone-200/70 dark:border-[#23382b]/70">
+            <div className="p-2 rounded-xl bg-stone-50/70 dark:bg-[#1D1A17]/70 border border-stone-200/70 dark:border-[#38312A]/70">
               <span className="text-3xs text-stone-500 dark:text-stone-400 block">Sodium</span>
               <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
                 {sodiumDisplay !== undefined && sodiumDisplay !== null ? `${sodiumDisplay}mg` : '—'}
               </span>
             </div>
-            <div className="p-2 rounded-xl bg-stone-50/70 dark:bg-[#16231a]/70 border border-stone-200/70 dark:border-[#23382b]/70">
+            <div className="p-2 rounded-xl bg-stone-50/70 dark:bg-[#1D1A17]/70 border border-stone-200/70 dark:border-[#38312A]/70">
               <span className="text-3xs text-stone-500 dark:text-stone-400 block">Dietary Fiber</span>
               <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
                 {fiberDisplay !== undefined && fiberDisplay !== null ? `${fiberDisplay}g` : '—'}
@@ -233,7 +233,7 @@ export function PackagedFoodResultCard({
               </div>
             )}
             {product.ingredientsText && (
-              <div className="text-2xs text-stone-600 dark:text-stone-300 leading-relaxed bg-stone-50 dark:bg-[#16231a] p-3 rounded-2xl border border-stone-200 dark:border-[#23382b]">
+              <div className="text-2xs text-stone-600 dark:text-stone-300 leading-relaxed bg-stone-50 dark:bg-[#1D1A17] p-3 rounded-2xl border border-stone-200 dark:border-[#38312A]">
                 <span className="font-bold text-stone-700 dark:text-stone-200 block mb-0.5">Ingredients:</span>
                 <span className="line-clamp-3">{product.ingredientsText}</span>
               </div>
@@ -242,7 +242,7 @@ export function PackagedFoodResultCard({
         )}
 
         {/* Package Details (MFG / EXP / Batch) Section */}
-        <div className="bg-stone-50 dark:bg-[#16231a] rounded-2xl p-4 border border-stone-200 dark:border-[#23382b] space-y-3">
+        <div className="bg-stone-50 dark:bg-[#1D1A17] rounded-2xl p-4 border border-stone-200 dark:border-[#38312A] space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-stone-800 dark:text-stone-200 flex items-center gap-1.5">
               <span>📅</span> Package Verification &amp; Dates
@@ -250,7 +250,7 @@ export function PackagedFoodResultCard({
             <button
               type="button"
               onClick={onOpenOcr}
-              className="text-2xs font-bold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 underline cursor-pointer"
+              className="text-2xs font-bold text-[#E86A33] dark:text-[#F4A340] hover:text-[#d65f2c] underline cursor-pointer"
             >
               {packageDetails ? 'Re-scan / Edit Details' : 'Scan Package Details'}
             </button>
@@ -258,7 +258,7 @@ export function PackagedFoodResultCard({
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
             {/* Manufacturing Date */}
-            <div className="p-2.5 rounded-xl bg-white dark:bg-[#19271e] border border-stone-200 dark:border-[#23382b]">
+            <div className="p-2.5 rounded-xl bg-white dark:bg-[#25211D] border border-stone-200 dark:border-[#38312A]">
               <span className="text-3xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
                 MFG Date
               </span>
@@ -270,7 +270,7 @@ export function PackagedFoodResultCard({
             </div>
 
             {/* Expiry Date */}
-            <div className="p-2.5 rounded-xl bg-white dark:bg-[#19271e] border border-stone-200 dark:border-[#23382b]">
+            <div className="p-2.5 rounded-xl bg-white dark:bg-[#25211D] border border-stone-200 dark:border-[#38312A]">
               <span className="text-3xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
                 EXP Date
               </span>
@@ -282,7 +282,7 @@ export function PackagedFoodResultCard({
             </div>
 
             {/* Batch / Lot */}
-            <div className="p-2.5 rounded-xl bg-white dark:bg-[#19271e] border border-stone-200 dark:border-[#23382b]">
+            <div className="p-2.5 rounded-xl bg-white dark:bg-[#25211D] border border-stone-200 dark:border-[#38312A]">
               <span className="text-3xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
                 Batch / Lot
               </span>
@@ -292,7 +292,7 @@ export function PackagedFoodResultCard({
             </div>
 
             {/* Status */}
-            <div className="p-2.5 rounded-xl bg-white dark:bg-[#19271e] border border-stone-200 dark:border-[#23382b] flex flex-col justify-center">
+            <div className="p-2.5 rounded-xl bg-white dark:bg-[#25211D] border border-stone-200 dark:border-[#38312A] flex flex-col justify-center">
               <span className="text-3xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
                 Status
               </span>

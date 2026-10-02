@@ -9,7 +9,7 @@ export function Card({
   return (
     <div
       className={cn(
-        'bg-white dark:bg-[#131d16] border border-[#e7e5e0] dark:border-[#23382b] text-stone-900 dark:text-stone-100 rounded-2xl shadow-xs transition-colors duration-200 overflow-hidden',
+        'bg-white dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] text-stone-900 dark:text-stone-100 rounded-2xl shadow-xs transition-colors duration-200 overflow-hidden',
         className
       )}
       {...props}
@@ -57,7 +57,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        'bg-white dark:bg-[#131d16] border border-[#e7e5e0] dark:border-[#23382b] p-5 rounded-2xl shadow-xs transition-colors',
+        'bg-white dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] p-5 rounded-2xl shadow-xs transition-colors',
         className
       )}
       {...props}

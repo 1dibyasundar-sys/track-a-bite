@@ -11,8 +11,8 @@ export function Footer() {
           {/* Brand Info */}
           <div className="space-y-4 lg:col-span-1">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-emerald-700 text-white flex items-center justify-center">
-                <LeafIcon size={18} className="text-emerald-200" />
+              <div className="w-8 h-8 rounded-lg bg-[#E86A33] text-white flex items-center justify-center shadow-xs">
+                <LeafIcon size={18} className="text-white" />
               </div>
               <span className="text-lg font-bold text-white tracking-tight">
                 Track-a-Bite
@@ -21,8 +21,8 @@ export function Footer() {
             <p className="text-xs leading-relaxed text-stone-400">
               Honoring regional diversity with intelligent, practical nutrition analysis. Built for real Indian plates—from home thalis to rural millets and budget hostel staples.
             </p>
-            <div className="flex items-center gap-2 text-2xs text-emerald-400 font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="flex items-center gap-2 text-2xs text-stone-400 font-medium">
+              <span className="w-2 h-2 rounded-full bg-[#3F8F68] animate-pulse" />
               Production Ready • Phase 12
             </div>
           </div>
@@ -34,33 +34,33 @@ export function Footer() {
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/dashboard" className="hover:text-emerald-400 transition-colors">
+                <Link href="/dashboard" className="hover:text-[#E86A33] transition-colors">
                   Personal Dashboard
                 </Link>
               </li>
               <li>
-                <Link href="/scan" className="hover:text-emerald-400 transition-colors">
+                <Link href="/scan" className="hover:text-[#E86A33] transition-colors">
                   Scan Your Meal
                 </Link>
               </li>
               <li>
-                <Link href="/foods" className="hover:text-emerald-400 transition-colors">
+                <Link href="/foods" className="hover:text-[#E86A33] transition-colors">
                   Indian Food Database
                 </Link>
               </li>
               <li>
-                <Link href="/history" className="hover:text-emerald-400 transition-colors">
+                <Link href="/history" className="hover:text-[#E86A33] transition-colors">
                   Meal History
                 </Link>
               </li>
               <li>
-                <Link href="/reports" className="hover:text-emerald-400 transition-colors">
+                <Link href="/reports" className="hover:text-[#E86A33] transition-colors">
                   Nutrition Reports
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-emerald-400 transition-colors">
-                  Vision & Philosophy
+                <Link href="/about" className="hover:text-[#E86A33] transition-colors">
+                  Vision &amp; Philosophy
                 </Link>
               </li>
             </ul>

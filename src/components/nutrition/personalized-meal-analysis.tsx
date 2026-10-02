@@ -89,7 +89,7 @@ export function PersonalizedMealAnalysis({
       {/* ========================================================= */}
       {/* 1. YOUR MEAL & 5-STAR SCORE HERO                         */}
       {/* ========================================================= */}
-      <Card className="border-stone-200 dark:border-[#23382b] shadow-sm overflow-hidden bg-white dark:bg-[#131d16]">
+      <Card className="border-stone-200 dark:border-[#38312A] shadow-sm overflow-hidden bg-white dark:bg-[#1D1A17]">
         <div className="p-6 sm:p-7 text-center space-y-4">
           <div className="flex items-center justify-center gap-2">
             <span className="text-xs font-black tracking-widest text-stone-500 dark:text-stone-400 uppercase">
@@ -134,14 +134,14 @@ export function PersonalizedMealAnalysis({
         {/* ========================================================= */}
         {/* 2. WHY THIS SCORE? (EXPANDABLE DIMENSIONS)                */}
         {/* ========================================================= */}
-        <div className="border-t border-stone-100 dark:border-[#23382b] bg-stone-50/60 dark:bg-[#0c130e]/40 p-4 sm:p-5">
+        <div className="border-t border-stone-100 dark:border-[#38312A] bg-stone-50/60 dark:bg-[#151311]/40 p-4 sm:p-5">
           <button
             type="button"
             onClick={() => setIsWhyScoreExpanded(!isWhyScoreExpanded)}
-            className="w-full flex items-center justify-between text-xs font-bold text-stone-800 dark:text-stone-200 hover:text-emerald-800 dark:hover:text-emerald-400 transition-colors cursor-pointer"
+            className="w-full flex items-center justify-between text-xs font-bold text-stone-800 dark:text-stone-200 hover:text-[#E86A33] transition-colors cursor-pointer"
           >
             <span className="flex items-center gap-1.5 uppercase tracking-wider text-2xs">
-              <SparklesIcon size={14} className="text-emerald-700 dark:text-emerald-400" />
+              <SparklesIcon size={14} className="text-[#E86A33]" />
               <span>Why this score?</span>
             </span>
             <div className="flex items-center gap-1 text-stone-500 dark:text-stone-400 font-normal text-2xs">
@@ -149,14 +149,14 @@ export function PersonalizedMealAnalysis({
               <ChevronDownIcon
                 size={14}
                 className={`transition-transform duration-200 ${
-                  isWhyScoreExpanded ? 'rotate-180 text-emerald-700 dark:text-emerald-400' : ''
+                  isWhyScoreExpanded ? 'rotate-180 text-[#E86A33]' : ''
                 }`}
               />
             </div>
           </button>
 
           {isWhyScoreExpanded && (
-            <div className="mt-4 pt-3 border-t border-stone-200/80 dark:border-[#23382b] space-y-3 animate-in fade-in duration-200">
+            <div className="mt-4 pt-3 border-t border-stone-200/80 dark:border-[#38312A] space-y-3 animate-in fade-in duration-200">
               {/* Protein Dimension */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs font-mono">
                 <div className="flex items-center justify-between sm:justify-start gap-3 min-w-[210px]">
@@ -246,7 +246,7 @@ export function PersonalizedMealAnalysis({
       {/* ========================================================= */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {/* Calories */}
-        <div className="col-span-2 sm:col-span-1 p-4 rounded-2xl bg-white dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] shadow-2xs text-center space-y-1">
+        <div className="col-span-2 sm:col-span-1 p-4 rounded-2xl bg-white dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] shadow-2xs text-center space-y-1">
           <span className="text-3xs font-extrabold uppercase tracking-wider text-stone-500 dark:text-stone-400 block">
             CALORIES
           </span>
@@ -256,12 +256,12 @@ export function PersonalizedMealAnalysis({
         </div>
 
         {/* Protein */}
-        <div className="p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/40 shadow-2xs text-center space-y-1">
-          <span className="text-3xs font-extrabold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 block">
+        <div className="p-4 rounded-2xl bg-[#FEF7EE] dark:bg-[#251A14] border border-[#FBD5BD] dark:border-[#4D2918] shadow-2xs text-center space-y-1">
+          <span className="text-3xs font-extrabold uppercase tracking-wider text-[#E86A33] block">
             PROTEIN
           </span>
-          <span className="text-xl sm:text-2xl font-black text-emerald-950 dark:text-emerald-200 font-mono block">
-            {displayProtein} <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">g</span>
+          <span className="text-xl sm:text-2xl font-black text-[#E86A33] dark:text-[#F4A340] font-mono block">
+            {displayProtein} <span className="text-xs font-semibold text-[#E86A33] dark:text-[#F4A340]">g</span>
           </span>
         </div>
 
@@ -286,12 +286,12 @@ export function PersonalizedMealAnalysis({
         </div>
 
         {/* Fiber */}
-        <div className="p-4 rounded-2xl bg-teal-50/60 dark:bg-teal-950/30 border border-teal-200/80 dark:border-teal-900/40 shadow-2xs text-center space-y-1">
-          <span className="text-3xs font-extrabold uppercase tracking-wider text-teal-800 dark:text-teal-300 block">
+        <div className="p-4 rounded-2xl bg-[#F0FDF4] dark:bg-[#15251C] border border-[#3F8F68]/30 dark:border-[#3F8F68]/40 shadow-2xs text-center space-y-1">
+          <span className="text-3xs font-extrabold uppercase tracking-wider text-[#3F8F68] dark:text-[#5FA77F] block">
             FIBER
           </span>
-          <span className="text-xl sm:text-2xl font-black text-teal-950 dark:text-teal-200 font-mono block">
-            {displayFiber} <span className="text-xs font-semibold text-teal-700 dark:text-teal-400">g</span>
+          <span className="text-xl sm:text-2xl font-black text-[#2E6B4E] dark:text-[#5FA77F] font-mono block">
+            {displayFiber} <span className="text-xs font-semibold text-[#2E6B4E] dark:text-[#5FA77F]">g</span>
           </span>
         </div>
       </div>
@@ -311,7 +311,7 @@ export function PersonalizedMealAnalysis({
             </p>
           </div>
           {onAddRecommendation && (
-            <span className="text-3xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+            <span className="text-3xs font-bold px-2 py-0.5 rounded-full bg-[#FEF7EE] dark:bg-[#2A1C14] text-[#E86A33] border border-[#FBD5BD] dark:border-[#4D2918]">
               Tap to add
             </span>
           )}
@@ -321,7 +321,7 @@ export function PersonalizedMealAnalysis({
           {recommendations.slice(0, 3).map((rec) => (
             <div
               key={rec.id}
-              className="p-4 rounded-2xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] hover:border-emerald-300 dark:hover:border-emerald-700 transition-all shadow-2xs flex flex-col justify-between space-y-3 group"
+              className="p-4 rounded-2xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] hover:border-[#E86A33]/50 transition-all shadow-2xs flex flex-col justify-between space-y-3 group"
             >
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
@@ -341,7 +341,7 @@ export function PersonalizedMealAnalysis({
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-stone-100 dark:border-[#23382b] flex items-center justify-between text-3xs">
+              <div className="pt-2 border-t border-stone-100 dark:border-[#38312A] flex items-center justify-between text-3xs">
                 <span className="text-stone-500 dark:text-stone-400 font-medium">
                   {rec.availabilityNote}
                 </span>
@@ -350,7 +350,7 @@ export function PersonalizedMealAnalysis({
                   <button
                     type="button"
                     onClick={() => onAddRecommendation(rec)}
-                    className="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                    className="px-2 py-1 rounded-lg bg-[#FEF7EE] dark:bg-[#2A1C14] text-[#E86A33] hover:bg-[#E86A33] hover:text-white border border-[#FBD5BD] dark:border-[#4D2918] font-bold flex items-center gap-1 transition-colors cursor-pointer"
                   >
                     <PlusIcon size={11} />
                     <span>Add</span>

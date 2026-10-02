@@ -136,6 +136,17 @@ export function NutritionDashboard({
     };
   }, [activeUserId, profile, initialMeals, refreshTrigger, hostelFilter]);
 
+  // Listen for real-time TAB voice mutations to trigger seamless background refresh
+  useEffect(() => {
+    const handleDataRefresh = () => {
+      setRefreshTrigger(prev => prev + 1);
+    };
+    window.addEventListener('track-a-bite-data-refresh', handleDataRefresh);
+    return () => {
+      window.removeEventListener('track-a-bite-data-refresh', handleDataRefresh);
+    };
+  }, []);
+
   const handleManualRefresh = () => {
     setRefreshing(true);
     setRefreshTrigger(prev => prev + 1);
@@ -244,7 +255,7 @@ export function NutritionDashboard({
           <div className="flex items-center gap-2">
             <Link
               href="/scan"
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold shadow-xs transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#E86A33] hover:bg-[#d65f2c] text-white text-xs font-bold shadow-xs transition-colors"
             >
               <CameraIcon size={16} />
               <span>Scan Food</span>
@@ -274,10 +285,10 @@ export function NutritionDashboard({
         )}
 
         {/* HEADER: Personalized Contextual Greeting & Student Tags */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-stone-200/80 dark:border-[#23382b] pb-5">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-stone-200/80 dark:border-[#38312A] pb-5">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/40">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#E86A33] bg-[#FEF7EE] dark:bg-[#2A1C14] px-2.5 py-0.5 rounded-md border border-[#FBD5BD] dark:border-[#4D2918]">
                 Personal Nutrition Companion
               </span>
               {profile.isHostelite && (
@@ -296,15 +307,15 @@ export function NutritionDashboard({
 
           {/* Quick Dietary Profile Tags */}
           <div className="flex flex-wrap items-center gap-1.5 text-2xs text-stone-600 dark:text-stone-400 font-medium">
-            <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-[#19271e] text-stone-700 dark:text-stone-300 capitalize">
+            <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-[#25211D] text-stone-700 dark:text-stone-300 capitalize">
               Diet: {profile.dietaryRestrictions || 'Vegetarian'}
             </span>
             {profile.allergies && profile.allergies.length > 0 && (
-              <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-[#19271e] text-stone-700 dark:text-stone-300">
+              <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-[#25211D] text-stone-700 dark:text-stone-300">
                 Allergies: {profile.allergies.join(', ')}
               </span>
             )}
-            <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-[#19271e] text-stone-700 dark:text-stone-300 capitalize">
+            <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-[#25211D] text-stone-700 dark:text-stone-300 capitalize">
               Budget: {profile.budgetPreference || 'Budget'}
             </span>
           </div>
@@ -313,21 +324,21 @@ export function NutritionDashboard({
         {/* =====================================================================
             5. MASTER 3D COMPANION CARD: TODAY'S NUTRITION & HEALTH SCORE
             ===================================================================== */}
-        <div className="card-3d p-6 sm:p-8 bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] shadow-md relative overflow-hidden">
+        <div className="card-3d p-6 sm:p-8 bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] shadow-md relative overflow-hidden">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
             {/* Left: Health Score Radial / Circular Visual */}
             <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
-              <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border-4 border-emerald-500/80 flex flex-col items-center justify-center shrink-0 shadow-inner">
-                <span className="text-3xl sm:text-4xl font-black text-emerald-800 dark:text-emerald-300 tracking-tight">
+              <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#F0FDF4] dark:bg-[#15251C] border-4 border-[#3F8F68] flex flex-col items-center justify-center shrink-0 shadow-inner">
+                <span className="text-3xl sm:text-4xl font-black text-[#2E6B4E] dark:text-[#5FA77F] tracking-tight">
                   {safeToday.nutritionScore || (safeToday.mealCount > 0 ? 82 : 78)}
                 </span>
-                <span className="text-3xs font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                <span className="text-3xs font-extrabold uppercase tracking-wider text-[#3F8F68] dark:text-[#5FA77F]">
                   HEALTH SCORE
                 </span>
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2 justify-center sm:justify-start">
-                  <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-[#2E6B4E] dark:text-[#5FA77F] px-2.5 py-0.5 rounded-full bg-[#F0FDF4] dark:bg-[#15251C] border border-[#3F8F68]/30 dark:border-[#3F8F68]/40">
                     {safeToday.nutritionRating ? safeToday.nutritionRating.replace('_', ' ').toUpperCase() : 'BALANCED MEAL'}
                   </span>
                   <span className="text-xs text-stone-500 dark:text-stone-400">
@@ -347,29 +358,29 @@ export function NutritionDashboard({
 
             {/* Right: Macro Pillars */}
             <div className="grid grid-cols-3 gap-3 w-full lg:w-auto">
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#19271e] border border-stone-200/80 dark:border-[#23382b] text-center min-w-[90px]">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#25211D] border border-stone-200/80 dark:border-[#38312A] text-center min-w-[90px]">
                 <span className="block text-3xs font-extrabold uppercase tracking-wider text-stone-500 dark:text-stone-400">
                   Protein
                 </span>
-                <span className="text-base sm:text-lg font-black text-emerald-700 dark:text-emerald-400 mt-0.5 block">
+                <span className="text-base sm:text-lg font-black text-[#E86A33] dark:text-[#F4A340] mt-0.5 block">
                   {Math.round(safeToday.totalProteinG)}g
                 </span>
                 <span className="text-3xs text-stone-500 dark:text-stone-400 font-medium">
                   / {safeToday.targetProteinG}g
                 </span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#19271e] border border-stone-200/80 dark:border-[#23382b] text-center min-w-[90px]">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#25211D] border border-stone-200/80 dark:border-[#38312A] text-center min-w-[90px]">
                 <span className="block text-3xs font-extrabold uppercase tracking-wider text-stone-500 dark:text-stone-400">
                   Carbs
                 </span>
-                <span className="text-base sm:text-lg font-black text-amber-700 dark:text-amber-400 mt-0.5 block">
+                <span className="text-base sm:text-lg font-black text-[#F4A340] dark:text-[#FBBF24] mt-0.5 block">
                   {Math.round(safeToday.totalCarbsG)}g
                 </span>
                 <span className="text-3xs text-stone-500 dark:text-stone-400 font-medium">
                   / {safeToday.targetCarbsG}g
                 </span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#19271e] border border-stone-200/80 dark:border-[#23382b] text-center min-w-[90px]">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#25211D] border border-stone-200/80 dark:border-[#38312A] text-center min-w-[90px]">
                 <span className="block text-3xs font-extrabold uppercase tracking-wider text-stone-500 dark:text-stone-400">
                   Calories
                 </span>
@@ -388,7 +399,7 @@ export function NutritionDashboard({
         {latestMeal && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
             {/* Recent Meal Food Card */}
-            <div className="card-3d-interactive overflow-hidden flex flex-col justify-between bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b]">
+            <div className="card-3d-interactive overflow-hidden flex flex-col justify-between bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A]">
               <div className="relative w-full aspect-16/9 bg-stone-900 overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -398,13 +409,13 @@ export function NutritionDashboard({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
                 <div className="absolute top-2.5 left-2.5">
-                  <span className="text-3xs font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-emerald-300 border border-emerald-400/40">
+                  <span className="text-3xs font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-stone-200 border border-stone-600/50">
                     Recent Meal
                   </span>
                 </div>
                 <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-xs">
                   <span className="font-bold drop-shadow-sm">{latestMeal.mealTitle}</span>
-                  <span className="text-3xs px-2 py-0.5 rounded-full bg-emerald-600/90 text-white font-bold">
+                  <span className="text-3xs px-2 py-0.5 rounded-full bg-[#E86A33] text-white font-bold">
                     {latestMeal.nutrientRichness?.stars ? `★ ${latestMeal.nutrientRichness.stars.toFixed(1)}/5` : '82/100'}
                   </span>
                 </div>
@@ -420,7 +431,7 @@ export function NutritionDashboard({
                 </div>
                 <Link
                   href={`/results?id=${latestMeal.id}`}
-                  className="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900 transition-colors"
+                  className="px-3 py-1.5 rounded-lg bg-[#FEF7EE] dark:bg-[#251A14] text-[#E86A33] text-xs font-bold hover:bg-[#E86A33] hover:text-white transition-colors border border-[#FBD5BD]/70 dark:border-[#4D2918]"
                 >
                   View Analysis →
                 </Link>
@@ -428,7 +439,7 @@ export function NutritionDashboard({
             </div>
 
             {/* Nutrition Insight & Recommendations */}
-            <div className="card-3d p-5 flex flex-col justify-between bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b]">
+            <div className="card-3d p-5 flex flex-col justify-between bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A]">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">💡</span>
@@ -437,20 +448,20 @@ export function NutritionDashboard({
                   </h3>
                 </div>
                 <div className="space-y-2 text-xs">
-                  <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/40 text-emerald-900 dark:text-emerald-200 flex items-start gap-2">
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">✓</span>
+                  <div className="p-2.5 rounded-xl bg-[#F0FDF4] dark:bg-[#15251C] border border-[#3F8F68]/30 dark:border-[#3F8F68]/40 text-[#1C4332] dark:text-[#88D4A8] flex items-start gap-2">
+                    <span className="text-[#3F8F68] font-bold shrink-0">✓</span>
                     <span><strong>What&apos;s working:</strong> Steady protein from recent meals. Energy intake matches your campus activity schedule.</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 flex items-start gap-2">
-                    <span className="text-amber-600 dark:text-amber-400 font-bold shrink-0">⚠</span>
+                  <div className="p-2.5 rounded-xl bg-[#FFFBEB] dark:bg-[#2A2016] border border-[#F59E0B]/30 dark:border-[#F59E0B]/40 text-[#92400E] dark:text-[#FDE68A] flex items-start gap-2">
+                    <span className="text-[#F59E0B] font-bold shrink-0">⚠</span>
                     <span><strong>Nutrient focus:</strong> Add dietary fiber or fresh curd to protect digestion from canteen oils.</span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-stone-100 dark:border-[#23382b] flex items-center justify-between">
+              <div className="pt-3 border-t border-stone-100 dark:border-[#38312A] flex items-center justify-between">
                 <span className="text-2xs text-stone-500 dark:text-stone-400">Personalized for {profile.healthGoal || 'General Health'}</span>
-                <Link href="/scan" className="text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:underline">
+                <Link href="/scan" className="text-xs font-bold text-[#E86A33] hover:underline">
                   Scan Next Meal →
                 </Link>
               </div>
@@ -459,10 +470,10 @@ export function NutritionDashboard({
         )}
 
         {/* PRIMARY SCAN CTA HERO BANNER */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-900 via-emerald-800 to-stone-900 text-white p-5 sm:p-7 shadow-md">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1D1A17] via-[#25211D] to-[#151311] border border-[#38312A] text-white p-5 sm:p-7 shadow-md">
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
             <div className="space-y-2 max-w-xl">
-              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-700/60 border border-emerald-500/40 text-emerald-200 text-2xs font-bold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#E86A33]/20 border border-[#E86A33]/40 text-[#F4A340] text-2xs font-bold uppercase tracking-wider">
                 <span>⚡ Quick Scan</span>
                 <span>•</span>
                 <span>AI Food Intelligence</span>
@@ -470,7 +481,7 @@ export function NutritionDashboard({
               <h2 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-white">
                 Scan Your Meal
               </h2>
-              <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed font-normal">
+              <p className="text-xs sm:text-sm text-stone-300 leading-relaxed font-normal">
                 Take a quick photo of your plate, mess thali, or canteen snack. Instant macro breakdown, Indian dish detection, and personalized balance recommendations in seconds.
               </p>
             </div>
@@ -478,10 +489,10 @@ export function NutritionDashboard({
             <div className="shrink-0 flex items-center gap-3">
               <Link
                 href="/scan"
-                className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-white text-emerald-950 font-bold text-sm shadow-md hover:bg-emerald-50 active:scale-98 transition-all cursor-pointer group"
+                className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#E86A33] text-white font-bold text-sm shadow-md hover:bg-[#d65f2c] active:scale-98 transition-all cursor-pointer group"
                 aria-label="Scan food with camera"
               >
-                <CameraIcon size={20} className="text-emerald-800 group-hover:scale-110 transition-transform" />
+                <CameraIcon size={20} className="text-white group-hover:scale-110 transition-transform" />
                 <span>Scan Food Now</span>
               </Link>
             </div>

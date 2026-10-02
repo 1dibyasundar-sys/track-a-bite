@@ -139,13 +139,13 @@ export default function HistoryPage() {
         />
 
         {/* Segmented View Switcher: Meals Journal vs Nutrition Analytics */}
-        <div className="flex items-center gap-2 p-1 rounded-xl bg-stone-100 dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] w-fit">
+        <div className="flex items-center gap-2 p-1 rounded-xl bg-stone-100 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] w-fit">
           <button
             type="button"
             onClick={() => setActiveTab('meals')}
             className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeTab === 'meals'
-                ? 'bg-white dark:bg-[#1e3024] text-emerald-950 dark:text-emerald-300 shadow-2xs'
+                ? 'bg-white dark:bg-[#25211D] text-[#E86A33] dark:text-[#F4A340] shadow-2xs'
                 : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200'
             }`}
           >
@@ -156,7 +156,7 @@ export default function HistoryPage() {
             onClick={() => setActiveTab('analytics')}
             className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeTab === 'analytics'
-                ? 'bg-white dark:bg-[#1e3024] text-emerald-950 dark:text-emerald-300 shadow-2xs'
+                ? 'bg-white dark:bg-[#25211D] text-[#E86A33] dark:text-[#F4A340] shadow-2xs'
                 : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200'
             }`}
           >
@@ -170,7 +170,7 @@ export default function HistoryPage() {
           <>
             {/* History Trends Summary Card */}
         {meals.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 rounded-2xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] shadow-2xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 rounded-2xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] shadow-2xs">
             <div>
               <span className="block text-2xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">
                 Total Meals Scanned
@@ -188,19 +188,19 @@ export default function HistoryPage() {
               </span>
             </div>
             <div>
-              <span className="block text-2xs font-semibold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">
+              <span className="block text-2xs font-semibold text-[#E86A33] dark:text-[#F4A340] uppercase tracking-wider">
                 Avg. Protein / Meal
               </span>
-              <span className="text-xl sm:text-2xl font-extrabold text-emerald-800 dark:text-emerald-400 mt-1 block">
-                {avgProtein} <span className="text-xs font-normal text-emerald-600 dark:text-emerald-400">g</span>
+              <span className="text-xl sm:text-2xl font-extrabold text-[#E86A33] dark:text-[#F4A340] mt-1 block">
+                {avgProtein} <span className="text-xs font-normal text-stone-500 dark:text-stone-400">g</span>
               </span>
             </div>
             <div>
-              <span className="block text-2xs font-semibold text-teal-800 dark:text-teal-400 uppercase tracking-wider">
+              <span className="block text-2xs font-semibold text-[#3F8F68] dark:text-[#5FA77F] uppercase tracking-wider">
                 Avg. Fiber / Meal
               </span>
-              <span className="text-xl sm:text-2xl font-extrabold text-teal-800 dark:text-teal-400 mt-1 block">
-                {avgFiber} <span className="text-xs font-normal text-teal-600 dark:text-teal-400">g</span>
+              <span className="text-xl sm:text-2xl font-extrabold text-[#3F8F68] dark:text-[#5FA77F] mt-1 block">
+                {avgFiber} <span className="text-xs font-normal text-stone-500 dark:text-stone-400">g</span>
               </span>
             </div>
           </div>
@@ -209,7 +209,7 @@ export default function HistoryPage() {
         {/* List of Previous Meals */}
         {isLoading ? (
           <div className="py-20 text-center">
-            <div className="inline-block w-8 h-8 border-3 border-emerald-700 dark:border-emerald-400 border-t-transparent rounded-full animate-spin mb-3" />
+            <div className="inline-block w-8 h-8 border-3 border-[#E86A33] border-t-transparent rounded-full animate-spin mb-3" />
             <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">Loading history...</p>
           </div>
         ) : meals.length === 0 ? (
@@ -241,7 +241,7 @@ export default function HistoryPage() {
                   href={`/results?id=${meal.id}`}
                   className="block group focus:outline-none"
                 >
-                  <div className="card-3d-interactive overflow-hidden bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] flex flex-col sm:flex-row items-stretch">
+                  <div className="card-3d-interactive overflow-hidden bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] flex flex-col sm:flex-row items-stretch">
                     {/* Food Image Thumbnail */}
                     <div className="relative w-full sm:w-44 md:w-52 aspect-16/10 sm:aspect-auto shrink-0 bg-stone-900 overflow-hidden">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -253,7 +253,7 @@ export default function HistoryPage() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent sm:hidden" />
                       <div className="absolute top-2.5 left-2.5">
-                        <span className="text-3xs font-extrabold uppercase px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-emerald-300 border border-emerald-500/40">
+                        <span className="text-3xs font-extrabold uppercase px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[#5FA77F] border border-[#3F8F68]/40">
                           {score}/100
                         </span>
                       </div>
@@ -263,7 +263,7 @@ export default function HistoryPage() {
                     <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
                       <div>
                         <div className="flex items-center gap-2 flex-wrap text-2xs text-stone-500 dark:text-stone-400 mb-1">
-                          <span className="font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400 font-mono">
+                          <span className="font-bold uppercase tracking-wider text-[#E86A33] dark:text-[#F4A340] font-mono">
                             {formatDate(meal.analyzedAt)}
                           </span>
                           <span>•</span>
@@ -277,26 +277,26 @@ export default function HistoryPage() {
                           )}
                         </div>
 
-                        <h3 className="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 group-hover:text-emerald-800 dark:group-hover:text-emerald-300 transition-colors">
+                        <h3 className="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 group-hover:text-[#E86A33] transition-colors">
                           {meal.mealTitle}
                         </h3>
 
                         {/* Quick Insights tags */}
                         <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
                           {meal.totalNutrition.protein >= 15 && (
-                            <span className="text-3xs font-semibold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
+                            <span className="text-3xs font-semibold px-2 py-0.5 rounded-md bg-[#FEF7EE] dark:bg-[#2A1C14] text-[#E86A33]">
                               ✓ Good protein ({meal.totalNutrition.protein}g)
                             </span>
                           )}
                           {meal.totalNutrition.fiber >= 5 && (
-                            <span className="text-3xs font-semibold px-2 py-0.5 rounded-md bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300">
+                            <span className="text-3xs font-semibold px-2 py-0.5 rounded-md bg-[#F0FDF4] dark:bg-[#15251C] text-[#3F8F68] dark:text-[#5FA77F]">
                               ✓ High fiber
                             </span>
                           )}
                           {meal.items.slice(0, 3).map((item, idx) => (
                             <span
                               key={idx}
-                              className="text-3xs px-2 py-0.5 rounded-md bg-stone-100 dark:bg-[#19271e] text-stone-600 dark:text-stone-400"
+                              className="text-3xs px-2 py-0.5 rounded-md bg-stone-100 dark:bg-[#25211D] text-stone-600 dark:text-stone-400"
                             >
                               {item.name}
                             </span>
@@ -305,13 +305,13 @@ export default function HistoryPage() {
                       </div>
 
                       {/* Bottom Info Bar: Calories & Actions */}
-                      <div className="flex items-center justify-between pt-2 border-t border-stone-100 dark:border-[#23382b] text-xs">
+                      <div className="flex items-center justify-between pt-2 border-t border-stone-100 dark:border-[#38312A] text-xs">
                         <div className="flex items-center gap-4">
                           <span className="font-black text-stone-900 dark:text-stone-100 text-sm">
                             {meal.totalNutrition.calories} <span className="text-3xs font-normal text-stone-500">kcal</span>
                           </span>
                           <span className="text-stone-400 dark:text-stone-600">|</span>
-                          <span className="font-bold text-emerald-700 dark:text-emerald-400 text-xs">
+                          <span className="font-bold text-[#E86A33] dark:text-[#F4A340] text-xs">
                             {meal.totalNutrition.protein}g protein
                           </span>
                         </div>
@@ -325,7 +325,7 @@ export default function HistoryPage() {
                           >
                             <TrashIcon size={15} />
                           </button>
-                          <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                          <span className="text-xs font-semibold text-[#E86A33] dark:text-[#F4A340] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
                             <span>Details</span>
                             <ArrowRightIcon size={14} />
                           </span>

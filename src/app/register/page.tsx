@@ -62,13 +62,13 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="py-12 sm:py-16 bg-gradient-to-b from-stone-50 via-emerald-50/20 to-stone-50 dark:from-[#0c130e] dark:via-[#131d16] dark:to-[#0c130e] min-h-[calc(100vh-4rem)] flex items-center">
+    <div className="py-12 sm:py-16 bg-gradient-to-b from-[#FAF7F2] via-[#F3EDE4] to-[#FAF7F2] dark:from-[#151311] dark:via-[#1D1A17] dark:to-[#151311] min-h-[calc(100vh-4rem)] flex items-center">
       <Container size="sm">
         <div className="w-full max-w-md mx-auto">
           {/* Brand Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex w-12 h-12 rounded-2xl bg-emerald-800 text-white items-center justify-center shadow-sm mb-4">
-              <LeafIcon size={24} className="text-emerald-300" />
+            <div className="inline-flex w-12 h-12 rounded-2xl bg-[#25211D] text-[#E86A33] items-center justify-center shadow-sm mb-4">
+              <LeafIcon size={24} className="text-[#E86A33]" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
               Join Track-a-Bite
@@ -79,7 +79,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Registration Card */}
-          <div className="bg-white/90 dark:bg-[#131d16]/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-stone-200/80 dark:border-[#23382b] shadow-sm">
+          <div className="bg-white/90 dark:bg-[#1D1A17]/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-stone-200/80 dark:border-[#38312A] shadow-sm">
             {serverError && (
               <div
                 role="alert"
@@ -108,7 +108,7 @@ export default function RegisterPage() {
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Aarav Sharma"
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#23382b] bg-white dark:bg-[#19271e] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent text-sm transition-all min-h-[44px]"
+                  className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#38312A] bg-white dark:bg-[#25211D] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-[#E86A33] focus:border-transparent text-sm transition-all min-h-[44px]"
                 />
               </div>
 
@@ -135,7 +135,7 @@ export default function RegisterPage() {
                   aria-describedby={errors.email ? 'register-email-error' : undefined}
                   placeholder="student@campus.edu"
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#23382b] bg-white dark:bg-[#19271e] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent text-sm transition-all min-h-[44px]"
+                  className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#38312A] bg-white dark:bg-[#25211D] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-[#E86A33] focus:border-transparent text-sm transition-all min-h-[44px]"
                 />
                 {errors.email && (
                   <p id="register-email-error" className="text-xs text-red-600 dark:text-rose-400 font-medium mt-1">
@@ -167,7 +167,7 @@ export default function RegisterPage() {
                   aria-describedby={errors.password ? 'register-password-error' : undefined}
                   placeholder="At least 6 characters"
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#23382b] bg-white dark:bg-[#19271e] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent text-sm transition-all min-h-[44px]"
+                  className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#38312A] bg-white dark:bg-[#25211D] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-[#E86A33] focus:border-transparent text-sm transition-all min-h-[44px]"
                 />
                 {errors.password && (
                   <p id="register-password-error" className="text-xs text-red-600 dark:text-rose-400 font-medium mt-1">
@@ -199,7 +199,7 @@ export default function RegisterPage() {
                   aria-describedby={errors.confirmPassword ? 'register-confirm-error' : undefined}
                   placeholder="Re-enter your password"
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#23382b] bg-white dark:bg-[#19271e] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent text-sm transition-all min-h-[44px]"
+                  className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#38312A] bg-white dark:bg-[#25211D] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-[#E86A33] focus:border-transparent text-sm transition-all min-h-[44px]"
                 />
                 {errors.confirmPassword && (
                   <p id="register-confirm-error" className="text-xs text-red-600 dark:text-rose-400 font-medium mt-1">
@@ -213,7 +213,7 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3 px-4 rounded-xl bg-emerald-800 dark:bg-emerald-700 hover:bg-emerald-900 dark:hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed min-h-[44px]"
+                  className="w-full py-3 px-4 rounded-xl bg-[#E86A33] hover:bg-[#d65f2c] text-white font-bold text-sm transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed min-h-[44px]"
                 >
                   {isSubmitting ? (
                     <>
@@ -228,12 +228,12 @@ export default function RegisterPage() {
             </form>
 
             {/* Footer Link */}
-            <div className="mt-6 pt-5 border-t border-stone-100 dark:border-[#23382b] text-center">
+            <div className="mt-6 pt-5 border-t border-stone-100 dark:border-[#38312A] text-center">
               <p className="text-xs text-stone-600 dark:text-stone-400">
                 Already have an account?{' '}
                 <Link
                   href="/login"
-                  className="font-bold text-emerald-800 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300 hover:underline"
+                  className="font-bold text-[#E86A33] dark:text-[#F4A340] hover:underline"
                 >
                   Sign in
                 </Link>

@@ -26,7 +26,7 @@ export function MobileBottomNav() {
   return (
     <nav
       aria-label="Mobile Navigation"
-      className="fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-[#0c130e]/95 backdrop-blur-md border-t border-stone-200/90 dark:border-[#23382b] shadow-lg md:hidden transition-all duration-200"
+      className="fixed bottom-0 inset-x-0 z-40 bg-[#FAF7F2]/95 dark:bg-[#151311]/95 backdrop-blur-md border-t border-[#E8DED2] dark:border-[#38312A] shadow-lg md:hidden transition-all duration-200"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <div className="flex items-center justify-around h-16 px-2 max-w-md mx-auto relative">
@@ -34,9 +34,9 @@ export function MobileBottomNav() {
         <Link
           href="/dashboard"
           className={cn(
-            'flex flex-col items-center justify-center flex-1 py-1 min-h-[48px] min-w-[48px] rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700',
+            'flex flex-col items-center justify-center flex-1 py-1 min-h-[48px] min-w-[48px] rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E86A33]',
             isHomeActive
-              ? 'text-emerald-800 dark:text-emerald-400 font-bold'
+              ? 'text-[#E86A33] dark:text-[#F4A340] font-bold'
               : 'text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 font-medium'
           )}
           aria-label="Dashboard Home"
@@ -44,7 +44,7 @@ export function MobileBottomNav() {
         >
           <HomeIcon
             size={20}
-            className={isHomeActive ? 'text-emerald-700 dark:text-emerald-400 stroke-[2.5]' : 'text-stone-500 dark:text-stone-400'}
+            className={isHomeActive ? 'text-[#E86A33] dark:text-[#F4A340] stroke-[2.5]' : 'text-stone-500 dark:text-stone-400'}
           />
           <span className="text-3xs tracking-tight mt-1">Home</span>
         </Link>
@@ -53,9 +53,9 @@ export function MobileBottomNav() {
         <Link
           href="/history"
           className={cn(
-            'flex flex-col items-center justify-center flex-1 py-1 min-h-[48px] min-w-[48px] rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700',
+            'flex flex-col items-center justify-center flex-1 py-1 min-h-[48px] min-w-[48px] rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E86A33]',
             isHistoryActive
-              ? 'text-emerald-800 dark:text-emerald-400 font-bold'
+              ? 'text-[#E86A33] dark:text-[#F4A340] font-bold'
               : 'text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 font-medium'
           )}
           aria-label="Meal History"
@@ -63,7 +63,7 @@ export function MobileBottomNav() {
         >
           <HistoryIcon
             size={20}
-            className={isHistoryActive ? 'text-emerald-700 dark:text-emerald-400 stroke-[2.5]' : 'text-stone-500 dark:text-stone-400'}
+            className={isHistoryActive ? 'text-[#E86A33] dark:text-[#F4A340] stroke-[2.5]' : 'text-stone-500 dark:text-stone-400'}
           />
           <span className="text-3xs tracking-tight mt-1">History</span>
         </Link>
@@ -73,26 +73,26 @@ export function MobileBottomNav() {
           <Link
             href="/scan"
             className={cn(
-              'w-13 h-13 rounded-full flex flex-col items-center justify-center shadow-lg transition-all transform active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500',
+              'w-13 h-13 rounded-full flex flex-col items-center justify-center shadow-lg transition-all transform active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E86A33]',
               isScanActive
-                ? 'bg-emerald-700 text-white ring-4 ring-emerald-100 dark:ring-emerald-950 shadow-emerald-900/30'
-                : 'bg-emerald-800 dark:bg-emerald-600 hover:bg-emerald-900 dark:hover:bg-emerald-500 text-white shadow-emerald-950/20'
+                ? 'bg-[#E86A33] text-white ring-4 ring-[#E86A33]/25 shadow-[#E86A33]/30'
+                : 'bg-[#E86A33] hover:bg-[#d65f2c] text-white shadow-stone-900/20'
             )}
             aria-label="Scan Food"
             aria-current={isScanActive ? 'page' : undefined}
           >
             <CameraIcon size={24} className="text-white" />
           </Link>
-          <span className="text-3xs font-bold tracking-tight text-emerald-900 dark:text-emerald-300 mt-1">Scan</span>
+          <span className="text-3xs font-bold tracking-tight text-[#E86A33] dark:text-[#F4A340] mt-1">Scan</span>
         </div>
 
         {/* 4. Analytics */}
         <Link
           href="/reports"
           className={cn(
-            'flex flex-col items-center justify-center flex-1 py-1 min-h-[48px] min-w-[48px] rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700',
+            'flex flex-col items-center justify-center flex-1 py-1 min-h-[48px] min-w-[48px] rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E86A33]',
             isAnalyticsActive
-              ? 'text-emerald-800 dark:text-emerald-400 font-bold'
+              ? 'text-[#E86A33] dark:text-[#F4A340] font-bold'
               : 'text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 font-medium'
           )}
           aria-label="Nutrition Analytics"
@@ -100,7 +100,7 @@ export function MobileBottomNav() {
         >
           <BarChartIcon
             size={20}
-            className={isAnalyticsActive ? 'text-emerald-700 dark:text-emerald-400 stroke-[2.5]' : 'text-stone-500 dark:text-stone-400'}
+            className={isAnalyticsActive ? 'text-[#E86A33] dark:text-[#F4A340] stroke-[2.5]' : 'text-stone-500 dark:text-stone-400'}
           />
           <span className="text-3xs tracking-tight mt-1">Analytics</span>
         </Link>
@@ -109,9 +109,9 @@ export function MobileBottomNav() {
         <Link
           href="/profile"
           className={cn(
-            'flex flex-col items-center justify-center flex-1 py-1 min-h-[48px] min-w-[48px] rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700',
+            'flex flex-col items-center justify-center flex-1 py-1 min-h-[48px] min-w-[48px] rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E86A33]',
             isProfileActive
-              ? 'text-emerald-800 dark:text-emerald-400 font-bold'
+              ? 'text-[#E86A33] dark:text-[#F4A340] font-bold'
               : 'text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 font-medium'
           )}
           aria-label="User Profile"
@@ -119,7 +119,7 @@ export function MobileBottomNav() {
         >
           <UserIcon
             size={20}
-            className={isProfileActive ? 'text-emerald-700 dark:text-emerald-400 stroke-[2.5]' : 'text-stone-500 dark:text-stone-400'}
+            className={isProfileActive ? 'text-[#E86A33] dark:text-[#F4A340] stroke-[2.5]' : 'text-stone-500 dark:text-stone-400'}
           />
           <span className="text-3xs tracking-tight mt-1">Profile</span>
         </Link>

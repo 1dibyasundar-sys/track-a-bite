@@ -24,12 +24,12 @@ export function HostelUpgradesCard({
 
   return (
     <div
-      className={`p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] text-stone-900 dark:text-stone-100 shadow-2xs space-y-5 ${className}`}
+      className={`p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] text-stone-900 dark:text-stone-100 shadow-2xs space-y-5 ${className}`}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-stone-100 dark:border-stone-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-stone-100 dark:border-[#38312A]">
         <div>
-          <div className="flex items-center gap-1.5 text-emerald-800 dark:text-emerald-400 text-2xs font-bold uppercase tracking-wider mb-0.5">
-            <SparklesIcon size={13} className="text-emerald-700 dark:text-emerald-400" />
+          <div className="flex items-center gap-1.5 text-[#E86A33] text-2xs font-bold uppercase tracking-wider mb-0.5">
+            <SparklesIcon size={13} className="text-[#E86A33]" />
             <span>Campus Friendly</span>
           </div>
           <h3 className="text-sm sm:text-base font-bold text-stone-900 dark:text-stone-100 tracking-tight">
@@ -40,7 +40,7 @@ export function HostelUpgradesCard({
           </p>
         </div>
 
-        <span className="self-start sm:self-auto text-3xs font-semibold px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700">
+        <span className="self-start sm:self-auto text-3xs font-semibold px-2 py-0.5 rounded-full bg-stone-100 dark:bg-[#25211D] text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-[#38312A]">
           Estimated Local Prices
         </span>
       </div>
@@ -55,20 +55,20 @@ export function HostelUpgradesCard({
             {upgrades.map(upgrade => (
               <div
                 key={upgrade.id}
-                className="p-3.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/40 border border-emerald-200/70 dark:border-emerald-800/60 flex flex-col justify-between space-y-2"
+                className="p-3.5 rounded-xl bg-[#FEF7EE] dark:bg-[#251A14] border border-[#FBD5BD] dark:border-[#4D2918] flex flex-col justify-between space-y-2"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
-                    <h4 className="text-xs font-bold text-emerald-950 dark:text-emerald-100 leading-snug">
+                    <h4 className="text-xs font-bold text-stone-900 dark:text-stone-100 leading-snug">
                       {upgrade.title}
                     </h4>
                     {upgrade.approximatePriceRange && (
-                      <span className="text-3xs font-bold px-1.5 py-0.5 rounded bg-white dark:bg-[#19271e] text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0">
+                      <span className="text-3xs font-bold px-1.5 py-0.5 rounded bg-white dark:bg-[#1D1A17] text-[#E86A33] border border-[#FBD5BD] dark:border-[#4D2918] shrink-0">
                         {upgrade.approximatePriceRange}
                       </span>
                     )}
                   </div>
-                  <p className="text-2xs text-emerald-900 dark:text-emerald-300 mt-1 leading-snug">
+                  <p className="text-2xs text-stone-700 dark:text-stone-300 mt-1 leading-snug">
                     {upgrade.description}
                   </p>
                   {upgrade.campusLocation && (
@@ -82,7 +82,7 @@ export function HostelUpgradesCard({
                   <button
                     type="button"
                     onClick={() => onAddUpgrade(upgrade)}
-                    className="w-full py-1.5 px-2 text-2xs font-bold rounded-lg bg-emerald-800 dark:bg-emerald-600 text-white hover:bg-emerald-900 dark:hover:bg-emerald-500 transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                    className="w-full py-1.5 px-2 text-2xs font-bold rounded-lg bg-[#E86A33] hover:bg-[#d65f2c] text-white transition-colors flex items-center justify-center gap-1 cursor-pointer"
                   >
                     <PlusIcon size={12} />
                     <span>Add to this meal</span>
@@ -95,7 +95,7 @@ export function HostelUpgradesCard({
       )}
 
       {/* Quick Hostel Staples Reference Grid */}
-      <div className="space-y-2 pt-2 border-t border-stone-100 dark:border-stone-800">
+      <div className="space-y-2 pt-2 border-t border-stone-100 dark:border-[#38312A]">
         <span className="text-2xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-400 block">
           Everyday Student Power Upgrades:
         </span>
@@ -104,7 +104,7 @@ export function HostelUpgradesCard({
           {campusStaples.map((staple, idx) => (
             <div
               key={idx}
-              className="p-3 rounded-xl bg-stone-50 dark:bg-[#16231a] border border-stone-200/70 dark:border-[#23382b] hover:border-stone-300 dark:hover:border-stone-700 transition-colors flex items-start gap-3"
+              className="p-3 rounded-xl bg-stone-50 dark:bg-[#25211D] border border-stone-200/70 dark:border-[#38312A] hover:border-stone-300 dark:hover:border-stone-700 transition-colors flex items-start gap-3"
             >
               <span className="text-2xl shrink-0 mt-0.5">{staple.emoji}</span>
               <div className="min-w-0 flex-1">
@@ -112,7 +112,7 @@ export function HostelUpgradesCard({
                   <span className="text-xs font-bold text-stone-900 dark:text-stone-100 truncate">
                     {staple.name}
                   </span>
-                  <span className="text-3xs font-extrabold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded">
+                  <span className="text-3xs font-extrabold text-[#E86A33] bg-[#FEF7EE] dark:bg-[#2A1C14] px-1.5 py-0.5 rounded">
                     {staple.price}
                   </span>
                 </div>

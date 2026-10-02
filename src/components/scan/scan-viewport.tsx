@@ -247,18 +247,18 @@ export function ScanViewport({
   ];
 
   return (
-    <div className="card-3d relative w-full max-w-2xl mx-auto rounded-3xl overflow-hidden bg-[#0c130e] border-2 border-emerald-900/60 dark:border-emerald-500/20 shadow-[0_16px_40px_-8px_rgba(4,120,87,0.25)] text-white">
+    <div className="card-3d relative w-full max-w-2xl mx-auto rounded-3xl overflow-hidden bg-[#151311] border-2 border-[#38312A] shadow-[0_16px_40px_-8px_rgba(0,0,0,0.6)] text-white">
       {/* Top Overlay Bar */}
       <div className="absolute top-0 inset-x-0 p-4 z-20 flex items-center justify-between bg-gradient-to-b from-black/85 via-black/40 to-transparent">
         <div className="flex items-center gap-2.5">
           <span
             className={`w-2.5 h-2.5 rounded-full ${
               isScanning
-                ? 'bg-amber-400 animate-ping'
+                ? 'bg-[#F4A340] animate-ping'
                 : isPreview
-                ? 'bg-sky-400 animate-pulse'
+                ? 'bg-[#7C6CE7] animate-pulse'
                 : cameraState === 'live'
-                ? 'bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse'
+                ? 'bg-[#3F8F68] dark:bg-[#5FA77F] shadow-[0_0_8px_#3F8F68] animate-pulse'
                 : 'bg-stone-500'
             }`}
           />
@@ -314,7 +314,7 @@ export function ScanViewport({
       )}
 
       {/* Main Viewport Window */}
-      <div className="relative w-full aspect-4/3 sm:aspect-16/10 bg-stone-950 flex items-center justify-center overflow-hidden">
+      <div className="relative w-full aspect-4/3 sm:aspect-16/10 bg-[#151311] flex items-center justify-center overflow-hidden">
         {/* Real Live Camera Video Stream */}
         <video
           ref={videoRef}
@@ -328,7 +328,7 @@ export function ScanViewport({
 
         {/* Synthetic Camera Background Grid (when camera is not active and not showing captured image) */}
         {!previewUrl && cameraState !== 'live' && (
-          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:16px_16px]" />
+          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#E86A33_1px,transparent_1px)] [background-size:16px_16px]" />
         )}
 
         {/* Captured/Uploaded Image Preview */}
@@ -346,21 +346,21 @@ export function ScanViewport({
         {/* Live Camera Framing Guides & Reticle */}
         {cameraState === 'live' && !previewUrl && (
           <div className="absolute inset-6 sm:inset-10 border border-white/20 rounded-3xl pointer-events-none flex items-center justify-center z-10 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
-            {/* AI Scanning Beam */}
-            <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] animate-scan-beam" />
+            {/* AI Scanning Beam (Soft Intelligent Violet) */}
+            <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#7C6CE7] to-transparent shadow-[0_0_12px_#9185E8] animate-scan-beam" />
 
             {/* Circular Plate Alignment Guide */}
-            <div className="w-52 h-52 sm:w-68 sm:h-68 rounded-full border-2 border-dashed border-emerald-400/80 pointer-events-none flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.25)]">
-              <span className="text-3xs tracking-widest text-emerald-300 uppercase font-mono px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md border border-emerald-500/40">
+            <div className="w-52 h-52 sm:w-68 sm:h-68 rounded-full border-2 border-dashed border-[#E86A33]/70 pointer-events-none flex items-center justify-center shadow-[0_0_20px_rgba(232,106,51,0.2)]">
+              <span className="text-3xs tracking-widest text-[#F4A340] uppercase font-mono px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md border border-[#F4A340]/40">
                 Center Food Plate
               </span>
             </div>
 
-            {/* Corner Marks with Soft Glow */}
-            <div className="absolute -top-1 -left-1 w-6 h-6 border-t-3 border-l-3 border-emerald-400 rounded-tl-xl shadow-[0_0_8px_#34d399]" />
-            <div className="absolute -top-1 -right-1 w-6 h-6 border-t-3 border-r-3 border-emerald-400 rounded-tr-xl shadow-[0_0_8px_#34d399]" />
-            <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-3 border-l-3 border-emerald-400 rounded-bl-xl shadow-[0_0_8px_#34d399]" />
-            <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-3 border-r-3 border-emerald-400 rounded-br-xl shadow-[0_0_8px_#34d399]" />
+            {/* Corner Marks with Terracotta Soft Glow */}
+            <div className="absolute -top-1 -left-1 w-6 h-6 border-t-3 border-l-3 border-[#E86A33] rounded-tl-xl shadow-[0_0_8px_rgba(232,106,51,0.6)]" />
+            <div className="absolute -top-1 -right-1 w-6 h-6 border-t-3 border-r-3 border-[#E86A33] rounded-tr-xl shadow-[0_0_8px_rgba(232,106,51,0.6)]" />
+            <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-3 border-l-3 border-[#E86A33] rounded-bl-xl shadow-[0_0_8px_rgba(232,106,51,0.6)]" />
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-3 border-r-3 border-[#E86A33] rounded-br-xl shadow-[0_0_8px_rgba(232,106,51,0.6)]" />
           </div>
         )}
 
@@ -454,7 +454,7 @@ export function ScanViewport({
         {/* Idle Instructions (When camera has not been requested yet) */}
         {stage === 'idle' && cameraState === 'idle' && !previewUrl && (
           <div className="z-10 text-center px-6 max-w-sm">
-            <div className="w-14 h-14 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto mb-3 shadow-lg">
+            <div className="w-14 h-14 rounded-full bg-[#25211D]/90 border border-[#E86A33]/40 text-[#E86A33] flex items-center justify-center mx-auto mb-3 shadow-lg">
               <CameraIcon size={26} />
             </div>
             <h3 className="text-base sm:text-lg font-bold text-white mb-1">
@@ -468,7 +468,7 @@ export function ScanViewport({
               id="enable-camera-btn"
               data-testid="enable-camera-btn"
               onClick={requestCamera}
-              className="px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 mx-auto cursor-pointer"
+              className="px-5 py-2.5 rounded-2xl bg-[#E86A33] hover:bg-[#d65f2c] text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 mx-auto cursor-pointer"
             >
               <CameraIcon size={16} /> Enable Camera
             </button>
@@ -477,8 +477,8 @@ export function ScanViewport({
 
         {/* Image Quality Guidance Overlay in Preview Mode */}
         {isPreview && previewUrl && (
-          <div className="absolute bottom-3 inset-x-4 bg-stone-950/80 backdrop-blur-xs text-emerald-300 text-2xs py-1.5 px-3 rounded-xl border border-emerald-500/30 text-center flex items-center justify-center gap-1.5 pointer-events-none z-20">
-            <SparklesIcon size={12} className="text-emerald-400" />
+          <div className="absolute bottom-3 inset-x-4 bg-stone-950/80 backdrop-blur-xs text-stone-200 text-2xs py-1.5 px-3 rounded-xl border border-stone-700/40 text-center flex items-center justify-center gap-1.5 pointer-events-none z-20">
+            <SparklesIcon size={12} className="text-[#F4A340]" />
             <span>Ensure all meal items are well-lit and fully visible before analyzing</span>
           </div>
         )}
@@ -585,7 +585,7 @@ export function ScanViewport({
               type="button"
               onClick={onStartAnalysis || handleShutterCapture}
               disabled={isAnalyzing}
-              className="flex-1 min-w-[160px] py-2.5 sm:py-3 px-5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="flex-1 min-w-[160px] py-2.5 sm:py-3 px-5 rounded-xl bg-[#E86A33] hover:bg-[#d65f2c] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <SparklesIcon size={16} />
               <span>{isAnalyzing ? 'Analyzing...' : 'Analyze Meal'}</span>
@@ -636,7 +636,7 @@ export function ScanViewport({
                   type="button"
                   onClick={handleShutterCapture}
                   disabled={isScanning}
-                  className="flex-1 min-w-[140px] py-2.5 sm:py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="flex-1 min-w-[140px] py-2.5 sm:py-3 px-4 rounded-xl bg-[#E86A33] hover:bg-[#d65f2c] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
                 >
                   <CameraIcon size={16} />
                   <span>Capture Plate</span>
@@ -660,7 +660,7 @@ export function ScanViewport({
                   type="button"
                   onClick={requestCamera}
                   disabled={isScanning || cameraState === 'requesting'}
-                  className="flex-1 min-w-[140px] py-2.5 sm:py-3 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="flex-1 min-w-[140px] py-2.5 sm:py-3 px-4 rounded-xl bg-[#E86A33] hover:bg-[#d65f2c] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
                 >
                   <CameraIcon size={16} />
                   <span>{cameraState === 'requesting' ? 'Starting...' : 'Enable Camera'}</span>

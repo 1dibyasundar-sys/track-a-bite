@@ -41,7 +41,7 @@ export function FoodFilterBar({ filters, onChange, resultCount }: FoodFilterBarP
   ];
 
   return (
-    <div className="bg-white dark:bg-[#131d16] p-5 rounded-2xl border border-stone-200/90 dark:border-[#23382b] shadow-2xs space-y-4">
+    <div className="bg-white dark:bg-[#1D1A17] p-5 rounded-2xl border border-stone-200/90 dark:border-[#38312A] shadow-2xs space-y-4">
       {/* Search Input & Sort Row */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative flex-1">
@@ -51,7 +51,7 @@ export function FoodFilterBar({ filters, onChange, resultCount }: FoodFilterBarP
             value={filters.query || ''}
             onChange={e => onChange({ ...filters, query: e.target.value })}
             placeholder="Search by dish name, Hindi name, dal, millet, or ingredient..."
-            className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-[#19271e] border border-stone-200 dark:border-[#23382b] rounded-xl text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:border-emerald-700 focus:bg-white dark:focus:bg-[#19271e] transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-[#25211D] border border-stone-200 dark:border-[#38312A] rounded-xl text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:border-[#E86A33] focus:bg-white dark:focus:bg-[#25211D] transition-all"
           />
         </div>
 
@@ -61,7 +61,7 @@ export function FoodFilterBar({ filters, onChange, resultCount }: FoodFilterBarP
             id="sort-by"
             value={filters.sortBy || 'name'}
             onChange={e => onChange({ ...filters, sortBy: e.target.value as FoodFilterOptions['sortBy'] })}
-            className="text-xs font-medium bg-stone-50 dark:bg-[#19271e] border border-stone-200 dark:border-[#23382b] rounded-lg px-2.5 py-2 text-stone-800 dark:text-stone-200 focus:outline-none focus:border-emerald-700"
+            className="text-xs font-medium bg-stone-50 dark:bg-[#25211D] border border-stone-200 dark:border-[#38312A] rounded-lg px-2.5 py-2 text-stone-800 dark:text-stone-200 focus:outline-none focus:border-[#E86A33]"
           >
             <option value="name">Name (A-Z)</option>
             <option value="protein">Highest Protein</option>
@@ -88,8 +88,8 @@ export function FoodFilterBar({ filters, onChange, resultCount }: FoodFilterBarP
                 onClick={() => onChange({ ...filters, region: reg })}
                 className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
                   isSelected
-                    ? 'bg-emerald-800 dark:bg-emerald-700 text-white font-semibold shadow-2xs'
-                    : 'bg-stone-100 dark:bg-[#19271e] text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-[#203327]'
+                    ? 'bg-[#E86A33] text-white font-semibold shadow-2xs'
+                    : 'bg-stone-100 dark:bg-[#25211D] text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-[#2D2620]'
                 }`}
               >
                 {reg}
@@ -100,7 +100,7 @@ export function FoodFilterBar({ filters, onChange, resultCount }: FoodFilterBarP
       </div>
 
       {/* Category Pills & Affordability */}
-      <div className="pt-2 border-t border-stone-100 dark:border-[#23382b] flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="pt-2 border-t border-stone-100 dark:border-[#38312A] flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex flex-wrap gap-1.5 items-center">
           <span className="text-xs font-semibold text-stone-500 dark:text-stone-400 mr-1">Category:</span>
           {categories.slice(0, 5).map(cat => {
@@ -112,8 +112,8 @@ export function FoodFilterBar({ filters, onChange, resultCount }: FoodFilterBarP
                 onClick={() => onChange({ ...filters, category: cat })}
                 className={`text-2xs px-2.5 py-1 rounded-md font-medium transition-colors cursor-pointer ${
                   isSelected
-                    ? 'bg-stone-900 dark:bg-emerald-700 text-white font-semibold'
-                    : 'bg-stone-100 dark:bg-[#19271e] text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-[#203327]'
+                    ? 'bg-[#1D1A17] dark:bg-[#E86A33] text-white font-semibold'
+                    : 'bg-stone-100 dark:bg-[#25211D] text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-[#2D2620]'
                 }`}
               >
                 {cat}
@@ -128,7 +128,7 @@ export function FoodFilterBar({ filters, onChange, resultCount }: FoodFilterBarP
                   onChange({ ...filters, category: e.target.value as FoodCategory });
                 }
               }}
-              className="text-2xs bg-stone-100 dark:bg-[#19271e] text-stone-600 dark:text-stone-300 rounded-md px-2 py-1 border-none focus:outline-none"
+              className="text-2xs bg-stone-100 dark:bg-[#25211D] text-stone-600 dark:text-stone-300 rounded-md px-2 py-1 border-none focus:outline-none"
             >
               <option value="more">More categories...</option>
               {categories.slice(5).map(c => (
@@ -161,7 +161,7 @@ export function FoodFilterBar({ filters, onChange, resultCount }: FoodFilterBarP
             })}
           </div>
 
-          <span className="text-2xs font-bold text-stone-500 dark:text-stone-400 pl-2 border-l border-stone-200 dark:border-[#23382b]">
+          <span className="text-2xs font-bold text-stone-500 dark:text-stone-400 pl-2 border-l border-stone-200 dark:border-[#38312A]">
             {resultCount} {resultCount === 1 ? 'dish' : 'dishes'}
           </span>
         </div>

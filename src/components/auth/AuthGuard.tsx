@@ -23,9 +23,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center py-20 px-4 text-center">
-        <div className="w-10 h-10 border-3 border-emerald-700 border-t-transparent rounded-full animate-spin mb-4" />
-        <h2 className="text-base font-bold text-stone-900">Checking your account...</h2>
-        <p className="text-xs text-stone-500 mt-1">Connecting to Track-a-Bite student network</p>
+        <div className="w-10 h-10 border-3 border-[#E86A33] border-t-transparent rounded-full animate-spin mb-4" />
+        <h2 className="text-base font-bold text-stone-900 dark:text-stone-100">Checking your account...</h2>
+        <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">Connecting to your secure Track-a-Bite session</p>
       </div>
     );
   }

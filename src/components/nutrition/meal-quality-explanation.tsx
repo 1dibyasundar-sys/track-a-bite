@@ -61,7 +61,7 @@ export function MealQualityExplanation({
     : 'Provides everyday essential minerals.';
 
   return (
-    <Card className="border border-stone-200/80 dark:border-[#23382b] bg-white dark:bg-[#131d16] shadow-xs overflow-hidden">
+    <Card className="border border-stone-200/80 dark:border-[#38312A] bg-white dark:bg-[#1D1A17] shadow-xs overflow-hidden">
       <CardContent className="p-4 sm:p-5 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -75,23 +75,23 @@ export function MealQualityExplanation({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {/* Protein */}
-          <div className="p-3 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 space-y-1">
+          <div className="p-3 rounded-xl bg-[#FEF7EE] dark:bg-[#251A14] border border-[#FBD5BD] dark:border-[#4D2918] space-y-1">
             <div className="flex items-baseline justify-between">
-              <span className="text-2xs font-bold uppercase tracking-wider text-emerald-900 dark:text-emerald-300">
+              <span className="text-2xs font-bold uppercase tracking-wider text-[#E86A33]">
                 Protein ({nutrition.protein}g)
               </span>
             </div>
-            <p className="text-xs text-emerald-950 dark:text-emerald-200 leading-relaxed">{proteinNote}</p>
+            <p className="text-xs text-stone-800 dark:text-stone-200 leading-relaxed">{proteinNote}</p>
           </div>
 
           {/* Fiber */}
-          <div className="p-3 rounded-xl bg-teal-50/50 dark:bg-teal-950/30 border border-teal-100 dark:border-teal-900/40 space-y-1">
+          <div className="p-3 rounded-xl bg-[#F0FDF4] dark:bg-[#15251C] border border-[#3F8F68]/30 dark:border-[#3F8F68]/40 space-y-1">
             <div className="flex items-baseline justify-between">
-              <span className="text-2xs font-bold uppercase tracking-wider text-teal-900 dark:text-teal-300">
+              <span className="text-2xs font-bold uppercase tracking-wider text-[#3F8F68] dark:text-[#5FA77F]">
                 Fiber ({nutrition.fiber}g)
               </span>
             </div>
-            <p className="text-xs text-teal-950 dark:text-teal-200 leading-relaxed">{fiberNote}</p>
+            <p className="text-xs text-[#1C4332] dark:text-[#88D4A8] leading-relaxed">{fiberNote}</p>
           </div>
 
           {/* Energy Source */}
@@ -105,7 +105,7 @@ export function MealQualityExplanation({
           </div>
 
           {/* Micronutrients */}
-          <div className="p-3 rounded-xl bg-stone-50 dark:bg-[#19271e] border border-stone-200/70 dark:border-[#23382b] space-y-1">
+          <div className="p-3 rounded-xl bg-stone-50 dark:bg-[#25211D] border border-stone-200/70 dark:border-[#38312A] space-y-1">
             <div className="flex items-baseline justify-between">
               <span className="text-2xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
                 Micronutrients

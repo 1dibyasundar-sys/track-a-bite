@@ -64,7 +64,7 @@ export function Dialog({
       {/* Dialog card */}
       <div
         className={cn(
-          'relative w-full bg-white dark:bg-[#131d16] rounded-2xl shadow-xl border border-stone-200 dark:border-[#23382b] p-6 z-10 my-auto text-left transform transition-all duration-200 text-stone-900 dark:text-stone-100',
+          'relative w-full bg-white dark:bg-[#1D1A17] rounded-2xl shadow-xl border border-stone-200 dark:border-[#38312A] p-6 z-10 my-auto text-left transform transition-all duration-200 text-stone-900 dark:text-stone-100',
           widths[maxWidth]
         )}
       >
@@ -115,7 +115,7 @@ export function Drawer({ isOpen, onClose, title, children }: DrawerProps) {
         aria-hidden="true"
       />
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-white dark:bg-[#131d16] border-l border-stone-200 dark:border-[#23382b] p-6 shadow-2xl flex flex-col text-stone-900 dark:text-stone-100 animate-in slide-in-from-right duration-200">
+        <div className="w-screen max-w-md bg-white dark:bg-[#1D1A17] border-l border-stone-200 dark:border-[#38312A] p-6 shadow-2xl flex flex-col text-stone-900 dark:text-stone-100 animate-in slide-in-from-right duration-200">
           <div className="flex items-center justify-between pb-4 border-b border-stone-100 dark:border-stone-800">
             {title && <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100">{title}</h3>}
             <button

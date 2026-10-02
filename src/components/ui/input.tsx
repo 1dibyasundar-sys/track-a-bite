@@ -30,9 +30,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             ref={ref}
             className={cn(
-              'w-full rounded-xl bg-white dark:bg-[#16231a] border border-stone-300 dark:border-[#23382b] text-stone-900 dark:text-stone-100 text-sm py-2.5 px-3.5 transition-all duration-150',
+              'w-full rounded-xl bg-white dark:bg-[#25211D] border border-stone-300 dark:border-[#38312A] text-stone-900 dark:text-stone-100 text-sm py-2.5 px-3.5 transition-all duration-150',
               'placeholder:text-stone-400 dark:placeholder:text-stone-500',
-              'focus:outline-none focus:border-emerald-700 dark:focus:border-emerald-500 focus:ring-1 focus:ring-emerald-700 dark:focus:ring-emerald-500',
+              'focus:outline-none focus:border-[#E86A33] dark:focus:border-[#E86A33] focus:ring-1 focus:ring-[#E86A33] dark:focus:ring-[#E86A33]',
               'disabled:bg-stone-50 dark:disabled:bg-stone-900 disabled:text-stone-400 dark:disabled:text-stone-600 disabled:cursor-not-allowed',
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
@@ -75,9 +75,9 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           id={inputId}
           ref={ref}
           className={cn(
-            'w-full rounded-xl bg-white dark:bg-[#16231a] border border-stone-300 dark:border-[#23382b] text-stone-900 dark:text-stone-100 text-sm py-2.5 px-3.5 transition-all duration-150',
+            'w-full rounded-xl bg-white dark:bg-[#25211D] border border-stone-300 dark:border-[#38312A] text-stone-900 dark:text-stone-100 text-sm py-2.5 px-3.5 transition-all duration-150',
             'placeholder:text-stone-400 dark:placeholder:text-stone-500',
-            'focus:outline-none focus:border-emerald-700 dark:focus:border-emerald-500 focus:ring-1 focus:ring-emerald-700 dark:focus:ring-emerald-500',
+            'focus:outline-none focus:border-[#E86A33] dark:focus:border-[#E86A33] focus:ring-1 focus:ring-[#E86A33] dark:focus:ring-[#E86A33]',
             'disabled:bg-stone-50 dark:disabled:bg-stone-900 disabled:text-stone-400 dark:disabled:text-stone-600 disabled:cursor-not-allowed',
             error && 'border-rose-500 focus:border-rose-500 focus:ring-rose-500',
             className
@@ -108,9 +108,9 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
           type="search"
           value={value}
           className={cn(
-            'w-full rounded-xl bg-white dark:bg-[#16231a] border border-stone-300 dark:border-[#23382b] text-stone-900 dark:text-stone-100 text-sm py-2.5 pl-10 pr-9 transition-all duration-150',
+            'w-full rounded-xl bg-white dark:bg-[#25211D] border border-stone-300 dark:border-[#38312A] text-stone-900 dark:text-stone-100 text-sm py-2.5 pl-10 pr-9 transition-all duration-150',
             'placeholder:text-stone-400 dark:placeholder:text-stone-500',
-            'focus:outline-none focus:border-emerald-700 dark:focus:border-emerald-500 focus:ring-1 focus:ring-emerald-700 dark:focus:ring-emerald-500',
+            'focus:outline-none focus:border-[#E86A33] dark:focus:border-[#E86A33] focus:ring-1 focus:ring-[#E86A33] dark:focus:ring-[#E86A33]',
             className
           )}
           {...props}
@@ -155,8 +155,8 @@ export function Switch({ checked, onChange, label, description, disabled = false
         disabled={disabled}
         onClick={() => !disabled && onChange(!checked)}
         className={cn(
-          'relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600',
-          checked ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-stone-300 dark:bg-stone-700'
+          'relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E86A33]',
+          checked ? 'bg-[#E86A33]' : 'bg-stone-300 dark:bg-stone-700'
         )}
       >
         <span

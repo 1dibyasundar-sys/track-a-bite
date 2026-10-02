@@ -229,11 +229,11 @@ export function PackageOcrScanner({
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-950/85 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-      <div className="bg-white dark:bg-[#131d16] rounded-3xl max-w-xl w-full p-5 sm:p-6 text-stone-900 dark:text-stone-100 border border-stone-200 dark:border-[#23382b] shadow-2xl space-y-4 my-auto">
+      <div className="bg-white dark:bg-[#1D1A17] rounded-3xl max-w-xl w-full p-5 sm:p-6 text-stone-900 dark:text-stone-100 border border-stone-200 dark:border-[#38312A] shadow-2xl space-y-4 my-auto">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-3">
+        <div className="flex items-center justify-between border-b border-stone-100 dark:border-[#38312A] pb-3">
           <div>
-            <span className="text-2xs font-bold tracking-widest text-emerald-800 dark:text-emerald-300 uppercase px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800/80">
+            <span className="text-2xs font-bold tracking-widest text-[#E86A33] uppercase px-2 py-0.5 rounded-full bg-[#FEF7EE] dark:bg-[#2A1C14] border border-[#FBD5BD] dark:border-[#4D2918]">
               Package Intelligence • OCR
             </span>
             <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100 mt-1">
@@ -359,7 +359,7 @@ export function PackageOcrScanner({
         )}
 
         {/* Extracted Details & Manual Verification Form */}
-        <div className="bg-stone-50 dark:bg-[#16231a] rounded-2xl p-4 border border-stone-200 dark:border-[#23382b] space-y-3">
+        <div className="bg-stone-50 dark:bg-[#1D1A17] rounded-2xl p-4 border border-stone-200 dark:border-[#38312A] space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider">
               Extracted Package Details
@@ -380,7 +380,7 @@ export function PackageOcrScanner({
                 value={mfgDate}
                 onChange={(e) => setMfgDate(e.target.value)}
                 placeholder="e.g. 12/08/2026 or 12 Aug 2026"
-                className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#19271e] border border-stone-300 dark:border-[#23382b] font-mono text-stone-800 dark:text-stone-100 focus:outline-hidden focus:border-emerald-500"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#25211D] border border-stone-300 dark:border-[#38312A] font-mono text-stone-800 dark:text-stone-100 focus:outline-hidden focus:border-[#E86A33]"
               />
             </div>
 
@@ -394,7 +394,7 @@ export function PackageOcrScanner({
                 value={expDate}
                 onChange={(e) => setExpDate(e.target.value)}
                 placeholder="e.g. 11/02/2027 or 11 Feb 2027"
-                className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#19271e] border border-stone-300 dark:border-[#23382b] font-mono text-stone-800 dark:text-stone-100 focus:outline-hidden focus:border-emerald-500"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#25211D] border border-stone-300 dark:border-[#38312A] font-mono text-stone-800 dark:text-stone-100 focus:outline-hidden focus:border-[#E86A33]"
               />
             </div>
 
@@ -408,7 +408,7 @@ export function PackageOcrScanner({
                 value={bestBeforePeriod}
                 onChange={(e) => setBestBeforePeriod(e.target.value)}
                 placeholder="e.g. 6 Months from MFD"
-                className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#19271e] border border-stone-300 dark:border-[#23382b] text-stone-800 dark:text-stone-100 focus:outline-hidden focus:border-emerald-500"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#25211D] border border-stone-300 dark:border-[#38312A] text-stone-800 dark:text-stone-100 focus:outline-hidden focus:border-[#E86A33]"
               />
             </div>
 
@@ -422,7 +422,7 @@ export function PackageOcrScanner({
                 value={batchNumber}
                 onChange={(e) => setBatchNumber(e.target.value)}
                 placeholder="e.g. B24X91"
-                className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#19271e] border border-stone-300 dark:border-[#23382b] font-mono text-stone-800 dark:text-stone-100 uppercase focus:outline-hidden focus:border-emerald-500"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#25211D] border border-stone-300 dark:border-[#38312A] font-mono text-stone-800 dark:text-stone-100 uppercase focus:outline-hidden focus:border-[#E86A33]"
               />
             </div>
           </div>

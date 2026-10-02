@@ -83,7 +83,7 @@ function LoginForm() {
       </div>
 
       {/* Login Card */}
-      <div className="bg-white/90 dark:bg-[#131d16]/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-stone-200/80 dark:border-[#23382b] shadow-sm">
+      <div className="bg-white/90 dark:bg-[#1D1A17]/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-stone-200/80 dark:border-[#38312A] shadow-sm">
         {serverError && (
           <div
             role="alert"
@@ -118,7 +118,7 @@ function LoginForm() {
               aria-describedby={errors.email ? 'login-email-error' : undefined}
               placeholder="student@campus.edu"
               disabled={isSubmitting}
-              className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#23382b] bg-white dark:bg-[#19271e] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent text-sm transition-all min-h-[44px]"
+              className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#38312A] bg-white dark:bg-[#25211D] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-[#E86A33] focus:border-transparent text-sm transition-all min-h-[44px]"
             />
             {errors.email && (
               <p id="login-email-error" className="text-xs text-red-600 dark:text-rose-400 font-medium mt-1">
@@ -138,7 +138,7 @@ function LoginForm() {
               </label>
               <Link
                 href="/forgot-password"
-                className="text-xs font-semibold text-emerald-800 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300 transition-colors"
+                className="text-xs font-semibold text-[#E86A33] dark:text-[#F4A340] hover:text-[#d65f2c] transition-colors"
               >
                 Forgot password?
               </Link>
@@ -158,7 +158,7 @@ function LoginForm() {
               aria-describedby={errors.password ? 'login-password-error' : undefined}
               placeholder="••••••••"
               disabled={isSubmitting}
-              className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#23382b] bg-white dark:bg-[#19271e] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent text-sm transition-all min-h-[44px]"
+              className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#38312A] bg-white dark:bg-[#25211D] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-[#E86A33] focus:border-transparent text-sm transition-all min-h-[44px]"
             />
             {errors.password && (
               <p id="login-password-error" className="text-xs text-red-600 dark:text-rose-400 font-medium mt-1">
@@ -172,7 +172,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 px-4 rounded-xl bg-emerald-800 dark:bg-emerald-700 hover:bg-emerald-900 dark:hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed min-h-[44px]"
+              className="w-full py-3 px-4 rounded-xl bg-[#E86A33] hover:bg-[#d65f2c] text-white font-bold text-sm transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed min-h-[44px]"
             >
               {isSubmitting ? (
                 <>
@@ -187,12 +187,12 @@ function LoginForm() {
         </form>
 
         {/* Footer Link */}
-        <div className="mt-6 pt-5 border-t border-stone-100 dark:border-[#23382b] text-center">
+        <div className="mt-6 pt-5 border-t border-stone-100 dark:border-[#38312A] text-center">
           <p className="text-xs text-stone-600 dark:text-stone-400">
             Don&apos;t have an account yet?{' '}
             <Link
               href="/register"
-              className="font-bold text-emerald-800 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300 hover:underline"
+              className="font-bold text-[#E86A33] dark:text-[#F4A340] hover:underline"
             >
               Create an account
             </Link>
@@ -205,12 +205,12 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="py-12 sm:py-16 bg-gradient-to-b from-stone-50 via-emerald-50/20 to-stone-50 dark:from-[#0c130e] dark:via-[#131d16] dark:to-[#0c130e] min-h-[calc(100vh-4rem)] flex items-center">
+    <div className="py-12 sm:py-16 bg-gradient-to-b from-[#FAF7F2] via-[#F3EDE4] to-[#FAF7F2] dark:from-[#151311] dark:via-[#1D1A17] dark:to-[#151311] min-h-[calc(100vh-4rem)] flex items-center">
       <Container size="sm">
         <Suspense
           fallback={
             <div className="py-20 text-center">
-              <div className="w-8 h-8 border-3 border-emerald-700 dark:border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+              <div className="w-8 h-8 border-3 border-[#E86A33] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
               <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">Loading sign in...</p>
             </div>
           }

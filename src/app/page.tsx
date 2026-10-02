@@ -2,14 +2,13 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Container } from '../components/layout/container';
 import { Button } from '../components/ui/button';
 import { SectionHeading } from '../components/common/section-heading';
 import { NutrientStarRating } from '../components/nutrition/nutrient-star-rating';
 import { CampusRealitySection } from '../components/campus/campus-reality-section';
 import { ProfileModal } from '../components/profile/profile-modal';
-import { userProfileService, useUserProfile, useHasCompletedOnboarding } from '../lib/services/userProfileService';
+import { useUserProfile, useHasCompletedOnboarding } from '../lib/services/userProfileService';
 import { useAuth } from '../components/auth/AuthProvider';
 import {
   CameraIcon,
@@ -22,7 +21,6 @@ import {
 } from '../components/ui/icons';
 
 export default function HomePage() {
-  const router = useRouter();
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const profile = useUserProfile();
   const hasCompletedOnboarding = useHasCompletedOnboarding();
@@ -33,17 +31,6 @@ export default function HomePage() {
     : !hasCompletedOnboarding
       ? { href: '/onboarding', label: 'Complete Profile' }
       : { href: '/dashboard', label: 'View Dashboard' };
-
-  const handleHosteliteClick = () => {
-    userProfileService.saveProfile({ isHostelite: true });
-    if (!isAuthenticated) {
-      router.push('/register');
-    } else if (!hasCompletedOnboarding) {
-      router.push('/onboarding');
-    } else {
-      router.push('/profile');
-    }
-  };
 
   const sampleRichnessSprouts = {
     stars: 4.5,
@@ -66,31 +53,28 @@ export default function HomePage() {
           ===================================================================== */}
       <section className="relative pt-8 sm:pt-16 pb-6 overflow-hidden">
         {/* Soft background ambient illumination */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-emerald-500/8 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[#E86A33]/5 dark:bg-[#E86A33]/8 rounded-full blur-3xl pointer-events-none" />
 
         <Container size="lg">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             {/* LEFT COLUMN: Confident Typography, Clear CTAs & Student Value */}
             <div className="lg:col-span-6 space-y-6 text-left">
-              {/* Identity & Campus Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/90 dark:bg-emerald-950/70 text-emerald-950 dark:text-emerald-200 border border-emerald-300/80 dark:border-emerald-800/60 text-xs font-bold shadow-2xs">
-                <span className="text-sm">{profile.isHostelite ? '🏠' : '🌿'}</span>
+              {/* Identity Badge */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F3EDE4] dark:bg-[#25211D] text-[#171717] dark:text-[#F7F3ED] border border-[#E8DED2] dark:border-[#38312A] text-xs font-bold shadow-2xs">
+                <span className="text-sm">{profile.isHostelite ? '🏠' : '🍽️'}</span>
                 <span>
-                  {profile.isHostelite ? 'Hostel Mode Active' : 'AI Food Intelligence for Students'}
-                </span>
-                <span className="text-3xs px-2 py-0.5 rounded-full bg-emerald-800 dark:bg-emerald-700 text-white font-extrabold uppercase tracking-wide">
-                  Campus Edition
+                  {profile.isHostelite ? 'Hostel Mode Active' : 'AI Food Intelligence'}
                 </span>
               </div>
 
               {/* Main Headline */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-stone-900 dark:text-stone-50 leading-[1.1]">
-                Know what you&apos;re <span className="text-emerald-700 dark:text-emerald-400">actually getting</span> from your food.
+                Know what&apos;s <span className="text-[#E86A33]">on your plate.</span>
               </h1>
 
               {/* Supporting Text */}
               <p className="text-base sm:text-lg text-stone-600 dark:text-stone-300 max-w-xl leading-relaxed font-normal">
-                Point your camera at your mess thali, canteen snack, or packaged food. Discover honest nutrient density, detect missing proteins, and get ₹15 hostel fixes without needing an expensive diet.
+                Scan your meal, understand its nutrition, and discover smarter food choices for everyday life.
               </p>
 
               {/* CTAs */}
@@ -98,48 +82,36 @@ export default function HomePage() {
                 <Link href={primaryCta.href} className="w-full sm:w-auto">
                   <Button
                     size="lg"
-                    className="w-full sm:w-auto px-8 py-3.5 font-bold shadow-md bg-emerald-800 hover:bg-emerald-900 text-white cursor-pointer"
-                    leftIcon={<CameraIcon size={20} className="text-emerald-300" />}
+                    className="w-full sm:w-auto px-8 py-3.5 font-bold shadow-md bg-[#E86A33] hover:bg-[#d65f2c] text-white cursor-pointer"
+                    leftIcon={<CameraIcon size={20} className="text-white/90" />}
                   >
-                    {primaryCta.label}
+                    Scan Your Meal
                   </Button>
                 </Link>
 
-                {isAuthenticated ? (
-                  <Link href="/scan" className="w-full sm:w-auto">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="w-full sm:w-auto px-8 py-3.5 font-semibold bg-white dark:bg-[#131d16] border-emerald-300 dark:border-emerald-700 text-emerald-950 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-[#19271e] cursor-pointer"
-                      leftIcon={<SparklesIcon size={18} />}
-                    >
-                      Instant AI Scan
-                    </Button>
-                  </Link>
-                ) : (
+                <Link href="/foods" className="w-full sm:w-auto">
                   <Button
                     variant="outline"
                     size="lg"
-                    onClick={handleHosteliteClick}
-                    className="w-full sm:w-auto px-8 py-3.5 font-semibold bg-white dark:bg-[#131d16] border-amber-300 dark:border-amber-700 text-amber-950 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-[#19271e] cursor-pointer"
+                    className="w-full sm:w-auto px-6 py-3.5 font-semibold bg-white dark:bg-[#1D1A17] border-[#E8DED2] dark:border-[#38312A] text-stone-800 dark:text-stone-200 hover:bg-[#FAF7F2] dark:hover:bg-[#25211D] cursor-pointer"
                   >
-                    I&apos;m a Hostelite
+                    Explore Foods
                   </Button>
-                )}
+                </Link>
               </div>
 
               {/* 3 Student Questions Answered */}
               <div className="pt-4 grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs text-stone-700 dark:text-stone-300">
-                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200/80 dark:border-[#23382b] shadow-2xs">
-                  <span className="text-emerald-700 dark:text-emerald-400 font-bold">✓</span>
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] shadow-2xs">
+                  <span className="text-[#3F8F68] dark:text-[#5FA77F] font-bold">✓</span>
                   <span className="font-medium">What nutrients are in this?</span>
                 </div>
-                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200/80 dark:border-[#23382b] shadow-2xs">
-                  <span className="text-amber-700 dark:text-amber-400 font-bold">⚠</span>
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] shadow-2xs">
+                  <span className="text-[#F4A340] font-bold">⚠</span>
                   <span className="font-medium">What am I missing?</span>
                 </div>
-                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200/80 dark:border-[#23382b] shadow-2xs">
-                  <span className="text-emerald-700 dark:text-emerald-400 font-bold">₹</span>
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white dark:bg-[#1D1A17] border border-[#E8DED2] dark:border-[#38312A] shadow-2xs">
+                  <span className="text-[#E86A33] font-bold">₹</span>
                   <span className="font-medium">What can I add for ₹15?</span>
                 </div>
               </div>
@@ -149,11 +121,11 @@ export default function HomePage() {
             <div className="lg:col-span-6 relative mt-4 lg:mt-0 flex items-center justify-center">
               {/* Outer 3D Container with Soft Elevation */}
               <div className="relative w-full max-w-[500px] aspect-4/3 rounded-3xl overflow-visible p-1">
-                {/* Background Shadow & Soft Glow */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-emerald-600/15 via-emerald-500/10 to-transparent blur-2xl" />
+                {/* Background Shadow & Soft Warm Ambient Glow */}
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-[#E86A33]/15 via-[#F4A340]/10 to-transparent blur-2xl" />
 
                 {/* Central Food Visual Surface */}
-                <div className="relative w-full h-full rounded-3xl overflow-hidden border-2 border-stone-200/90 dark:border-[#23382b] shadow-[0_16px_40px_-8px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.7)] bg-stone-900 group">
+                <div className="relative w-full h-full rounded-3xl overflow-hidden border-2 border-[#E8DED2] dark:border-[#38312A] shadow-[0_16px_40px_-8px_rgba(0,0,0,0.14)] dark:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.7)] bg-stone-900 group">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/images/food/hero-meal-platter.jpg"
@@ -166,7 +138,7 @@ export default function HomePage() {
                   {/* Food Label at the base of the image */}
                   <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white text-xs z-10 pointer-events-none">
                     <span className="font-bold drop-shadow-md">Campus Thali • Dal, Paneer, Rice &amp; Roti</span>
-                    <span className="text-3xs px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-emerald-300 border border-emerald-500/40">
+                    <span className="text-3xs px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[#F4A340] border border-[#F4A340]/40">
                       Standard Serving
                     </span>
                   </div>
@@ -174,46 +146,47 @@ export default function HomePage() {
 
                 {/* =========================================================
                     FLOATING 3D METRIC CARDS (PHYSICAL SURFACES WITH DEPTH)
+                    Distinct Accent Colors: Health Green, Terracotta, Mango, Violet
                     ========================================================= */}
 
-                {/* Floating Card 1: Top Left — Nutrition Score */}
+                {/* Floating Card 1: Top Left — Health Score (Green Accent) */}
                 <div className="absolute -top-4 -left-3 sm:-top-6 sm:-left-6 z-20 card-float px-3.5 py-2.5 animate-float-slow shadow-lg">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 flex items-center justify-center font-black text-xs shrink-0 border border-emerald-300 dark:border-emerald-700">
+                    <div className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-[#3F8F68] dark:text-[#5FA77F] flex items-center justify-center font-black text-xs shrink-0 border border-[#3F8F68]/40">
                       8.8
                     </div>
                     <div>
-                      <span className="block text-3xs font-extrabold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
-                        Nutrition Score
+                      <span className="block text-3xs font-extrabold uppercase tracking-wider text-[#3F8F68] dark:text-[#5FA77F]">
+                        Health Score
                       </span>
                       <span className="text-xs font-bold text-stone-900 dark:text-stone-100">
-                        Nutrient Dense
+                        8.8 / 10
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Floating Card 2: Top Right — Protein */}
+                {/* Floating Card 2: Top Right — Protein (Terracotta Accent) */}
                 <div className="absolute -top-3 -right-3 sm:-top-5 sm:-right-5 z-20 card-float px-3.5 py-2.5 animate-float-reverse shadow-lg">
                   <div className="flex items-center gap-2">
                     <span className="text-base">💪</span>
                     <div>
-                      <span className="block text-3xs font-extrabold uppercase tracking-wider text-stone-500 dark:text-stone-400">
+                      <span className="block text-3xs font-extrabold uppercase tracking-wider text-[#E86A33]">
                         Protein
                       </span>
-                      <span className="text-sm font-black text-emerald-700 dark:text-emerald-400">
-                        24.5g
+                      <span className="text-sm font-black text-stone-900 dark:text-stone-100">
+                        24.5 g
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Floating Card 3: Bottom Left — Energy Calories */}
+                {/* Floating Card 3: Bottom Left — Calories (Golden Mango Accent) */}
                 <div className="absolute -bottom-4 -left-3 sm:-bottom-5 sm:-left-5 z-20 card-float px-3.5 py-2.5 animate-float-reverse shadow-lg">
                   <div className="flex items-center gap-2">
                     <span className="text-base">🔥</span>
                     <div>
-                      <span className="block text-3xs font-extrabold uppercase tracking-wider text-stone-500 dark:text-stone-400">
+                      <span className="block text-3xs font-extrabold uppercase tracking-wider text-[#F4A340]">
                         Calories
                       </span>
                       <span className="text-sm font-black text-stone-900 dark:text-stone-100">
@@ -223,16 +196,16 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Floating Card 4: Bottom Right — AI Detection */}
+                {/* Floating Card 4: Bottom Right — AI Detected (Soft Intelligent Violet Accent) */}
                 <div className="absolute -bottom-5 -right-3 sm:-bottom-6 sm:-right-5 z-20 card-float px-4 py-2.5 animate-float-slow shadow-lg">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#7C6CE7] animate-pulse shrink-0 shadow-[0_0_8px_#7C6CE7]" />
                     <div>
-                      <span className="block text-3xs font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                      <span className="block text-3xs font-extrabold uppercase tracking-wider text-[#7C6CE7] dark:text-[#9185E8]">
                         AI Detected
                       </span>
                       <span className="text-xs font-bold text-stone-900 dark:text-stone-100">
-                        6 items identified
+                        6 foods
                       </span>
                     </div>
                   </div>
@@ -257,10 +230,10 @@ export default function HomePage() {
           ===================================================================== */}
       <section className="relative">
         <Container size="lg">
-          <div className="card-3d p-6 sm:p-10 bg-gradient-to-br from-emerald-950 via-[#101812] to-stone-950 text-white border-emerald-800/50">
+          <div className="card-3d p-6 sm:p-10 bg-gradient-to-br from-[#1D1A17] via-[#151311] to-[#25211D] text-white border border-[#38312A] shadow-xl">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-6 space-y-5">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 text-xs font-bold">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#7C6CE7]/20 text-[#9185E8] border border-[#7C6CE7]/40 text-xs font-bold">
                   <SparklesIcon size={14} />
                   <span>The AI Food Scanner</span>
                 </div>
@@ -274,7 +247,7 @@ export default function HomePage() {
                   <Link href="/scan">
                     <Button
                       size="lg"
-                      className="bg-white text-emerald-950 hover:bg-emerald-50 font-bold px-7"
+                      className="bg-[#E86A33] text-white hover:bg-[#d65f2c] font-bold px-7 shadow-md cursor-pointer"
                       leftIcon={<CameraIcon size={18} />}
                     >
                       Open Live Scanner
@@ -284,7 +257,7 @@ export default function HomePage() {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="text-stone-200 border-stone-700 hover:bg-white/10 font-semibold"
+                      className="text-stone-200 border-[#38312A] hover:bg-white/10 font-semibold cursor-pointer"
                     >
                       Browse Food Database
                     </Button>
@@ -294,7 +267,7 @@ export default function HomePage() {
 
               {/* Visual Scanner HUD Mockup */}
               <div className="lg:col-span-6">
-                <div className="relative rounded-2xl overflow-hidden border border-emerald-500/40 bg-black aspect-16/10 shadow-2xl flex items-center justify-center">
+                <div className="relative rounded-2xl overflow-hidden border border-[#38312A] bg-black aspect-16/10 shadow-2xl flex items-center justify-center">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/images/food/hostel-mess-thali.jpg"
@@ -303,18 +276,18 @@ export default function HomePage() {
                   />
                   {/* HUD Elements */}
                   <div className="absolute inset-4 border border-white/20 rounded-xl pointer-events-none flex items-center justify-center">
-                    {/* Animated Scanning Beam */}
-                    <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] animate-scan-beam" />
+                    {/* Animated Scanning Beam (Soft Intelligent Violet) */}
+                    <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#7C6CE7] to-transparent shadow-[0_0_12px_#9185E8] animate-scan-beam" />
                     
-                    {/* Reticle Corner Guides */}
-                    <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-emerald-400" />
-                    <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-emerald-400" />
-                    <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-emerald-400" />
-                    <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-emerald-400" />
+                    {/* Reticle Corner Guides (Terracotta Accent) */}
+                    <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-[#E86A33]" />
+                    <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-[#E86A33]" />
+                    <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-[#E86A33]" />
+                    <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-[#E86A33]" />
 
                     {/* Central Target Tag */}
-                    <div className="px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-emerald-400/60 text-emerald-300 text-2xs font-mono font-bold flex items-center gap-1.5 shadow-md">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                    <div className="px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-[#F4A340]/60 text-[#F4A340] text-2xs font-mono font-bold flex items-center gap-1.5 shadow-md">
+                      <span className="w-2 h-2 rounded-full bg-[#F4A340] animate-ping" />
                       <span>DAL TADKA DETECTED (96%)</span>
                     </div>
                   </div>
@@ -340,7 +313,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Card 1: Multi-Dish Segmentation */}
             <div className="card-3d-interactive p-6 space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 flex items-center justify-center text-xl shadow-xs">
+              <div className="w-12 h-12 rounded-2xl bg-[#FEF7EE] dark:bg-[#2A1C14] text-[#E86A33] border border-[#E86A33]/20 flex items-center justify-center text-xl shadow-xs">
                 🍛
               </div>
               <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100">
@@ -349,7 +322,7 @@ export default function HomePage() {
               <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
                 Whether you have dal, dry sabzi, two rotis, and a bowl of curd on a single compartment thali, Track-a-Bite isolates and measures each item separately.
               </p>
-              <div className="pt-2 text-2xs font-semibold text-emerald-800 dark:text-emerald-400 flex items-center gap-1">
+              <div className="pt-2 text-2xs font-semibold text-[#E86A33] dark:text-[#F4A340] flex items-center gap-1">
                 <span>Bounding box localization</span> →
               </div>
             </div>
@@ -426,11 +399,11 @@ export default function HomePage() {
       {/* =====================================================================
           6. HOSTEL INTELLIGENCE — AFFORDABLE UPGRADES UNDER ₹30
           ===================================================================== */}
-      <section className="bg-emerald-950 text-white py-16 rounded-3xl mx-4 sm:mx-6 lg:mx-8 shadow-xl">
+      <section className="bg-[#1D1A17] text-white py-16 rounded-3xl mx-4 sm:mx-6 lg:mx-8 shadow-xl border border-[#38312A]">
         <Container size="lg">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-6 space-y-6">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-900/80 px-3 py-1 rounded-md border border-emerald-700/60">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#F4A340] bg-[#F4A340]/15 px-3 py-1 rounded-md border border-[#F4A340]/30">
                 The Differentiator
               </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
@@ -442,19 +415,19 @@ export default function HomePage() {
 
               <div className="space-y-3 text-xs sm:text-sm text-stone-200">
                 <div className="flex items-start gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-emerald-800 text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-5 h-5 rounded-full bg-[#3F8F68] text-white flex items-center justify-center shrink-0 mt-0.5">
                     <CheckIcon size={12} />
                   </div>
                   <span><strong>Zero Cooking Required:</strong> Hard boiled eggs, sprouts, dahi, peanuts, banana.</span>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-emerald-800 text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-5 h-5 rounded-full bg-[#3F8F68] text-white flex items-center justify-center shrink-0 mt-0.5">
                     <CheckIcon size={12} />
                   </div>
                   <span><strong>Campus Budget Friendly:</strong> Additions range from ₹5 to ₹25 max.</span>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-emerald-800 text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-5 h-5 rounded-full bg-[#3F8F68] text-white flex items-center justify-center shrink-0 mt-0.5">
                     <CheckIcon size={12} />
                   </div>
                   <span><strong>No Stigma or Guilt:</strong> Enjoy your samosa; balance it with curd or sprouts.</span>
@@ -463,7 +436,7 @@ export default function HomePage() {
 
               <div className="pt-2">
                 <Link href="/scan">
-                  <Button size="md" className="bg-white text-emerald-950 hover:bg-emerald-50 font-bold" rightIcon={<ArrowRightIcon size={16} />}>
+                  <Button size="md" className="bg-[#E86A33] hover:bg-[#d65f2c] text-white font-bold cursor-pointer" rightIcon={<ArrowRightIcon size={16} />}>
                     Test a Food Scan
                   </Button>
                 </Link>
@@ -540,7 +513,7 @@ export default function HomePage() {
         <Container size="lg">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-6 space-y-4">
-              <span className="text-2xs font-extrabold uppercase tracking-widest text-emerald-800 dark:text-emerald-300 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60">
+              <span className="text-2xs font-extrabold uppercase tracking-widest text-[#7C6CE7] dark:text-[#9185E8] px-3 py-1 rounded-full bg-[#EEECFB] dark:bg-[#211E38] border border-[#7C6CE7]/30">
                 Zero Hallucination OCR
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 dark:text-stone-100 tracking-tight">
@@ -654,18 +627,18 @@ export default function HomePage() {
           ===================================================================== */}
       <section>
         <Container size="lg">
-          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 text-white text-center flex flex-col items-center space-y-6 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-[#1D1A17] via-[#25211D] to-[#151311] border border-[#38312A] text-white text-center flex flex-col items-center space-y-6 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-[#E86A33]/5 rounded-full blur-3xl pointer-events-none" />
 
             <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight max-w-xl">
               Ready to see what&apos;s on your plate right now?
             </h2>
-            <p className="text-xs sm:text-sm text-emerald-100 max-w-md leading-relaxed">
+            <p className="text-xs sm:text-sm text-stone-300 max-w-md leading-relaxed">
               Try scanning your meal or testing a campus canteen snack. Takes less than 10 seconds.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
               <Link href="/scan" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto bg-white text-emerald-950 hover:bg-emerald-50 font-bold px-8 shadow-md" leftIcon={<CameraIcon size={20} />}>
+                <Button size="lg" className="w-full sm:w-auto bg-[#E86A33] hover:bg-[#d65f2c] text-white font-bold px-8 shadow-md cursor-pointer" leftIcon={<CameraIcon size={20} className="text-white/90" />}>
                   Scan Food Now
                 </Button>
               </Link>
@@ -673,7 +646,7 @@ export default function HomePage() {
                 variant="ghost"
                 size="lg"
                 onClick={() => setProfileModalOpen(true)}
-                className="w-full sm:w-auto text-white hover:bg-emerald-800/80 cursor-pointer"
+                className="w-full sm:w-auto text-stone-200 hover:text-white hover:bg-white/10 cursor-pointer"
               >
                 Set Personal Profile
               </Button>

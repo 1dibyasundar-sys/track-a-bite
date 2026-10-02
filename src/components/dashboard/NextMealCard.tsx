@@ -67,20 +67,20 @@ export function NextMealCard({
   }
 
   return (
-    <Card className="border border-emerald-200/80 bg-gradient-to-br from-emerald-50/40 via-white to-white shadow-xs overflow-hidden">
+    <Card className="border border-[#E8DED2] dark:border-[#38312A] bg-white dark:bg-[#1D1A17] shadow-xs overflow-hidden">
       <CardContent className="p-5 sm:p-6 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg">
+            <div className="w-9 h-9 rounded-xl bg-[#FEF7EE] dark:bg-[#2A1C14] text-[#E86A33] border border-[#E86A33]/20 flex items-center justify-center font-bold text-lg">
               {topRec.emoji || '🍽️'}
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <h2 className="text-sm font-semibold text-stone-900">Smart Next-Meal Recommendation</h2>
-                <SparklesIcon size={14} className="text-amber-500" />
+                <h2 className="text-sm font-semibold text-stone-900 dark:text-stone-100">Smart Next-Meal Recommendation</h2>
+                <SparklesIcon size={14} className="text-[#F4A340]" />
               </div>
-              <span className="text-2xs text-stone-500 font-medium">
+              <span className="text-2xs text-stone-500 dark:text-stone-400 font-medium">
                 {isHostelite ? 'Hostel & Campus Adapted' : 'Personalized Food Balance'}
               </span>
             </div>

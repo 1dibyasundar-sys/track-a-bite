@@ -34,7 +34,7 @@ export function NutrientStarRating({ richness, className = '' }: NutrientStarRat
 
   return (
     <div
-      className={`p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] text-stone-900 dark:text-stone-100 shadow-2xs space-y-3 ${className}`}
+      className={`p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] text-stone-900 dark:text-stone-100 shadow-2xs space-y-3 ${className}`}
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100 dark:border-stone-800">
         <div>

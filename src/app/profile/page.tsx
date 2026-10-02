@@ -19,14 +19,14 @@ export default function ProfilePage() {
 
   return (
     <AuthGuard>
-      <div className="py-8 sm:py-12 bg-gradient-to-b from-stone-50 via-emerald-50/10 to-stone-50 dark:from-[#0c130e] dark:via-[#131d16] dark:to-[#0c130e] min-h-[calc(100vh-4rem)]">
+      <div className="py-8 sm:py-12 bg-[#FAF7F2] dark:bg-[#151311] min-h-[calc(100vh-4rem)]">
         <Container size="md">
         <div className="space-y-6">
           {/* Page Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-[#23382b]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E8DED2] dark:border-[#38312A]">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-2xs font-extrabold uppercase tracking-widest text-emerald-800 dark:text-emerald-300 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60">
+                <span className="text-2xs font-extrabold uppercase tracking-widest text-[#E86A33] px-2.5 py-0.5 rounded-full bg-[#FEF7EE] dark:bg-[#2A1C14] border border-[#E86A33]/20">
                   Settings &amp; Preferences
                 </span>
               </div>
@@ -34,7 +34,7 @@ export default function ProfilePage() {
                 Your Nutrition Profile
               </h1>
               <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 mt-1">
-                Fine-tune your personal metrics, hostel lifestyle, and dietary preferences.
+                Fine-tune your personal metrics, dietary preferences, and lifestyle realities.
               </p>
             </div>
 
@@ -51,7 +51,7 @@ export default function ProfilePage() {
           <ProfileForm mode="edit" />
 
           {/* Reset & Privacy Footer */}
-          <div className="pt-6 border-t border-stone-200 dark:border-[#23382b] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-2xs text-stone-500 dark:text-stone-400">
+          <div className="pt-6 border-t border-stone-200 dark:border-[#38312A] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-2xs text-stone-500 dark:text-stone-400">
             <div className="flex items-center gap-2">
               <ShieldCheckIcon size={16} className="text-stone-400 dark:text-stone-500 shrink-0" />
               <span>

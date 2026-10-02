@@ -13,10 +13,10 @@ export function RecommendationCard({
   onAddSuggestion,
 }: RecommendationCardProps) {
   return (
-    <div className="p-4 rounded-xl bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] shadow-2xs hover:shadow-xs transition-shadow space-y-3">
+    <div className="p-4 rounded-xl bg-white dark:bg-[#1D1A17] border border-stone-200/90 dark:border-[#38312A] shadow-2xs hover:shadow-xs transition-shadow space-y-3">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-center shrink-0">
+          <div className="w-7 h-7 rounded-lg bg-[#FEF7EE] dark:bg-[#2A1C14] text-[#E86A33] flex items-center justify-center shrink-0">
             <SparklesIcon size={14} />
           </div>
           <div>
@@ -38,11 +38,11 @@ export function RecommendationCard({
         {recommendation.description}
       </p>
 
-      <div className="p-2.5 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 text-xs text-emerald-950 dark:text-emerald-200 flex flex-col gap-1">
-        <span className="font-semibold text-2xs uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
+      <div className="p-2.5 rounded-lg bg-[#FEF7EE] dark:bg-[#251A14] border border-[#FBD5BD] dark:border-[#4D2918] text-xs text-stone-800 dark:text-stone-300 flex flex-col gap-1">
+        <span className="font-semibold text-2xs uppercase tracking-wider text-[#E86A33]">
           Why this balances your plate
         </span>
-        <p className="text-2xs text-emerald-900 dark:text-emerald-300 leading-normal">
+        <p className="text-2xs text-stone-700 dark:text-stone-300 leading-normal">
           {recommendation.impactReason}
         </p>
       </div>
@@ -53,7 +53,7 @@ export function RecommendationCard({
           {recommendation.localIngredientsSuggested.map((ing, idx) => (
             <span
               key={idx}
-              className="text-2xs px-2 py-0.5 rounded-md bg-stone-100 dark:bg-[#19271e] text-stone-700 dark:text-stone-300 font-medium"
+              className="text-2xs px-2 py-0.5 rounded-md bg-stone-100 dark:bg-[#25211D] text-stone-700 dark:text-stone-300 font-medium"
             >
               {ing}
             </span>
@@ -65,7 +65,7 @@ export function RecommendationCard({
         <div className="pt-2">
           <button
             onClick={() => onAddSuggestion(recommendation)}
-            className="w-full py-2 px-3 text-xs font-semibold rounded-lg bg-stone-100 dark:bg-[#19271e] hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-stone-800 dark:text-stone-200 hover:text-emerald-900 dark:hover:text-emerald-300 border border-stone-200 dark:border-[#23382b] hover:border-emerald-300 dark:hover:border-emerald-800/60 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            className="w-full py-2 px-3 text-xs font-semibold rounded-lg bg-stone-100 dark:bg-[#25211D] hover:bg-[#FEF7EE] dark:hover:bg-[#2A1C14] text-stone-800 dark:text-stone-200 hover:text-[#E86A33] border border-stone-200 dark:border-[#38312A] hover:border-[#E86A33]/40 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <PlusIcon size={14} />
             <span>Add this to my meal calculation</span>

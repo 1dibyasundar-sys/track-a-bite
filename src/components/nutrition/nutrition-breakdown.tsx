@@ -60,51 +60,51 @@ export function NutritionBreakdown({
       value: `${nutrition.protein}g`,
       sub: `${proteinShare}% energy`,
       pct: proteinPct,
-      color: 'bg-emerald-600',
-      track: 'bg-emerald-100/60',
+      color: 'bg-[#E86A33]',
+      track: 'bg-[#E86A33]/15',
       badge: nutrition.protein >= 15 ? 'Solid source' : nutrition.protein >= 8 ? 'Moderate' : 'Low',
-      badgeColor: nutrition.protein >= 15 ? 'text-emerald-700 bg-emerald-50' : 'text-stone-600 bg-stone-100',
+      badgeColor: nutrition.protein >= 15 ? 'text-[#E86A33] bg-[#E86A33]/10 dark:bg-[#E86A33]/20' : 'text-stone-600 bg-stone-100 dark:bg-[#25211D] dark:text-stone-300',
     },
     {
       label: 'Carbohydrates',
       value: `${nutrition.carbohydrates}g`,
       sub: `${carbsShare}% energy`,
       pct: carbsPct,
-      color: 'bg-amber-500',
-      track: 'bg-amber-100/60',
+      color: 'bg-[#F4A340]',
+      track: 'bg-[#F4A340]/15',
       badge: carbsShare >= 60 ? 'Primary energy' : 'Balanced',
-      badgeColor: 'text-amber-800 bg-amber-50',
+      badgeColor: 'text-[#D97706] dark:text-[#F4A340] bg-[#FEF3C7] dark:bg-[#F4A340]/20',
     },
     {
       label: 'Fat',
       value: `${nutrition.fat}g`,
       sub: `${fatShare}% energy`,
       pct: fatPct,
-      color: 'bg-rose-500',
-      track: 'bg-rose-100/60',
+      color: 'bg-[#E15B64]',
+      track: 'bg-[#E15B64]/15',
       badge: fatShare >= 45 ? 'High contribution' : 'Moderate',
-      badgeColor: fatShare >= 45 ? 'text-rose-800 bg-rose-50' : 'text-stone-600 bg-stone-100',
+      badgeColor: fatShare >= 45 ? 'text-[#BE123C] dark:text-[#FDA4AF] bg-[#FFE4E6] dark:bg-[#BE123C]/20' : 'text-stone-600 bg-stone-100 dark:bg-[#25211D] dark:text-stone-300',
     },
     {
       label: 'Fiber',
       value: `${nutrition.fiber}g`,
       sub: `${nutrition.fiber >= 6 ? 'High gut fiber' : 'Moderate fiber'}`,
       pct: fiberPct,
-      color: 'bg-teal-600',
-      track: 'bg-teal-100/60',
+      color: 'bg-[#3F8F68]',
+      track: 'bg-[#3F8F68]/15',
       badge: nutrition.fiber >= 6 ? 'Gut-friendly' : nutrition.fiber >= 3 ? 'Some fiber' : 'Needs boost',
-      badgeColor: nutrition.fiber >= 6 ? 'text-teal-800 bg-teal-50' : 'text-amber-800 bg-amber-50',
+      badgeColor: nutrition.fiber >= 6 ? 'text-[#3F8F68] bg-[#3F8F68]/10 dark:bg-[#3F8F68]/20' : 'text-[#D97706] bg-[#FEF3C7] dark:bg-[#F4A340]/20',
     },
   ];
 
   return (
-    <Card className={`border-stone-200/90 dark:border-[#23382b] bg-white dark:bg-[#131d16] shadow-sm ${className}`}>
-      <CardHeader className="pb-3 border-b border-stone-100 dark:border-[#23382b]">
+    <Card className={`border-stone-200/90 dark:border-[#38312A] bg-white dark:bg-[#1D1A17] shadow-sm ${className}`}>
+      <CardHeader className="pb-3 border-b border-stone-100 dark:border-[#38312A]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <div className="flex items-center gap-2">
               <CardTitle className="text-base sm:text-lg text-stone-900 dark:text-stone-100">{title}</CardTitle>
-              <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-stone-100 dark:bg-[#19271e] text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-[#23382b]">
+              <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-stone-100 dark:bg-[#25211D] text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-[#38312A]">
                 Estimated nutrition
               </span>
             </div>
@@ -115,7 +115,7 @@ export function NutritionBreakdown({
             )}
           </div>
 
-          <div className="flex items-baseline gap-1 self-start sm:self-auto bg-stone-50 dark:bg-[#19271e] px-3 py-1.5 rounded-xl border border-stone-200/70 dark:border-[#23382b]">
+          <div className="flex items-baseline gap-1 self-start sm:self-auto bg-stone-50 dark:bg-[#25211D] px-3 py-1.5 rounded-xl border border-stone-200/70 dark:border-[#38312A]">
             <span className="text-xs text-stone-500 dark:text-stone-400 font-medium">Estimated Energy:</span>
             <span className="text-lg font-bold text-stone-900 dark:text-stone-100">{nutrition.calories}</span>
             <span className="text-xs font-semibold text-stone-600 dark:text-stone-400">kcal</span>
@@ -162,7 +162,7 @@ export function NutritionBreakdown({
 
         {/* Micronutrients / Electrolytes if present */}
         {nutrition.micronutrients && nutrition.micronutrients.length > 0 && (
-          <div className="pt-4 border-t border-stone-100 dark:border-[#23382b]">
+          <div className="pt-4 border-t border-stone-100 dark:border-[#38312A]">
             <h4 className="text-2xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-2">
               Detected Micronutrient Contributions
             </h4>
@@ -170,11 +170,11 @@ export function NutritionBreakdown({
               {nutrition.micronutrients.map((micro, idx) => (
                 <div
                   key={idx}
-                  className="p-2.5 rounded-xl bg-stone-50 dark:bg-[#19271e] border border-stone-200/70 dark:border-[#23382b] text-xs"
+                  className="p-2.5 rounded-xl bg-stone-50 dark:bg-[#25211D] border border-stone-200/70 dark:border-[#38312A] text-xs"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-stone-800 dark:text-stone-200">{micro.name}</span>
-                    <span className="font-bold text-emerald-800 dark:text-emerald-400">{micro.amount}</span>
+                    <span className="font-bold text-[#3F8F68] dark:text-[#5FA77F]">{micro.amount}</span>
                   </div>
                   {micro.healthContext && (
                     <span className="text-3xs text-stone-500 dark:text-stone-400 block mt-0.5 line-clamp-1">
