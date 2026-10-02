@@ -27,23 +27,23 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-medium transition-all duration-150 rounded-xl cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100';
+      'inline-flex items-center justify-center font-medium transition-all duration-150 rounded-xl cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 dark:focus-visible:ring-emerald-500 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100';
 
     const variants = {
       primary:
-        'bg-emerald-800 text-white hover:bg-emerald-900 shadow-sm border border-emerald-900/10',
+        'bg-emerald-800 dark:bg-emerald-600 text-white hover:bg-emerald-900 dark:hover:bg-emerald-500 shadow-sm border border-emerald-900/10 dark:border-emerald-700',
       secondary:
-        'bg-emerald-50 text-emerald-900 hover:bg-emerald-100 border border-emerald-200/60',
+        'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/60 dark:border-emerald-800/60',
       outline:
-        'bg-white text-stone-800 border border-stone-300 hover:bg-stone-50 hover:border-stone-400 shadow-2xs',
+        'bg-white dark:bg-[#131d16] text-stone-800 dark:text-stone-200 border border-stone-300 dark:border-[#23382b] hover:bg-stone-50 dark:hover:bg-[#19271e] hover:border-stone-400 dark:hover:border-stone-600 shadow-2xs',
       ghost:
-        'text-stone-700 hover:bg-stone-100 hover:text-stone-900',
+        'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/70 hover:text-stone-900 dark:hover:text-white',
       warm:
         'bg-amber-700 text-white hover:bg-amber-800 shadow-sm border border-amber-900/10',
       danger:
-        'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200',
+        'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-900/60',
       subtle:
-        'bg-stone-100 text-stone-800 hover:bg-stone-200 border border-stone-200/60',
+        'bg-stone-100 dark:bg-stone-800/80 text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-700 border border-stone-200/60 dark:border-stone-700/60',
     };
 
     const sizes = {
@@ -78,3 +78,46 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 Button.displayName = 'Button';
+
+export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  icon: React.ReactNode;
+  'aria-label': string;
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'subtle';
+  size?: 'sm' | 'md' | 'lg';
+}
+
+export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
+  ({ icon, className, variant = 'ghost', size = 'md', ...props }, ref) => {
+    const sizeClasses = {
+      sm: 'w-8 h-8 p-1.5 text-xs rounded-lg',
+      md: 'w-10 h-10 p-2 text-sm rounded-xl',
+      lg: 'w-12 h-12 p-3 text-base rounded-2xl',
+    };
+
+    const variantClasses = {
+      primary: 'bg-emerald-800 dark:bg-emerald-600 text-white hover:bg-emerald-900',
+      secondary: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300',
+      outline: 'bg-white dark:bg-[#131d16] border border-stone-300 dark:border-[#23382b] text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-[#19271e]',
+      ghost: 'text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800',
+      subtle: 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700',
+    };
+
+    return (
+      <button
+        ref={ref}
+        type="button"
+        className={cn(
+          'inline-flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 cursor-pointer',
+          sizeClasses[size],
+          variantClasses[variant],
+          className
+        )}
+        {...props}
+      >
+        {icon}
+      </button>
+    );
+  }
+);
+
+IconButton.displayName = 'IconButton';

@@ -46,14 +46,14 @@ export function FoodSelectorModal({
       <div className="space-y-4">
         {/* Search */}
         <div className="relative">
-          <SearchIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+          <SearchIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 dark:text-stone-500" />
           <input
             type="text"
             autoFocus
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search rice, dal, roti, poha, sabzi..."
-            className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-emerald-700 focus:bg-white"
+            className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] rounded-xl text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:border-emerald-700 focus:bg-white dark:focus:bg-[#19271e]"
           />
         </div>
 
@@ -62,7 +62,7 @@ export function FoodSelectorModal({
           {filteredFoods.map(food => (
             <div
               key={food.id}
-              className="p-3 rounded-xl border border-stone-200 hover:border-emerald-500 hover:bg-emerald-50/40 transition-all flex items-center justify-between gap-3 cursor-pointer group"
+              className="p-3 rounded-xl border border-stone-200 dark:border-[#23382b] hover:border-emerald-500 dark:hover:border-emerald-600 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20 transition-all flex items-center justify-between gap-3 cursor-pointer group"
               onClick={() => {
                 onSelectFood(food);
                 onClose();
@@ -70,25 +70,25 @@ export function FoodSelectorModal({
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-semibold text-stone-900 truncate group-hover:text-emerald-950">
+                  <h4 className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate group-hover:text-emerald-950 dark:group-hover:text-emerald-300">
                     {food.name}
                   </h4>
                   <Badge variant="stone" size="sm">
                     {food.region}
                   </Badge>
                 </div>
-                <div className="flex items-center gap-2 mt-1 text-xs text-stone-500">
+                <div className="flex items-center gap-2 mt-1 text-xs text-stone-500 dark:text-stone-400">
                   <span>{food.category}</span>
                   <span>•</span>
                   <span>{food.standardServingSize}</span>
                   <span>•</span>
-                  <span className="font-semibold text-emerald-800">{food.nutritionPerServing.calories} kcal</span>
+                  <span className="font-semibold text-emerald-800 dark:text-emerald-400">{food.nutritionPerServing.calories} kcal</span>
                 </div>
               </div>
 
               <button
                 type="button"
-                className="shrink-0 p-2 rounded-lg bg-stone-100 group-hover:bg-emerald-700 group-hover:text-white text-stone-700 transition-colors"
+                className="shrink-0 p-2 rounded-lg bg-stone-100 dark:bg-[#19271e] group-hover:bg-emerald-700 group-hover:text-white text-stone-700 dark:text-stone-300 transition-colors"
                 aria-label={`Select ${food.name}`}
               >
                 <PlusIcon size={16} />
@@ -97,7 +97,7 @@ export function FoodSelectorModal({
           ))}
 
           {filteredFoods.length === 0 && (
-            <div className="py-8 text-center text-stone-500 text-xs">
+            <div className="py-8 text-center text-stone-500 dark:text-stone-400 text-xs">
               No matching foods found for &quot;{query}&quot;. Try a different search term.
             </div>
           )}

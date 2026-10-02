@@ -27,7 +27,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="py-8 sm:py-12 bg-gradient-to-b from-stone-50 via-emerald-50/20 to-stone-50 min-h-[calc(100vh-4rem)]">
+    <div className="py-8 sm:py-12 bg-gradient-to-b from-stone-50 via-emerald-50/20 to-stone-50 dark:from-[#0c130e] dark:via-[#131d16] dark:to-[#0c130e] min-h-[calc(100vh-4rem)]">
       <Container size="md">
         <ProfileForm mode="onboarding" onComplete={() => router.push('/dashboard')} />
       </Container>

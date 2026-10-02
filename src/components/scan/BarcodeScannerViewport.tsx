@@ -295,7 +295,7 @@ export function BarcodeScannerViewport({
   };
 
   return (
-    <div className="relative w-full rounded-3xl overflow-hidden bg-stone-950 border border-stone-800 shadow-xl">
+    <div className="card-3d relative w-full rounded-3xl overflow-hidden bg-[#0c130e] border-2 border-emerald-900/60 dark:border-emerald-500/20 shadow-[0_16px_40px_-8px_rgba(4,120,87,0.25)]">
       {/* Video Viewport */}
       <div className="relative aspect-[4/3] sm:aspect-video w-full flex items-center justify-center overflow-hidden">
         <video
@@ -318,9 +318,9 @@ export function BarcodeScannerViewport({
               <div className="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-emerald-400 rounded-br-lg" />
 
               {/* Animated Laser Scanning Line */}
-              <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent animate-bounce opacity-85 shadow-[0_0_8px_#34d399]" />
+              <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent animate-scan-beam opacity-90 shadow-[0_0_12px_#34d399]" />
 
-              <span className="text-2xs font-semibold text-emerald-200/90 tracking-wider uppercase px-2 py-0.5 rounded bg-emerald-950/70 border border-emerald-500/30">
+              <span className="text-2xs font-semibold text-emerald-200/90 tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 font-mono">
                 {detectedFormat ? `Format: ${detectedFormat}` : 'Point at Barcode'}
               </span>
             </div>

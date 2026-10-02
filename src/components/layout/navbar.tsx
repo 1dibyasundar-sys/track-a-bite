@@ -9,6 +9,7 @@ import { CameraIcon, LeafIcon, XIcon } from '../ui/icons';
 import { userProfileService, useUserProfile } from '../../lib/services/userProfileService';
 import { useAuth } from '../auth/AuthProvider';
 import { ProfileModal } from '../profile/profile-modal';
+import { ThemeToggle } from '../theme/ThemeToggle';
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -44,7 +45,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#e7e5e0] transition-all">
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#0c130e]/95 backdrop-blur-md border-b border-[#e7e5e0] dark:border-[#23382b] transition-all">
         <Container size="lg">
           <div className="flex items-center justify-between h-16 sm:h-18">
             {/* Brand Logo */}
@@ -53,19 +54,19 @@ export function Navbar() {
               className="flex items-center gap-2.5 sm:gap-3 shrink-0 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 rounded-xl py-1 px-1 -ml-1 transition-colors"
               aria-label="Track-a-Bite Home"
             >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-800 text-white flex items-center justify-center shadow-xs group-hover:bg-emerald-900 transition-colors shrink-0">
-                <LeafIcon size={20} className="text-emerald-300" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-800 dark:bg-emerald-700 text-white flex items-center justify-center shadow-xs group-hover:bg-emerald-900 transition-colors shrink-0">
+                <LeafIcon size={20} className="text-emerald-300 dark:text-emerald-200" />
               </div>
               <div className="flex flex-col justify-center min-w-0">
                 <div className="flex items-center gap-1.5 leading-none">
-                  <span className="text-base sm:text-lg font-bold tracking-tight text-stone-900 font-sans whitespace-nowrap">
+                  <span className="text-base sm:text-lg font-bold tracking-tight text-stone-900 dark:text-stone-100 font-sans whitespace-nowrap">
                     Track-a-Bite
                   </span>
-                  <span className="text-3xs sm:text-2xs font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 shrink-0 whitespace-nowrap border border-emerald-200/60">
+                  <span className="text-3xs sm:text-2xs font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 shrink-0 whitespace-nowrap border border-emerald-200/60 dark:border-emerald-800/60">
                     Campus
                   </span>
                 </div>
-                <span className="text-3xs sm:text-2xs text-stone-500 font-medium tracking-wide whitespace-nowrap mt-0.5">
+                <span className="text-3xs sm:text-2xs text-stone-500 dark:text-stone-400 font-medium tracking-wide whitespace-nowrap mt-0.5">
                   Student Food Intelligence
                 </span>
               </div>
@@ -82,8 +83,8 @@ export function Navbar() {
                     className={cn(
                       'px-2.5 xl:px-3.5 py-2 text-xs xl:text-sm font-medium rounded-lg transition-colors whitespace-nowrap',
                       active
-                        ? 'text-emerald-900 bg-emerald-50 font-semibold'
-                        : 'text-stone-600 hover:text-stone-900 hover:bg-stone-50'
+                        ? 'text-emerald-900 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 font-semibold'
+                        : 'text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-50 dark:hover:bg-stone-800/60'
                     )}
                   >
                     {link.label}
@@ -92,8 +93,11 @@ export function Navbar() {
               })}
             </nav>
 
-            {/* Desktop Quick Actions: Hostel Mode Toggle, Auth & Scan */}
+            {/* Desktop Quick Actions: Theme, Hostel Mode Toggle, Auth & Scan */}
             <div className="hidden lg:flex items-center gap-2 xl:gap-2.5 shrink-0">
+              {/* Theme Toggle Dropdown */}
+              <ThemeToggle variant="dropdown" />
+
               {/* Hostel Mode Pill Switch */}
               <button
                 type="button"
@@ -101,15 +105,15 @@ export function Navbar() {
                 className={cn(
                   'px-2.5 xl:px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border cursor-pointer shrink-0 whitespace-nowrap',
                   profile.isHostelite
-                    ? 'bg-amber-100/90 text-amber-950 border-amber-300 hover:bg-amber-200'
-                    : 'bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200'
+                    ? 'bg-amber-100/90 dark:bg-amber-950/60 text-amber-950 dark:text-amber-200 border-amber-300 dark:border-amber-700 hover:bg-amber-200 dark:hover:bg-amber-900/60'
+                    : 'bg-stone-100 dark:bg-stone-900/90 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-800 hover:bg-stone-200 dark:hover:bg-stone-800'
                 )}
                 title="Toggle Hostel Mode for campus-friendly recommendations"
               >
                 <span className="text-sm">{profile.isHostelite ? '🏠' : '🍽️'}</span>
                 <span className="hidden xl:inline">Hostel Mode:</span>
                 <span className="xl:hidden">Hostel:</span>
-                <span className={cn('text-3xs xl:text-2xs font-extrabold uppercase px-1 rounded', profile.isHostelite ? 'bg-amber-200 text-amber-950' : 'bg-stone-200 text-stone-700')}>
+                <span className={cn('text-3xs xl:text-2xs font-extrabold uppercase px-1 rounded', profile.isHostelite ? 'bg-amber-200 dark:bg-amber-800/80 text-amber-950 dark:text-amber-100' : 'bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300')}>
                   {profile.isHostelite ? 'ON' : 'OFF'}
                 </span>
               </button>
@@ -120,10 +124,10 @@ export function Navbar() {
                   {/* User Identity Pill */}
                   <Link
                     href="/profile"
-                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200/80 border border-stone-200/80 text-xs text-stone-800 transition-colors group shrink-0 whitespace-nowrap"
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-stone-100 dark:bg-stone-900/90 hover:bg-stone-200/80 dark:hover:bg-stone-800 border border-stone-200/80 dark:border-stone-800 text-xs text-stone-800 dark:text-stone-200 transition-colors group shrink-0 whitespace-nowrap"
                     title={`Signed in as ${user?.displayName || user?.email || 'User'}`}
                   >
-                    <div className="w-6 h-6 rounded-full bg-emerald-800 text-white flex items-center justify-center text-3xs font-bold uppercase shadow-2xs group-hover:bg-emerald-900">
+                    <div className="w-6 h-6 rounded-full bg-emerald-800 dark:bg-emerald-700 text-white flex items-center justify-center text-3xs font-bold uppercase shadow-2xs group-hover:bg-emerald-900">
                       {((user?.displayName || user?.email || 'U')[0]).toUpperCase()}
                     </div>
                     <span className="font-semibold max-w-[80px] xl:max-w-[110px] truncate text-xs">
@@ -134,13 +138,13 @@ export function Navbar() {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="px-2.5 xl:px-3 py-2 text-xs font-semibold rounded-xl text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+                    className="px-2.5 xl:px-3 py-2 text-xs font-semibold rounded-xl text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
                   >
                     Sign Out
                   </button>
                   <Link
                     href="/scan"
-                    className="inline-flex items-center gap-1.5 xl:gap-2 px-3.5 xl:px-4 py-2 text-xs xl:text-sm font-semibold rounded-xl bg-emerald-800 text-white hover:bg-emerald-900 transition-colors shadow-2xs shrink-0 whitespace-nowrap"
+                    className="inline-flex items-center gap-1.5 xl:gap-2 px-3.5 xl:px-4 py-2 text-xs xl:text-sm font-semibold rounded-xl bg-emerald-800 dark:bg-emerald-600 text-white hover:bg-emerald-900 dark:hover:bg-emerald-500 transition-colors shadow-2xs shrink-0 whitespace-nowrap"
                   >
                     <CameraIcon size={16} className="text-emerald-200" />
                     <span>Scan Food</span>
@@ -150,15 +154,16 @@ export function Navbar() {
                 <>
                   <Link
                     href="/login"
-                    className="px-3 xl:px-3.5 py-2 text-xs font-semibold rounded-xl text-stone-700 hover:text-stone-950 hover:bg-stone-100 transition-colors shrink-0 whitespace-nowrap"
+                    className="px-3 xl:px-3.5 py-2 text-xs font-semibold rounded-xl text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors shrink-0 whitespace-nowrap"
                   >
                     Sign In
                   </Link>
                   <Link
-                    href="/register"
-                    className="inline-flex items-center gap-1.5 px-3.5 xl:px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-800 text-white hover:bg-emerald-900 transition-colors shadow-2xs shrink-0 whitespace-nowrap"
+                    href="/scan"
+                    className="inline-flex items-center gap-1.5 xl:gap-2 px-3.5 xl:px-4 py-2 text-xs xl:text-sm font-bold rounded-xl bg-emerald-800 dark:bg-emerald-600 text-white hover:bg-emerald-900 dark:hover:bg-emerald-500 transition-all shadow-sm hover:-translate-y-0.5 shrink-0 whitespace-nowrap"
                   >
-                    <span>Register</span>
+                    <CameraIcon size={16} className="text-emerald-200" />
+                    <span>Scan Food</span>
                   </Link>
                 </>
               )}
@@ -166,12 +171,17 @@ export function Navbar() {
 
             {/* Mobile / Tablet Actions (< 1024px) */}
             <div className="flex items-center gap-1.5 sm:gap-2 lg:hidden shrink-0">
+              {/* Quick Cycle Theme Toggle for mobile top bar */}
+              <ThemeToggle variant="cycle" className="p-1.5" />
+
               <button
                 type="button"
                 onClick={handleToggleHostelMode}
                 className={cn(
                   'p-1.5 px-2 rounded-lg text-2xs font-bold border transition-colors flex items-center gap-1 shrink-0 whitespace-nowrap',
-                  profile.isHostelite ? 'bg-amber-100 text-amber-950 border-amber-300' : 'bg-stone-100 text-stone-600 border-stone-200'
+                  profile.isHostelite
+                    ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-950 dark:text-amber-200 border-amber-300 dark:border-amber-700'
+                    : 'bg-stone-100 dark:bg-stone-900/90 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-800'
                 )}
                 aria-label="Toggle Hostel Mode"
                 title={`Hostel Mode: ${profile.isHostelite ? 'ON' : 'OFF'}`}
@@ -182,7 +192,7 @@ export function Navbar() {
 
               <Link
                 href="/scan"
-                className="p-2 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors shrink-0"
+                className="p-2 text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 rounded-lg transition-colors shrink-0"
                 aria-label="Quick Scan"
                 title="Scan Food"
               >
@@ -192,7 +202,7 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-100 focus:outline-none transition-colors shrink-0"
+                className="p-2 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 focus:outline-none transition-colors shrink-0"
                 aria-label="Toggle Navigation Menu"
                 aria-expanded={mobileMenuOpen}
               >
@@ -211,23 +221,31 @@ export function Navbar() {
 
           {/* Mobile Dropdown */}
           {mobileMenuOpen && (
-            <div className="lg:hidden py-4 border-t border-stone-200 animate-in fade-in slide-in-from-top-2 duration-150 space-y-3">
+            <div className="lg:hidden py-4 border-t border-stone-200 dark:border-stone-800 animate-in fade-in slide-in-from-top-2 duration-150 space-y-3">
               {/* Authenticated User Identity Header in Mobile Drawer */}
               {isAuthenticated && (
-                <div className="p-3 rounded-xl bg-stone-50 border border-stone-200/80 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-emerald-800 text-white flex items-center justify-center text-xs font-bold uppercase shrink-0">
+                <div className="p-3 rounded-xl bg-stone-50 dark:bg-[#131d16] border border-stone-200/80 dark:border-[#23382b] flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-emerald-800 dark:bg-emerald-700 text-white flex items-center justify-center text-xs font-bold uppercase shrink-0">
                     {((user?.displayName || user?.email || 'U')[0]).toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-stone-900 truncate">
+                    <p className="text-xs font-bold text-stone-900 dark:text-stone-100 truncate">
                       {user?.displayName || (user?.email ? user.email.split('@')[0] : 'Campus Foodie')}
                     </p>
-                    <p className="text-2xs text-stone-500 truncate">
+                    <p className="text-2xs text-stone-500 dark:text-stone-400 truncate">
                       {user?.email || 'Logged in'}
                     </p>
                   </div>
                 </div>
               )}
+
+              {/* Theme Preference in Mobile Drawer */}
+              <div className="px-1 py-1">
+                <span className="text-3xs sm:text-2xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5 block">
+                  Appearance
+                </span>
+                <ThemeToggle variant="segmented" />
+              </div>
 
               <nav className="flex flex-col gap-1">
                 {navLinks.map(link => {
@@ -240,12 +258,12 @@ export function Navbar() {
                       className={cn(
                         'px-4 py-3 text-base font-medium rounded-xl transition-colors flex items-center justify-between',
                         active
-                          ? 'text-emerald-900 bg-emerald-50 font-semibold'
-                          : 'text-stone-700 hover:bg-stone-50'
+                          ? 'text-emerald-900 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 font-semibold'
+                          : 'text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800/60'
                       )}
                     >
                       <span>{link.label}</span>
-                      {active && <span className="w-1.5 h-1.5 rounded-full bg-emerald-700" />}
+                      {active && <span className="w-1.5 h-1.5 rounded-full bg-emerald-700 dark:bg-emerald-400" />}
                     </Link>
                   );
                 })}
@@ -254,11 +272,11 @@ export function Navbar() {
               {/* Mobile Auth and Quick Actions */}
               {isAuthenticated ? (
                 <>
-                  <div className="pt-2 border-t border-stone-100 flex items-center justify-between gap-2 px-1">
+                  <div className="pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between gap-2 px-1">
                     <Link
                       href="/profile"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex-1 py-2.5 px-3 rounded-xl bg-stone-100 text-stone-800 text-xs font-bold text-center border border-stone-200"
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200 text-xs font-bold text-center border border-stone-200 dark:border-stone-700"
                     >
                       Personal Profile
                     </Link>
@@ -268,7 +286,7 @@ export function Navbar() {
                         setMobileMenuOpen(false);
                         handleLogout();
                       }}
-                      className="flex-1 py-2.5 px-3 rounded-xl bg-stone-100 text-stone-700 text-xs font-bold text-center border border-stone-200 cursor-pointer"
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-xs font-bold text-center border border-stone-200 dark:border-stone-700 cursor-pointer"
                     >
                       Sign Out
                     </button>
@@ -277,7 +295,7 @@ export function Navbar() {
                     <Link
                       href="/scan"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-800 text-white font-semibold shadow-xs"
+                      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-800 dark:bg-emerald-600 text-white font-semibold shadow-xs hover:bg-emerald-900 dark:hover:bg-emerald-500 transition-colors"
                     >
                       <CameraIcon size={18} />
                       <span>Scan My Food</span>
@@ -285,18 +303,18 @@ export function Navbar() {
                   </div>
                 </>
               ) : (
-                <div className="pt-2 border-t border-stone-100 flex items-center gap-2 px-1">
+                <div className="pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center gap-2 px-1">
                   <Link
                     href="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-stone-100 text-stone-800 text-xs font-bold text-center border border-stone-200"
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200 text-xs font-bold text-center border border-stone-200 dark:border-stone-700"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/register"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-800 text-white text-xs font-bold text-center shadow-2xs"
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-800 dark:bg-emerald-600 text-white text-xs font-bold text-center shadow-2xs hover:bg-emerald-900 dark:hover:bg-emerald-500 transition-colors"
                   >
                     Register
                   </Link>

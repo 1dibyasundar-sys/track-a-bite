@@ -19,11 +19,11 @@ export function Progress({
   const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
 
   const colors = {
-    emerald: 'bg-emerald-600',
-    amber: 'bg-amber-600',
-    rose: 'bg-rose-500',
-    teal: 'bg-teal-600',
-    stone: 'bg-stone-700',
+    emerald: 'bg-emerald-600 dark:bg-emerald-500',
+    amber: 'bg-amber-500 dark:bg-amber-400',
+    rose: 'bg-rose-500 dark:bg-rose-400',
+    teal: 'bg-teal-600 dark:bg-teal-400',
+    stone: 'bg-stone-700 dark:bg-stone-400',
   };
 
   const sizes = {
@@ -39,7 +39,7 @@ export function Progress({
       aria-valuemin={0}
       aria-valuemax={max}
       className={cn(
-        'w-full bg-stone-100 rounded-full overflow-hidden border border-stone-200/60',
+        'w-full bg-stone-100 dark:bg-stone-800/80 rounded-full overflow-hidden border border-stone-200/60 dark:border-stone-700/60',
         sizes[size],
         className
       )}
@@ -52,3 +52,5 @@ export function Progress({
     </div>
   );
 }
+
+export const ProgressBar = Progress;

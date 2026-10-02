@@ -17,7 +17,7 @@ export function MacroDistributionBar({
   return (
     <div className={`space-y-2.5 ${className}`}>
       {/* Segmented Bar */}
-      <div className="h-4 w-full bg-stone-100 rounded-full overflow-hidden flex border border-stone-200/80 shadow-2xs">
+      <div className="h-4 w-full bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden flex border border-stone-200/80 dark:border-stone-700 shadow-2xs">
         <div
           style={{ width: `${carbsPercent}%` }}
           className="bg-amber-500 hover:bg-amber-600 transition-all duration-300 relative group"
@@ -40,18 +40,18 @@ export function MacroDistributionBar({
         <div className="flex flex-wrap items-center justify-between text-xs gap-y-1.5 pt-1">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-            <span className="font-semibold text-stone-800">Carbs:</span>
-            <span className="text-stone-600">{carbsPercent}%</span>
+            <span className="font-semibold text-stone-800 dark:text-stone-200">Carbs:</span>
+            <span className="text-stone-600 dark:text-stone-400">{carbsPercent}%</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
-            <span className="font-semibold text-stone-800">Protein:</span>
-            <span className="text-stone-600">{proteinPercent}%</span>
+            <span className="font-semibold text-stone-800 dark:text-stone-200">Protein:</span>
+            <span className="text-stone-600 dark:text-stone-400">{proteinPercent}%</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-            <span className="font-semibold text-stone-800">Fat:</span>
-            <span className="text-stone-600">{fatPercent}%</span>
+            <span className="font-semibold text-stone-800 dark:text-stone-200">Fat:</span>
+            <span className="text-stone-600 dark:text-stone-400">{fatPercent}%</span>
           </div>
         </div>
       )}

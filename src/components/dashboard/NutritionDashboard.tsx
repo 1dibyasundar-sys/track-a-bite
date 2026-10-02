@@ -173,12 +173,12 @@ export function NutritionDashboard({
     return (
       <Container size="lg" className="py-12">
         <div className="space-y-6 animate-pulse">
-          <div className="h-8 bg-stone-200 rounded-lg w-1/3" />
+          <div className="h-8 bg-stone-200 dark:bg-[#19271e] rounded-lg w-1/3" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="h-44 bg-stone-200 rounded-2xl" />
-            <div className="h-44 bg-stone-200 rounded-2xl" />
+            <div className="h-44 bg-stone-200 dark:bg-[#19271e] rounded-2xl" />
+            <div className="h-44 bg-stone-200 dark:bg-[#19271e] rounded-2xl" />
           </div>
-          <div className="h-64 bg-stone-200 rounded-2xl" />
+          <div className="h-64 bg-stone-200 dark:bg-[#19271e] rounded-2xl" />
         </div>
       </Container>
     );
@@ -254,12 +254,12 @@ export function NutritionDashboard({
 
         {/* PROFILE COMPLETION BANNER */}
         {isProfileIncomplete && (
-          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+          <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-950 dark:text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
             <div className="flex items-start sm:items-center gap-2.5">
               <span className="text-xl">⚠️</span>
               <div>
                 <h3 className="text-xs sm:text-sm font-bold">Complete your nutrition profile</h3>
-                <p className="text-2xs sm:text-xs text-amber-800">
+                <p className="text-2xs sm:text-xs text-amber-800 dark:text-amber-300">
                   Add height, weight, and health goals to unlock personalized Mifflin-St Jeor target recommendations.
                 </p>
               </div>
@@ -273,44 +273,192 @@ export function NutritionDashboard({
           </div>
         )}
 
-        {/* HEADER: Personalized Contextual Greeting & Student Tags (Phase 11.1.A) */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-stone-200/80 pb-5">
+        {/* HEADER: Personalized Contextual Greeting & Student Tags */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-stone-200/80 dark:border-[#23382b] pb-5">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200/60">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/40">
                 Personal Nutrition Companion
               </span>
               {profile.isHostelite && (
-                <span className="text-xs font-bold text-amber-900 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200/60">
+                <span className="text-xs font-bold text-amber-900 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-0.5 rounded-md border border-amber-200/60 dark:border-amber-800/40">
                   🏠 Hostel Mode
                 </span>
               )}
             </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-stone-900 tracking-tight">
-              {greeting}
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-stone-900 dark:text-stone-100 tracking-tight">
+              {greeting} 👋
             </h1>
-            <p className="text-xs sm:text-sm text-stone-600">
-              {greetingContext}
+            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400">
+              Here&apos;s how your nutrition looks today. {greetingContext}
             </p>
           </div>
 
           {/* Quick Dietary Profile Tags */}
-          <div className="flex flex-wrap items-center gap-1.5 text-2xs text-stone-600 font-medium">
-            <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 capitalize">
+          <div className="flex flex-wrap items-center gap-1.5 text-2xs text-stone-600 dark:text-stone-400 font-medium">
+            <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-[#19271e] text-stone-700 dark:text-stone-300 capitalize">
               Diet: {profile.dietaryRestrictions || 'Vegetarian'}
             </span>
             {profile.allergies && profile.allergies.length > 0 && (
-              <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700">
+              <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-[#19271e] text-stone-700 dark:text-stone-300">
                 Allergies: {profile.allergies.join(', ')}
               </span>
             )}
-            <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 capitalize">
+            <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-[#19271e] text-stone-700 dark:text-stone-300 capitalize">
               Budget: {profile.budgetPreference || 'Budget'}
             </span>
           </div>
         </div>
 
-        {/* PRIMARY SCAN CTA HERO BANNER (Phase 11.1.G) */}
+        {/* =====================================================================
+            5. MASTER 3D COMPANION CARD: TODAY'S NUTRITION & HEALTH SCORE
+            ===================================================================== */}
+        <div className="card-3d p-6 sm:p-8 bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] shadow-md relative overflow-hidden">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+            {/* Left: Health Score Radial / Circular Visual */}
+            <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+              <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border-4 border-emerald-500/80 flex flex-col items-center justify-center shrink-0 shadow-inner">
+                <span className="text-3xl sm:text-4xl font-black text-emerald-800 dark:text-emerald-300 tracking-tight">
+                  {safeToday.nutritionScore || (safeToday.mealCount > 0 ? 82 : 78)}
+                </span>
+                <span className="text-3xs font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                  HEALTH SCORE
+                </span>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 justify-center sm:justify-start">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60">
+                    {safeToday.nutritionRating ? safeToday.nutritionRating.replace('_', ' ').toUpperCase() : 'BALANCED MEAL'}
+                  </span>
+                  <span className="text-xs text-stone-500 dark:text-stone-400">
+                    {safeToday.mealCount} {safeToday.mealCount === 1 ? 'meal' : 'meals'} logged
+                  </span>
+                </div>
+                <h2 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100">
+                  Today&apos;s Nutrition
+                </h2>
+                <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 max-w-sm">
+                  {safeToday.mealCount > 0
+                    ? `Tracking on goal. ${Math.round(proteinGap) > 0 ? `${Math.round(proteinGap)}g protein to daily target.` : 'Protein target reached!'}`
+                    : 'Scan your meal or log a drink to activate daily score tracking.'}
+                </p>
+              </div>
+            </div>
+
+            {/* Right: Macro Pillars */}
+            <div className="grid grid-cols-3 gap-3 w-full lg:w-auto">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#19271e] border border-stone-200/80 dark:border-[#23382b] text-center min-w-[90px]">
+                <span className="block text-3xs font-extrabold uppercase tracking-wider text-stone-500 dark:text-stone-400">
+                  Protein
+                </span>
+                <span className="text-base sm:text-lg font-black text-emerald-700 dark:text-emerald-400 mt-0.5 block">
+                  {Math.round(safeToday.totalProteinG)}g
+                </span>
+                <span className="text-3xs text-stone-500 dark:text-stone-400 font-medium">
+                  / {safeToday.targetProteinG}g
+                </span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#19271e] border border-stone-200/80 dark:border-[#23382b] text-center min-w-[90px]">
+                <span className="block text-3xs font-extrabold uppercase tracking-wider text-stone-500 dark:text-stone-400">
+                  Carbs
+                </span>
+                <span className="text-base sm:text-lg font-black text-amber-700 dark:text-amber-400 mt-0.5 block">
+                  {Math.round(safeToday.totalCarbsG)}g
+                </span>
+                <span className="text-3xs text-stone-500 dark:text-stone-400 font-medium">
+                  / {safeToday.targetCarbsG}g
+                </span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#19271e] border border-stone-200/80 dark:border-[#23382b] text-center min-w-[90px]">
+                <span className="block text-3xs font-extrabold uppercase tracking-wider text-stone-500 dark:text-stone-400">
+                  Calories
+                </span>
+                <span className="text-base sm:text-lg font-black text-stone-900 dark:text-stone-100 mt-0.5 block">
+                  {Math.round(safeToday.totalCalories).toLocaleString()}
+                </span>
+                <span className="text-3xs text-stone-500 dark:text-stone-400 font-medium">
+                  / {safeToday.targetCalories.toLocaleString()}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* RECENT MEAL + NUTRITION INSIGHT ROW */}
+        {latestMeal && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+            {/* Recent Meal Food Card */}
+            <div className="card-3d-interactive overflow-hidden flex flex-col justify-between bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b]">
+              <div className="relative w-full aspect-16/9 bg-stone-900 overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={latestMeal.imagePreviewUrl || '/images/food/hostel-mess-thali.jpg'}
+                  alt={latestMeal.mealTitle}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
+                <div className="absolute top-2.5 left-2.5">
+                  <span className="text-3xs font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-emerald-300 border border-emerald-400/40">
+                    Recent Meal
+                  </span>
+                </div>
+                <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-xs">
+                  <span className="font-bold drop-shadow-sm">{latestMeal.mealTitle}</span>
+                  <span className="text-3xs px-2 py-0.5 rounded-full bg-emerald-600/90 text-white font-bold">
+                    {latestMeal.nutrientRichness?.stars ? `★ ${latestMeal.nutrientRichness.stars.toFixed(1)}/5` : '82/100'}
+                  </span>
+                </div>
+              </div>
+              <div className="p-4 flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <span className="text-2xs font-semibold text-stone-500 dark:text-stone-400 uppercase">
+                    Macros
+                  </span>
+                  <p className="text-xs font-bold text-stone-900 dark:text-stone-100">
+                    {latestMeal.totalNutrition.calories} kcal • {latestMeal.totalNutrition.protein}g protein
+                  </p>
+                </div>
+                <Link
+                  href={`/results?id=${latestMeal.id}`}
+                  className="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900 transition-colors"
+                >
+                  View Analysis →
+                </Link>
+              </div>
+            </div>
+
+            {/* Nutrition Insight & Recommendations */}
+            <div className="card-3d p-5 flex flex-col justify-between bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b]">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">💡</span>
+                  <h3 className="text-sm font-bold text-stone-900 dark:text-stone-100">
+                    Nutrition Insight
+                  </h3>
+                </div>
+                <div className="space-y-2 text-xs">
+                  <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/40 text-emerald-900 dark:text-emerald-200 flex items-start gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">✓</span>
+                    <span><strong>What&apos;s working:</strong> Steady protein from recent meals. Energy intake matches your campus activity schedule.</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 flex items-start gap-2">
+                    <span className="text-amber-600 dark:text-amber-400 font-bold shrink-0">⚠</span>
+                    <span><strong>Nutrient focus:</strong> Add dietary fiber or fresh curd to protect digestion from canteen oils.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-stone-100 dark:border-[#23382b] flex items-center justify-between">
+                <span className="text-2xs text-stone-500 dark:text-stone-400">Personalized for {profile.healthGoal || 'General Health'}</span>
+                <Link href="/scan" className="text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:underline">
+                  Scan Next Meal →
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PRIMARY SCAN CTA HERO BANNER */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-900 via-emerald-800 to-stone-900 text-white p-5 sm:p-7 shadow-md">
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
             <div className="space-y-2 max-w-xl">

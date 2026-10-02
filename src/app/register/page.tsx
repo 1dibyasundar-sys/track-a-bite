@@ -62,7 +62,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="py-12 sm:py-16 bg-gradient-to-b from-stone-50 via-emerald-50/20 to-stone-50 min-h-[calc(100vh-4rem)] flex items-center">
+    <div className="py-12 sm:py-16 bg-gradient-to-b from-stone-50 via-emerald-50/20 to-stone-50 dark:from-[#0c130e] dark:via-[#131d16] dark:to-[#0c130e] min-h-[calc(100vh-4rem)] flex items-center">
       <Container size="sm">
         <div className="w-full max-w-md mx-auto">
           {/* Brand Header */}
@@ -70,20 +70,20 @@ export default function RegisterPage() {
             <div className="inline-flex w-12 h-12 rounded-2xl bg-emerald-800 text-white items-center justify-center shadow-sm mb-4">
               <LeafIcon size={24} className="text-emerald-300" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
               Join Track-a-Bite
             </h1>
-            <p className="text-xs sm:text-sm text-stone-600 mt-2">
+            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 mt-2">
               Create your account to personalize your daily nutrition insights
             </p>
           </div>
 
           {/* Registration Card */}
-          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-stone-200/80 shadow-sm">
+          <div className="bg-white/90 dark:bg-[#131d16]/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-stone-200/80 dark:border-[#23382b] shadow-sm">
             {serverError && (
               <div
                 role="alert"
-                className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs font-medium text-red-800 flex items-start gap-2.5"
+                className="mb-5 p-3.5 rounded-xl bg-red-50 dark:bg-rose-950/40 border border-red-200 dark:border-rose-900/60 text-xs font-medium text-red-800 dark:text-rose-300 flex items-start gap-2.5"
               >
                 <span className="text-sm">⚠️</span>
                 <div className="flex-1">{serverError}</div>
@@ -95,9 +95,9 @@ export default function RegisterPage() {
               <div>
                 <label
                   htmlFor="register-name"
-                  className="block text-xs font-bold text-stone-800 uppercase tracking-wider mb-1.5"
+                  className="block text-xs font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider mb-1.5"
                 >
-                  Name <span className="text-stone-400 font-normal lowercase">(optional)</span>
+                  Name <span className="text-stone-400 dark:text-stone-500 font-normal lowercase">(optional)</span>
                 </label>
                 <input
                   id="register-name"
@@ -108,7 +108,7 @@ export default function RegisterPage() {
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Aarav Sharma"
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 rounded-xl border border-stone-300 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent text-sm transition-all min-h-[44px]"
+                  className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#23382b] bg-white dark:bg-[#19271e] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent text-sm transition-all min-h-[44px]"
                 />
               </div>
 
@@ -116,7 +116,7 @@ export default function RegisterPage() {
               <div>
                 <label
                   htmlFor="register-email"
-                  className="block text-xs font-bold text-stone-800 uppercase tracking-wider mb-1.5"
+                  className="block text-xs font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider mb-1.5"
                 >
                   Email Address
                 </label>
@@ -135,10 +135,10 @@ export default function RegisterPage() {
                   aria-describedby={errors.email ? 'register-email-error' : undefined}
                   placeholder="student@campus.edu"
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 rounded-xl border border-stone-300 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent text-sm transition-all min-h-[44px]"
+                  className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#23382b] bg-white dark:bg-[#19271e] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent text-sm transition-all min-h-[44px]"
                 />
                 {errors.email && (
-                  <p id="register-email-error" className="text-xs text-red-600 font-medium mt-1">
+                  <p id="register-email-error" className="text-xs text-red-600 dark:text-rose-400 font-medium mt-1">
                     {errors.email}
                   </p>
                 )}
@@ -148,7 +148,7 @@ export default function RegisterPage() {
               <div>
                 <label
                   htmlFor="register-password"
-                  className="block text-xs font-bold text-stone-800 uppercase tracking-wider mb-1.5"
+                  className="block text-xs font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider mb-1.5"
                 >
                   Password
                 </label>
@@ -167,10 +167,10 @@ export default function RegisterPage() {
                   aria-describedby={errors.password ? 'register-password-error' : undefined}
                   placeholder="At least 6 characters"
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 rounded-xl border border-stone-300 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent text-sm transition-all min-h-[44px]"
+                  className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#23382b] bg-white dark:bg-[#19271e] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent text-sm transition-all min-h-[44px]"
                 />
                 {errors.password && (
-                  <p id="register-password-error" className="text-xs text-red-600 font-medium mt-1">
+                  <p id="register-password-error" className="text-xs text-red-600 dark:text-rose-400 font-medium mt-1">
                     {errors.password}
                   </p>
                 )}
@@ -180,7 +180,7 @@ export default function RegisterPage() {
               <div>
                 <label
                   htmlFor="register-confirm-password"
-                  className="block text-xs font-bold text-stone-800 uppercase tracking-wider mb-1.5"
+                  className="block text-xs font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider mb-1.5"
                 >
                   Confirm Password
                 </label>
@@ -199,10 +199,10 @@ export default function RegisterPage() {
                   aria-describedby={errors.confirmPassword ? 'register-confirm-error' : undefined}
                   placeholder="Re-enter your password"
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 rounded-xl border border-stone-300 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent text-sm transition-all min-h-[44px]"
+                  className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-[#23382b] bg-white dark:bg-[#19271e] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent text-sm transition-all min-h-[44px]"
                 />
                 {errors.confirmPassword && (
-                  <p id="register-confirm-error" className="text-xs text-red-600 font-medium mt-1">
+                  <p id="register-confirm-error" className="text-xs text-red-600 dark:text-rose-400 font-medium mt-1">
                     {errors.confirmPassword}
                   </p>
                 )}
@@ -213,7 +213,7 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3 px-4 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed min-h-[44px]"
+                  className="w-full py-3 px-4 rounded-xl bg-emerald-800 dark:bg-emerald-700 hover:bg-emerald-900 dark:hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed min-h-[44px]"
                 >
                   {isSubmitting ? (
                     <>
@@ -228,12 +228,12 @@ export default function RegisterPage() {
             </form>
 
             {/* Footer Link */}
-            <div className="mt-6 pt-5 border-t border-stone-100 text-center">
-              <p className="text-xs text-stone-600">
+            <div className="mt-6 pt-5 border-t border-stone-100 dark:border-[#23382b] text-center">
+              <p className="text-xs text-stone-600 dark:text-stone-400">
                 Already have an account?{' '}
                 <Link
                   href="/login"
-                  className="font-bold text-emerald-800 hover:text-emerald-900 hover:underline"
+                  className="font-bold text-emerald-800 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300 hover:underline"
                 >
                   Sign in
                 </Link>

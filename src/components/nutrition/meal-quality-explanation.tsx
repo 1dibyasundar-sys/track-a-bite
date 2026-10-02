@@ -61,61 +61,61 @@ export function MealQualityExplanation({
     : 'Provides everyday essential minerals.';
 
   return (
-    <Card className="border border-stone-200/80 bg-white shadow-xs overflow-hidden">
+    <Card className="border border-stone-200/80 dark:border-[#23382b] bg-white dark:bg-[#131d16] shadow-xs overflow-hidden">
       <CardContent className="p-4 sm:p-5 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-base">💡</span>
-            <h3 className="text-sm font-bold text-stone-900">What Does This Mean?</h3>
+            <h3 className="text-sm font-bold text-stone-900 dark:text-stone-100">What Does This Mean?</h3>
           </div>
-          <span className="text-3xs uppercase font-medium text-stone-400 tracking-wider">
+          <span className="text-3xs uppercase font-medium text-stone-400 dark:text-stone-500 tracking-wider">
             Meal Quality Context
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {/* Protein */}
-          <div className="p-3 rounded-xl bg-emerald-50/50 border border-emerald-100 space-y-1">
+          <div className="p-3 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 space-y-1">
             <div className="flex items-baseline justify-between">
-              <span className="text-2xs font-bold uppercase tracking-wider text-emerald-900">
+              <span className="text-2xs font-bold uppercase tracking-wider text-emerald-900 dark:text-emerald-300">
                 Protein ({nutrition.protein}g)
               </span>
             </div>
-            <p className="text-xs text-emerald-950 leading-relaxed">{proteinNote}</p>
+            <p className="text-xs text-emerald-950 dark:text-emerald-200 leading-relaxed">{proteinNote}</p>
           </div>
 
           {/* Fiber */}
-          <div className="p-3 rounded-xl bg-teal-50/50 border border-teal-100 space-y-1">
+          <div className="p-3 rounded-xl bg-teal-50/50 dark:bg-teal-950/30 border border-teal-100 dark:border-teal-900/40 space-y-1">
             <div className="flex items-baseline justify-between">
-              <span className="text-2xs font-bold uppercase tracking-wider text-teal-900">
+              <span className="text-2xs font-bold uppercase tracking-wider text-teal-900 dark:text-teal-300">
                 Fiber ({nutrition.fiber}g)
               </span>
             </div>
-            <p className="text-xs text-teal-950 leading-relaxed">{fiberNote}</p>
+            <p className="text-xs text-teal-950 dark:text-teal-200 leading-relaxed">{fiberNote}</p>
           </div>
 
           {/* Energy Source */}
-          <div className="p-3 rounded-xl bg-amber-50/50 border border-amber-100 space-y-1">
+          <div className="p-3 rounded-xl bg-amber-50/50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/40 space-y-1">
             <div className="flex items-baseline justify-between">
-              <span className="text-2xs font-bold uppercase tracking-wider text-amber-900">
+              <span className="text-2xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
                 Energy Balance ({nutrition.calories} kcal)
               </span>
             </div>
-            <p className="text-xs text-amber-950 leading-relaxed">{energyNote}</p>
+            <p className="text-xs text-amber-950 dark:text-amber-200 leading-relaxed">{energyNote}</p>
           </div>
 
           {/* Micronutrients */}
-          <div className="p-3 rounded-xl bg-stone-50 border border-stone-200/70 space-y-1">
+          <div className="p-3 rounded-xl bg-stone-50 dark:bg-[#19271e] border border-stone-200/70 dark:border-[#23382b] space-y-1">
             <div className="flex items-baseline justify-between">
-              <span className="text-2xs font-bold uppercase tracking-wider text-stone-700">
+              <span className="text-2xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
                 Micronutrients
               </span>
             </div>
-            <p className="text-xs text-stone-700 leading-relaxed">{microNote}</p>
+            <p className="text-xs text-stone-700 dark:text-stone-300 leading-relaxed">{microNote}</p>
           </div>
         </div>
 
-        <p className="text-3xs text-stone-400 italic pt-1">
+        <p className="text-3xs text-stone-400 dark:text-stone-500 italic pt-1">
           Nutritional context based on standard reference profiles. No medical diagnosis or claims.
         </p>
       </CardContent>

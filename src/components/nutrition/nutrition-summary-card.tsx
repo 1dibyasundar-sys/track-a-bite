@@ -17,19 +17,19 @@ export function NutritionSummaryCard({
   compact = false,
 }: NutritionSummaryCardProps) {
   const macros = [
-    { label: 'Calories', value: `${nutrition.calories}`, unit: 'kcal', color: 'text-stone-900', bg: 'bg-stone-50 border-stone-200' },
-    { label: 'Protein', value: formatNutrient(nutrition.protein, 'g'), unit: '', color: 'text-emerald-800', bg: 'bg-emerald-50/70 border-emerald-200/60' },
-    { label: 'Carbs', value: formatNutrient(nutrition.carbohydrates, 'g'), unit: '', color: 'text-amber-800', bg: 'bg-amber-50/70 border-amber-200/60' },
-    { label: 'Fat', value: formatNutrient(nutrition.fat, 'g'), unit: '', color: 'text-rose-800', bg: 'bg-rose-50/70 border-rose-200/60' },
-    { label: 'Fiber', value: formatNutrient(nutrition.fiber, 'g'), unit: '', color: 'text-teal-800', bg: 'bg-teal-50/70 border-teal-200/60' },
+    { label: 'Calories', value: `${nutrition.calories}`, unit: 'kcal', color: 'text-stone-900 dark:text-stone-100', bg: 'bg-stone-50 dark:bg-[#16231a] border-stone-200 dark:border-[#23382b]' },
+    { label: 'Protein', value: formatNutrient(nutrition.protein, 'g'), unit: '', color: 'text-emerald-800 dark:text-emerald-300', bg: 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-200/60 dark:border-emerald-800/60' },
+    { label: 'Carbs', value: formatNutrient(nutrition.carbohydrates, 'g'), unit: '', color: 'text-amber-800 dark:text-amber-300', bg: 'bg-amber-50/70 dark:bg-amber-950/40 border-amber-200/60 dark:border-amber-800/60' },
+    { label: 'Fat', value: formatNutrient(nutrition.fat, 'g'), unit: '', color: 'text-rose-800 dark:text-rose-300', bg: 'bg-rose-50/70 dark:bg-rose-950/40 border-rose-200/60 dark:border-rose-800/60' },
+    { label: 'Fiber', value: formatNutrient(nutrition.fiber, 'g'), unit: '', color: 'text-teal-800 dark:text-teal-300', bg: 'bg-teal-50/70 dark:bg-teal-950/40 border-teal-200/60 dark:border-teal-800/60' },
   ];
 
   return (
-    <Card className="border-stone-200/80">
+    <Card className="border-stone-200/80 dark:border-[#23382b]">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base sm:text-lg">{title}</CardTitle>
-          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 border border-stone-200">
+          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700">
             Estimated
           </span>
         </div>
@@ -42,14 +42,14 @@ export function NutritionSummaryCard({
               key={idx}
               className={`p-3 rounded-xl border ${m.bg} flex flex-col justify-between ${idx === 0 ? 'col-span-2 sm:col-span-1' : ''}`}
             >
-              <span className="text-2xs font-semibold uppercase tracking-wider text-stone-500">
+              <span className="text-2xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">
                 {m.label}
               </span>
               <div className="mt-1 flex items-baseline gap-1">
                 <span className={`text-xl sm:text-2xl font-bold tracking-tight ${m.color}`}>
                   {m.value}
                 </span>
-                {m.unit && <span className="text-xs text-stone-500 font-medium">{m.unit}</span>}
+                {m.unit && <span className="text-xs text-stone-500 dark:text-stone-400 font-medium">{m.unit}</span>}
               </div>
             </div>
           ))}
@@ -57,16 +57,16 @@ export function NutritionSummaryCard({
 
         {/* Secondary Details (Sodium & Sugar) */}
         {!compact && (nutrition.sodium !== undefined || nutrition.sugar !== undefined) && (
-          <div className="mt-4 pt-3 border-t border-stone-100 flex items-center gap-6 text-xs text-stone-600">
+          <div className="mt-4 pt-3 border-t border-stone-100 dark:border-stone-800 flex items-center gap-6 text-xs text-stone-600 dark:text-stone-300">
             {nutrition.sodium !== undefined && (
               <div>
-                <span className="font-semibold text-stone-700">Estimated Sodium:</span>{' '}
+                <span className="font-semibold text-stone-700 dark:text-stone-200">Estimated Sodium:</span>{' '}
                 {nutrition.sodium} mg
               </div>
             )}
             {nutrition.sugar !== undefined && (
               <div>
-                <span className="font-semibold text-stone-700">Natural / Added Sugar:</span>{' '}
+                <span className="font-semibold text-stone-700 dark:text-stone-200">Natural / Added Sugar:</span>{' '}
                 {nutrition.sugar} g
               </div>
             )}
@@ -75,22 +75,22 @@ export function NutritionSummaryCard({
 
         {/* Micronutrients */}
         {showMicronutrients && nutrition.micronutrients && nutrition.micronutrients.length > 0 && (
-          <div className="mt-5 pt-4 border-t border-stone-100">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-stone-500 mb-2.5">
+          <div className="mt-5 pt-4 border-t border-stone-100 dark:border-stone-800">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-2.5">
               Key Micronutrients Detected
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {nutrition.micronutrients.map((micro, idx) => (
                 <div
                   key={idx}
-                  className="p-2.5 rounded-lg bg-stone-50 border border-stone-200/60 text-xs flex flex-col justify-between"
+                  className="p-2.5 rounded-lg bg-stone-50 dark:bg-[#16231a] border border-stone-200/60 dark:border-[#23382b] text-xs flex flex-col justify-between"
                 >
                   <div className="flex items-center justify-between font-medium">
-                    <span className="text-stone-900">{micro.name}</span>
-                    <span className="text-emerald-700 font-bold">{micro.amount}</span>
+                    <span className="text-stone-900 dark:text-stone-100">{micro.name}</span>
+                    <span className="text-emerald-700 dark:text-emerald-400 font-bold">{micro.amount}</span>
                   </div>
                   {micro.healthContext && (
-                    <p className="text-2xs text-stone-500 mt-1 leading-snug">
+                    <p className="text-2xs text-stone-500 dark:text-stone-400 mt-1 leading-snug">
                       {micro.healthContext}
                     </p>
                   )}

@@ -21,7 +21,7 @@ export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
     <div
       role="tablist"
       className={cn(
-        'flex items-center gap-1.5 p-1 bg-stone-100/90 rounded-xl border border-stone-200/80 overflow-x-auto scrollbar-none',
+        'flex items-center gap-1.5 p-1 bg-stone-100/90 dark:bg-stone-900/90 rounded-xl border border-stone-200/80 dark:border-stone-800 overflow-x-auto scrollbar-none',
         className
       )}
     >
@@ -34,10 +34,10 @@ export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
             aria-selected={isActive}
             onClick={() => onChange(tab.id)}
             className={cn(
-              'px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-lg whitespace-nowrap transition-all duration-150 flex items-center gap-1.5',
+              'px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-lg whitespace-nowrap transition-all duration-150 flex items-center gap-1.5 cursor-pointer',
               isActive
-                ? 'bg-white text-stone-900 shadow-2xs font-semibold'
-                : 'text-stone-600 hover:text-stone-900 hover:bg-white/60'
+                ? 'bg-white dark:bg-[#19271e] text-stone-900 dark:text-emerald-200 shadow-2xs font-semibold'
+                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-white/60 dark:hover:bg-stone-800/60'
             )}
           >
             <span>{tab.label}</span>
@@ -45,7 +45,9 @@ export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
               <span
                 className={cn(
                   'text-2xs px-1.5 py-0.2 rounded-full font-bold',
-                  isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-200 text-stone-600'
+                  isActive
+                    ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300'
+                    : 'bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
                 )}
               >
                 {tab.count}

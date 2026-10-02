@@ -202,25 +202,25 @@ export function PackageOcrScanner({
     switch (status) {
       case 'VALID':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
             🟢 Valid Product
           </span>
         );
       case 'EXPIRING_SOON':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
             🟡 Expiring Soon
           </span>
         );
       case 'EXPIRED':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800">
             🔴 Expired
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-stone-100 text-stone-700 border border-stone-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">
             ⚪ Date Unverified
           </span>
         );
@@ -229,21 +229,21 @@ export function PackageOcrScanner({
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-950/85 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 text-stone-900 shadow-2xl space-y-4 my-auto">
+      <div className="bg-white dark:bg-[#131d16] rounded-3xl max-w-xl w-full p-5 sm:p-6 text-stone-900 dark:text-stone-100 border border-stone-200 dark:border-[#23382b] shadow-2xl space-y-4 my-auto">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+        <div className="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-3">
           <div>
-            <span className="text-2xs font-bold tracking-widest text-emerald-800 uppercase px-2 py-0.5 rounded-full bg-emerald-100 border border-emerald-200">
+            <span className="text-2xs font-bold tracking-widest text-emerald-800 dark:text-emerald-300 uppercase px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800/80">
               Package Intelligence • OCR
             </span>
-            <h2 className="text-lg font-bold text-stone-900 mt-1">
+            <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100 mt-1">
               Scan MFG, EXP &amp; Batch Details
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center text-sm font-bold"
+            className="w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 flex items-center justify-center text-sm font-bold"
           >
             ✕
           </button>
@@ -359,12 +359,12 @@ export function PackageOcrScanner({
         )}
 
         {/* Extracted Details & Manual Verification Form */}
-        <div className="bg-stone-50 rounded-2xl p-4 border border-stone-200 space-y-3">
+        <div className="bg-stone-50 dark:bg-[#16231a] rounded-2xl p-4 border border-stone-200 dark:border-[#23382b] space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold text-stone-800 uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider">
               Extracted Package Details
             </h4>
-            <span className="text-3xs text-stone-500 font-medium">
+            <span className="text-3xs text-stone-500 dark:text-stone-400 font-medium">
               Editable • Never fabricated
             </span>
           </div>
@@ -372,7 +372,7 @@ export function PackageOcrScanner({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Manufacturing Date */}
             <div>
-              <label className="text-2xs font-semibold text-stone-600 block mb-1">
+              <label className="text-2xs font-semibold text-stone-600 dark:text-stone-400 block mb-1">
                 Manufacturing Date (MFG / PKD)
               </label>
               <input
@@ -380,13 +380,13 @@ export function PackageOcrScanner({
                 value={mfgDate}
                 onChange={(e) => setMfgDate(e.target.value)}
                 placeholder="e.g. 12/08/2026 or 12 Aug 2026"
-                className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-stone-300 font-mono text-stone-800 focus:outline-hidden focus:border-emerald-500"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#19271e] border border-stone-300 dark:border-[#23382b] font-mono text-stone-800 dark:text-stone-100 focus:outline-hidden focus:border-emerald-500"
               />
             </div>
 
             {/* Expiry Date */}
             <div>
-              <label className="text-2xs font-semibold text-stone-600 block mb-1">
+              <label className="text-2xs font-semibold text-stone-600 dark:text-stone-400 block mb-1">
                 Expiry Date (EXP / Use By)
               </label>
               <input
@@ -394,13 +394,13 @@ export function PackageOcrScanner({
                 value={expDate}
                 onChange={(e) => setExpDate(e.target.value)}
                 placeholder="e.g. 11/02/2027 or 11 Feb 2027"
-                className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-stone-300 font-mono text-stone-800 focus:outline-hidden focus:border-emerald-500"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#19271e] border border-stone-300 dark:border-[#23382b] font-mono text-stone-800 dark:text-stone-100 focus:outline-hidden focus:border-emerald-500"
               />
             </div>
 
             {/* Best Before Period */}
             <div>
-              <label className="text-2xs font-semibold text-stone-600 block mb-1">
+              <label className="text-2xs font-semibold text-stone-600 dark:text-stone-400 block mb-1">
                 Best Before Clause (if printed)
               </label>
               <input
@@ -408,13 +408,13 @@ export function PackageOcrScanner({
                 value={bestBeforePeriod}
                 onChange={(e) => setBestBeforePeriod(e.target.value)}
                 placeholder="e.g. 6 Months from MFD"
-                className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-stone-300 text-stone-800 focus:outline-hidden focus:border-emerald-500"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#19271e] border border-stone-300 dark:border-[#23382b] text-stone-800 dark:text-stone-100 focus:outline-hidden focus:border-emerald-500"
               />
             </div>
 
             {/* Batch / Lot */}
             <div>
-              <label className="text-2xs font-semibold text-stone-600 block mb-1">
+              <label className="text-2xs font-semibold text-stone-600 dark:text-stone-400 block mb-1">
                 Batch / Lot Number
               </label>
               <input
@@ -422,14 +422,14 @@ export function PackageOcrScanner({
                 value={batchNumber}
                 onChange={(e) => setBatchNumber(e.target.value)}
                 placeholder="e.g. B24X91"
-                className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-stone-300 font-mono text-stone-800 uppercase focus:outline-hidden focus:border-emerald-500"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-[#19271e] border border-stone-300 dark:border-[#23382b] font-mono text-stone-800 dark:text-stone-100 uppercase focus:outline-hidden focus:border-emerald-500"
               />
             </div>
           </div>
 
           {/* Derived Best Before Notice if applicable */}
           {currentExpiryEvaluation.isDerived && currentExpiryEvaluation.derivedExpiryDate && (
-            <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-2xs text-emerald-900">
+            <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 text-2xs text-emerald-900 dark:text-emerald-200">
               <span className="font-bold">Estimated Best Before:</span>{' '}
               {expiryCalculationService.formatHumanDate(currentExpiryEvaluation.derivedExpiryDate)}{' '}
               (Calculated from printed MFG date &amp; {bestBeforePeriod})
@@ -438,14 +438,14 @@ export function PackageOcrScanner({
 
           {/* Unverified note if neither date is present */}
           {!mfgDate && !expDate && (
-            <p className="text-2xs text-stone-500 italic">
+            <p className="text-2xs text-stone-500 dark:text-stone-400 italic">
               &quot;Manufacturing/expiry date could not be verified from the package.&quot;
             </p>
           )}
 
           {/* Expiry explanation note */}
           {currentExpiryEvaluation.explanation && (
-            <p className="text-2xs text-stone-600">
+            <p className="text-2xs text-stone-600 dark:text-stone-400">
               <span className="font-semibold">Expiry Assessment:</span>{' '}
               {currentExpiryEvaluation.explanation}
             </p>
@@ -453,18 +453,18 @@ export function PackageOcrScanner({
         </div>
 
         {/* Modal Footer Controls */}
-        <div className="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+        <div className="flex items-center justify-end gap-2 pt-2 border-t border-stone-100 dark:border-stone-800">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl text-stone-600 hover:text-stone-900 text-xs font-semibold transition-colors"
+            className="px-4 py-2 rounded-xl text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 text-xs font-semibold transition-colors"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleSave}
-            className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+            className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
             Save &amp; Apply Package Details
           </button>

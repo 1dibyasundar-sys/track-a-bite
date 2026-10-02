@@ -9,12 +9,87 @@ export function Card({
   return (
     <div
       className={cn(
-        'bg-white border border-[#e7e5e0] rounded-2xl shadow-xs transition-shadow duration-200 overflow-hidden',
+        'bg-white dark:bg-[#131d16] border border-[#e7e5e0] dark:border-[#23382b] text-stone-900 dark:text-stone-100 rounded-2xl shadow-xs transition-colors duration-200 overflow-hidden',
         className
       )}
       {...props}
     >
       {children}
+    </div>
+  );
+}
+
+export function GlassCard({
+  className,
+  children,
+  interactive = false,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & { interactive?: boolean }) {
+  return (
+    <div
+      className={cn(
+        interactive ? 'glass-panel-interactive' : 'glass-panel',
+        'rounded-2xl text-stone-900 dark:text-stone-100 overflow-hidden',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function StatCard({
+  label,
+  value,
+  subtitle,
+  icon,
+  trend,
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & {
+  label: string;
+  value: React.ReactNode;
+  subtitle?: string;
+  icon?: React.ReactNode;
+  trend?: { value: string; positive?: boolean };
+}) {
+  return (
+    <div
+      className={cn(
+        'bg-white dark:bg-[#131d16] border border-[#e7e5e0] dark:border-[#23382b] p-5 rounded-2xl shadow-xs transition-colors',
+        className
+      )}
+      {...props}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">
+          {label}
+        </span>
+        {icon && (
+          <div className="w-8 h-8 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 flex items-center justify-center">
+            {icon}
+          </div>
+        )}
+      </div>
+      <div className="mt-2 text-2xl font-bold text-stone-900 dark:text-stone-100 tracking-tight">
+        {value}
+      </div>
+      {(subtitle || trend) && (
+        <div className="mt-1 flex items-center gap-2 text-xs">
+          {trend && (
+            <span
+              className={cn(
+                'font-bold',
+                trend.positive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+              )}
+            >
+              {trend.value}
+            </span>
+          )}
+          {subtitle && <span className="text-stone-500 dark:text-stone-400">{subtitle}</span>}
+        </div>
+      )}
     </div>
   );
 }
@@ -38,7 +113,7 @@ export function CardTitle({
 }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h3
-      className={cn('text-lg font-semibold tracking-tight text-stone-900', className)}
+      className={cn('text-lg font-semibold tracking-tight text-stone-900 dark:text-stone-100', className)}
       {...props}
     >
       {children}
@@ -52,7 +127,7 @@ export function CardDescription({
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p className={cn('text-sm text-stone-600 mt-1', className)} {...props}>
+    <p className={cn('text-sm text-stone-600 dark:text-stone-400 mt-1', className)} {...props}>
       {children}
     </p>
   );
@@ -77,7 +152,7 @@ export function CardFooter({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('p-5 sm:p-6 pt-3 border-t border-stone-100 flex items-center justify-between', className)}
+      className={cn('p-5 sm:p-6 pt-3 border-t border-stone-100 dark:border-stone-800/80 flex items-center justify-between', className)}
       {...props}
     >
       {children}

@@ -604,30 +604,33 @@ export default function ScanPage() {
     <AuthGuard>
       <div className="py-6 sm:py-10">
         <Container size="lg">
-        {/* Primary Scanner Switcher: Identify Meal vs Scan Packaged Food */}
-        <div className="flex justify-center mb-6">
-          <div className="inline-flex items-center p-1 bg-stone-100 border border-stone-200 rounded-2xl shadow-xs">
+        {/* Unified 3D SCAN FOOD Switcher */}
+        <div className="flex flex-col items-center justify-center mb-6 space-y-2">
+          <span className="text-3xs font-extrabold uppercase tracking-widest text-emerald-800 dark:text-emerald-400">
+            SCAN FOOD
+          </span>
+          <div className="card-3d inline-flex items-center p-1.5 bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] rounded-2xl shadow-sm">
             <button
               type="button"
               onClick={() => setScanCategory('cooked')}
-              className={`px-4 sm:px-5 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
+              className={`px-5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
                 scanCategory === 'cooked'
-                  ? 'bg-emerald-700 text-white shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
+                  ? 'bg-emerald-800 dark:bg-emerald-600 text-white shadow-xs'
+                  : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-50 dark:hover:bg-[#19271e]'
               }`}
             >
-              <span>🍛</span> Identify Meal
+              <span>🍽️</span> <span>Meal</span>
             </button>
             <button
               type="button"
               onClick={() => setScanCategory('packaged')}
-              className={`px-4 sm:px-5 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
+              className={`px-5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
                 scanCategory === 'packaged'
-                  ? 'bg-emerald-700 text-white shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
+                  ? 'bg-emerald-800 dark:bg-emerald-600 text-white shadow-xs'
+                  : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-50 dark:hover:bg-[#19271e]'
               }`}
             >
-              <span>🔳</span> Scan Packaged Food
+              <span>📦</span> <span>Barcode</span>
             </button>
           </div>
         </div>
@@ -637,13 +640,13 @@ export default function ScanPage() {
             {/* Header */}
             <div className="text-center max-w-xl mx-auto mb-6">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="text-2xs font-bold tracking-widest text-emerald-800 uppercase px-3 py-1 rounded-full bg-emerald-100 border border-emerald-200 inline-block">
+            <span className="text-2xs font-bold tracking-widest text-emerald-800 dark:text-emerald-300 uppercase px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 inline-block">
               Perception Pipeline • Phase 3
             </span>
           </div>
 
           {/* Mode Switcher: Gemini AI Vision vs Mock Simulation */}
-          <div className="inline-flex items-center gap-1 p-1 bg-stone-100 border border-stone-200 rounded-full mb-3 shadow-2xs">
+          <div className="inline-flex items-center gap-1 p-1 bg-stone-100 dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] rounded-full mb-3 shadow-2xs">
             <button
               type="button"
               onClick={() => {
@@ -653,7 +656,7 @@ export default function ScanPage() {
               className={`px-3 py-1 text-xs font-semibold rounded-full transition-all cursor-pointer ${
                 recognitionMode === 'gemini'
                   ? 'bg-emerald-700 text-white shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
+                  : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
               }`}
             >
               ✨ Gemini AI Vision
@@ -667,29 +670,29 @@ export default function ScanPage() {
               className={`px-3 py-1 text-xs font-semibold rounded-full transition-all cursor-pointer ${
                 recognitionMode === 'mock'
                   ? 'bg-stone-800 text-white shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
+                  : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
               }`}
             >
               🧪 Mock Simulation
             </button>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 dark:text-stone-100 tracking-tight">
             Scan Your Meal
           </h1>
-          <p className="text-xs sm:text-sm text-stone-600 mt-1.5">
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 mt-1.5">
             Identify single snacks, multi-dish canteen plates, and packaged foods with computer vision.
           </p>
         </div>
 
         {/* Profile Completion Callout if Incomplete */}
         {!profile.onboardingCompleted && (
-          <div className="max-w-2xl mx-auto mb-6 p-3 sm:p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+          <div className="max-w-2xl mx-auto mb-6 p-3 sm:p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-xs text-amber-950 dark:text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
             <div className="flex items-center gap-2.5">
               <span className="text-xl">💡</span>
               <div className="space-y-0.5">
                 <span className="font-bold block">General Nutrition Mode</span>
-                <span className="text-2xs text-amber-900 leading-snug">
+                <span className="text-2xs text-amber-900 dark:text-amber-300 leading-snug">
                   Complete your profile for personalized energy targets and campus-tailored recommendations.
                 </span>
               </div>
@@ -723,10 +726,10 @@ export default function ScanPage() {
             />
 
             {/* Architecture Separation & Confidence Notice */}
-            <div className="p-3.5 rounded-2xl bg-stone-100 border border-stone-200 text-xs text-stone-600 flex items-start gap-2.5">
+            <div className="p-3.5 rounded-2xl bg-stone-100 dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] text-xs text-stone-600 dark:text-stone-400 flex items-start gap-2.5">
               <InfoIcon size={16} className="text-stone-500 shrink-0 mt-0.5" />
               <div className="space-y-0.5 leading-relaxed">
-                <span className="font-semibold text-stone-800">
+                <span className="font-semibold text-stone-800 dark:text-stone-200">
                   Confidence Notice:
                 </span>{' '}
                 Confidence percentages indicate visual pattern match against our regional dish models, not nutritional certainty. All portions are estimates.
@@ -738,16 +741,16 @@ export default function ScanPage() {
           <div className="lg:col-span-5 space-y-4">
             {/* Stage: Idle */}
             {stage === 'idle' && (
-              <Card className="border-stone-200/90 shadow-sm">
+              <Card className="border-stone-200/90 dark:border-[#23382b] bg-white dark:bg-[#131d16] shadow-sm">
                 <CardContent className="p-6 sm:p-8 text-center space-y-4">
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto shadow-inner">
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-center mx-auto shadow-inner">
                     <CameraIcon size={26} />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold text-stone-900">
+                    <h2 className="text-base font-bold text-stone-900 dark:text-stone-100">
                       Vision Engine Ready
                     </h2>
-                    <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    <p className="text-xs text-stone-600 dark:text-stone-400 mt-1 leading-relaxed">
                       Select a test scenario below the camera or upload a plate image to trigger multi-dish food identification.
                     </p>
                   </div>
@@ -765,16 +768,16 @@ export default function ScanPage() {
 
             {/* Stage: Preview */}
             {stage === 'preview' && (
-              <Card className="border-emerald-200/90 bg-emerald-50/30 shadow-sm">
+              <Card className="border-emerald-200/90 dark:border-emerald-900/50 bg-emerald-50/30 dark:bg-emerald-950/20 shadow-sm">
                 <CardContent className="p-6 sm:p-8 text-center space-y-4">
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto shadow-inner">
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-center mx-auto shadow-inner">
                     <SparklesIcon size={26} />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold text-stone-900">
+                    <h2 className="text-base font-bold text-stone-900 dark:text-stone-100">
                       Photo Ready for Analysis
                     </h2>
-                    <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    <p className="text-xs text-stone-600 dark:text-stone-400 mt-1 leading-relaxed">
                       Review your food photo preview. Ensure the meal is well-lit and all items are visible before running recognition.
                     </p>
                   </div>
@@ -805,13 +808,13 @@ export default function ScanPage() {
 
             {/* Stage: Analyzing Feedback ("Identifying your food...") */}
             {stage === 'analyzing' && (
-              <Card className="border-emerald-200 bg-emerald-50/50 shadow-sm">
+              <Card className="border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-sm">
                 <CardContent className="p-8 text-center space-y-3">
-                  <div className="inline-block w-9 h-9 border-3 border-emerald-700 border-t-transparent rounded-full animate-spin" />
-                  <h2 className="text-base font-bold text-stone-900">
+                  <div className="inline-block w-9 h-9 border-3 border-emerald-700 dark:border-emerald-400 border-t-transparent rounded-full animate-spin" />
+                  <h2 className="text-base font-bold text-stone-900 dark:text-stone-100">
                     Identifying your food...
                   </h2>
-                  <p className="text-xs text-stone-600 max-w-xs mx-auto leading-relaxed">
+                  <p className="text-xs text-stone-600 dark:text-stone-400 max-w-xs mx-auto leading-relaxed">
                     Executing vision segmentation, matching against regional recipes, and estimating volumetric portion weights.
                   </p>
                 </CardContent>
@@ -820,16 +823,16 @@ export default function ScanPage() {
 
             {/* ERROR STATE: General Error / API / Timeout */}
             {isErrorState && (
-              <Card className="border-rose-200 bg-rose-50/40 shadow-sm">
+              <Card className="border-rose-200 dark:border-rose-900/40 bg-rose-50/40 dark:bg-rose-950/20 shadow-sm">
                 <CardContent className="p-6 sm:p-7 text-center space-y-3">
-                  <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-800 flex items-center justify-center mx-auto">
+                  <div className="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 flex items-center justify-center mx-auto">
                     <AlertCircleIcon size={24} />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-rose-950">
+                    <h3 className="text-base font-bold text-rose-950 dark:text-rose-200">
                       Couldn&apos;t confidently identify the food in this image
                     </h3>
-                    <p className="text-xs text-rose-900 mt-1 leading-relaxed">
+                    <p className="text-xs text-rose-900 dark:text-rose-300 mt-1 leading-relaxed">
                       {recognitionResult?.errorMessage ||
                         "Track-a-Bite couldn't identify the food at this moment. Try taking a clearer photo or enter manually."}
                     </p>
@@ -862,16 +865,16 @@ export default function ScanPage() {
 
             {/* ERROR STATE: No Food Detected */}
             {isNoFoodState && (
-              <Card className="border-amber-200 bg-amber-50/40 shadow-sm">
+              <Card className="border-amber-200 dark:border-amber-900/40 bg-amber-50/40 dark:bg-amber-950/20 shadow-sm">
                 <CardContent className="p-6 sm:p-7 text-center space-y-3">
-                  <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center mx-auto">
+                  <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 flex items-center justify-center mx-auto">
                     <AlertCircleIcon size={24} />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-amber-950">
+                    <h3 className="text-base font-bold text-amber-950 dark:text-amber-200">
                       No Food Detected
                     </h3>
-                    <p className="text-xs text-amber-900 mt-1 leading-relaxed">
+                    <p className="text-xs text-amber-900 dark:text-amber-300 mt-1 leading-relaxed">
                       {recognitionResult?.errorMessage ||
                         "We couldn't detect recognizable foods in this image. Please ensure your plate is clearly framed."}
                     </p>
@@ -904,16 +907,16 @@ export default function ScanPage() {
 
             {/* ERROR STATE: Invalid Image */}
             {isInvalidImageState && (
-              <Card className="border-rose-200 bg-rose-50/40 shadow-sm">
+              <Card className="border-rose-200 dark:border-rose-900/40 bg-rose-50/40 dark:bg-rose-950/20 shadow-sm">
                 <CardContent className="p-6 sm:p-7 text-center space-y-3">
-                  <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-800 flex items-center justify-center mx-auto">
+                  <div className="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 flex items-center justify-center mx-auto">
                     <AlertCircleIcon size={24} />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-rose-950">
+                    <h3 className="text-base font-bold text-rose-950 dark:text-rose-200">
                       Invalid or Corrupted Image
                     </h3>
-                    <p className="text-xs text-rose-900 mt-1 leading-relaxed">
+                    <p className="text-xs text-rose-900 dark:text-rose-300 mt-1 leading-relaxed">
                       {recognitionResult?.errorMessage ||
                         'Unable to decode the visual frame. Please capture another image.'}
                     </p>
@@ -940,11 +943,11 @@ export default function ScanPage() {
               <div className="space-y-4 animate-in fade-in duration-300">
                 {/* Low-confidence warning banner if flagged */}
                 {recognitionResult?.status === 'low-confidence' && (
-                  <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-xs text-amber-900 flex items-start gap-2.5">
-                    <AlertCircleIcon size={16} className="text-amber-700 shrink-0 mt-0.5" />
+                  <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800/60 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
+                    <AlertCircleIcon size={16} className="text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
                     <div>
                       <span className="font-bold block">Low-Confidence Detection</span>
-                      <p className="text-2xs text-amber-800 mt-0.5">
+                      <p className="text-2xs text-amber-800 dark:text-amber-300 mt-0.5">
                         {recognitionResult.confidenceWarning ||
                           "We couldn't confidently identify this food. Tap 'Not correct?' to select your exact dish."}
                       </p>
@@ -956,11 +959,11 @@ export default function ScanPage() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold uppercase tracking-wider text-stone-700">
+                      <span className="text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
                         Detected ({items.length})
                       </span>
                       {items.length > 1 && (
-                        <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                        <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
                           Multi-Food Plate
                         </span>
                       )}
@@ -968,7 +971,7 @@ export default function ScanPage() {
                     <button
                       type="button"
                       onClick={handleRequestAddFood}
-                      className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200/80 flex items-center gap-1 transition-colors cursor-pointer"
+                      className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/80 dark:border-emerald-800/60 flex items-center gap-1 transition-colors cursor-pointer"
                     >
                       <PlusIcon size={13} />
                       <span>Add Extra Item</span>
@@ -993,38 +996,38 @@ export default function ScanPage() {
                 </div>
 
                 {/* Aggregated Macro Preview & Proceed */}
-                <Card className="border-stone-200 shadow-sm">
+                <Card className="border-stone-200 dark:border-[#23382b] bg-white dark:bg-[#131d16] shadow-sm">
                   <CardContent className="p-4 sm:p-5 space-y-4">
-                    <div className="flex items-center justify-between pb-2 border-b border-stone-100">
+                    <div className="flex items-center justify-between pb-2 border-b border-stone-100 dark:border-[#23382b]">
                       <div>
-                        <span className="text-xs font-bold text-stone-800 block">
+                        <span className="text-xs font-bold text-stone-800 dark:text-stone-200 block">
                           Total Meal Estimation
                         </span>
-                        <span className="text-3xs text-stone-500">
+                        <span className="text-3xs text-stone-500 dark:text-stone-400">
                           {items.length} item{items.length > 1 ? 's' : ''} combined
                         </span>
                       </div>
-                      <span className="text-sm font-extrabold text-emerald-800">
+                      <span className="text-sm font-extrabold text-emerald-800 dark:text-emerald-400">
                         {totalNutrition.calories} kcal
                       </span>
                     </div>
 
                     <div className="grid grid-cols-4 gap-1.5 text-center text-xs">
-                      <div className="p-2 rounded-xl bg-emerald-50/70 border border-emerald-100">
-                        <span className="block text-3xs text-emerald-700 font-semibold uppercase">Protein</span>
-                        <span className="text-sm font-bold text-emerald-900">{totalNutrition.protein}g</span>
+                      <div className="p-2 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40">
+                        <span className="block text-3xs text-emerald-700 dark:text-emerald-400 font-semibold uppercase">Protein</span>
+                        <span className="text-sm font-bold text-emerald-900 dark:text-emerald-200">{totalNutrition.protein}g</span>
                       </div>
-                      <div className="p-2 rounded-xl bg-amber-50/70 border border-amber-100">
-                        <span className="block text-3xs text-amber-700 font-semibold uppercase">Carbs</span>
-                        <span className="text-sm font-bold text-amber-900">{totalNutrition.carbohydrates}g</span>
+                      <div className="p-2 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/40">
+                        <span className="block text-3xs text-amber-700 dark:text-amber-400 font-semibold uppercase">Carbs</span>
+                        <span className="text-sm font-bold text-amber-900 dark:text-amber-200">{totalNutrition.carbohydrates}g</span>
                       </div>
-                      <div className="p-2 rounded-xl bg-rose-50/70 border border-rose-100">
-                        <span className="block text-3xs text-rose-700 font-semibold uppercase">Fat</span>
-                        <span className="text-sm font-bold text-rose-900">{totalNutrition.fat}g</span>
+                      <div className="p-2 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/40">
+                        <span className="block text-3xs text-rose-700 dark:text-rose-400 font-semibold uppercase">Fat</span>
+                        <span className="text-sm font-bold text-rose-900 dark:text-rose-200">{totalNutrition.fat}g</span>
                       </div>
-                      <div className="p-2 rounded-xl bg-teal-50/70 border border-teal-100">
-                        <span className="block text-3xs text-teal-700 font-semibold uppercase">Fiber</span>
-                        <span className="text-sm font-bold text-teal-900">{totalNutrition.fiber}g</span>
+                      <div className="p-2 rounded-xl bg-teal-50/70 dark:bg-teal-950/30 border border-teal-100 dark:border-teal-900/40">
+                        <span className="block text-3xs text-teal-700 dark:text-teal-400 font-semibold uppercase">Fiber</span>
+                        <span className="text-sm font-bold text-teal-900 dark:text-teal-200">{totalNutrition.fiber}g</span>
                       </div>
                     </div>
 
@@ -1032,7 +1035,7 @@ export default function ScanPage() {
 
                     {/* Saving Status Feedback Banner */}
                     {isProcessingFinal && (
-                      <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center gap-2 animate-pulse" role="status">
+                      <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-emerald-900 dark:text-emerald-200 text-xs flex items-center gap-2 animate-pulse" role="status">
                         <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping shrink-0" />
                         <span className="font-semibold">
                           {user?.uid ? 'Syncing meal to your cloud nutrition journal...' : 'Saving meal to local nutrition journal...'}
@@ -1053,7 +1056,7 @@ export default function ScanPage() {
                     </Button>
 
                     {/* Subtle Accuracy Disclaimer */}
-                    <p className="text-3xs text-center text-stone-500 pt-1 leading-relaxed">
+                    <p className="text-3xs text-center text-stone-500 dark:text-stone-400 pt-1 leading-relaxed">
                       * Nutrition values are estimates based on standard regional reference food data and confirmed portion size, not laboratory measurements.
                     </p>
                   </CardContent>
@@ -1079,14 +1082,14 @@ export default function ScanPage() {
           <div className="space-y-6">
             <div className="text-center max-w-xl mx-auto mb-6">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-2xs font-bold tracking-widest text-emerald-800 uppercase px-3 py-1 rounded-full bg-emerald-100 border border-emerald-200 inline-block">
+                <span className="text-2xs font-bold tracking-widest text-emerald-800 dark:text-emerald-300 uppercase px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 inline-block">
                   Barcode &amp; Package Intelligence
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 dark:text-stone-100 tracking-tight">
                 Scan Packaged Food
               </h1>
-              <p className="text-xs sm:text-sm text-stone-600 mt-1.5">
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 mt-1.5">
                 Scan product barcodes to inspect nutrition, ingredients, and verify package expiry dates.
               </p>
             </div>
@@ -1100,15 +1103,15 @@ export default function ScanPage() {
                   />
 
                   {barcodeLookupError && (
-                    <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs flex items-start gap-3 shadow-xs">
-                      <AlertCircleIcon size={18} className="text-rose-600 shrink-0 mt-0.5" />
+                    <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 text-rose-900 dark:text-rose-200 text-xs flex items-start gap-3 shadow-xs">
+                      <AlertCircleIcon size={18} className="text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
                       <div className="space-y-1">
                         <span className="font-bold block">Product Not Found</span>
-                        <p className="text-rose-800 leading-relaxed">{barcodeLookupError}</p>
+                        <p className="text-rose-800 dark:text-rose-300 leading-relaxed">{barcodeLookupError}</p>
                         <button
                           type="button"
                           onClick={handleResetPackaged}
-                          className="mt-1 text-2xs font-bold text-rose-700 hover:underline cursor-pointer"
+                          className="mt-1 text-2xs font-bold text-rose-700 dark:text-rose-400 hover:underline cursor-pointer"
                         >
                           Try another barcode →
                         </button>
@@ -1116,10 +1119,10 @@ export default function ScanPage() {
                     </div>
                   )}
 
-                  <div className="p-4 rounded-2xl bg-stone-100 border border-stone-200 text-xs text-stone-600 flex items-start gap-2.5">
+                  <div className="p-4 rounded-2xl bg-stone-100 dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] text-xs text-stone-600 dark:text-stone-400 flex items-start gap-2.5">
                     <InfoIcon size={16} className="text-stone-500 shrink-0 mt-0.5" />
                     <div className="space-y-0.5 leading-relaxed">
-                      <span className="font-semibold text-stone-800">
+                      <span className="font-semibold text-stone-800 dark:text-stone-200">
                         Zero Hallucination Guarantee:
                       </span>{' '}
                       Barcodes identify products and official nutrition facts. Manufacturing and expiry dates are never fabricated; they are verified using optical text recognition directly from printed package stamps.

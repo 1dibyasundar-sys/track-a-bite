@@ -14,13 +14,13 @@ export function DisclaimerBanner({ className, variant = 'subtle' }: DisclaimerBa
         role="note"
         aria-label="Nutritional estimates disclaimer"
         className={cn(
-          'p-3.5 sm:p-4 rounded-2xl bg-amber-50/70 border border-amber-200/70 text-amber-950 text-xs flex items-start gap-2.5 leading-relaxed',
+          'p-3.5 sm:p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-900/40 text-amber-950 dark:text-amber-200 text-xs flex items-start gap-2.5 leading-relaxed',
           className
         )}
       >
-        <InfoIcon size={16} className="text-amber-700 shrink-0 mt-0.5" />
+        <InfoIcon size={16} className="text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
         <p>
-          <span className="font-semibold text-amber-900">Educational Nutrition Estimates:</span>{' '}
+          <span className="font-semibold text-amber-900 dark:text-amber-300">Educational Nutrition Estimates:</span>{' '}
           All values are approximations based on visual portion assessment and standard regional recipes. Not intended for medical or clinical diagnosis.
         </p>
       </div>
@@ -32,13 +32,13 @@ export function DisclaimerBanner({ className, variant = 'subtle' }: DisclaimerBa
       role="note"
       aria-label="Nutritional estimates disclaimer"
       className={cn(
-        'p-3 rounded-xl bg-stone-100/90 border border-stone-200/80 text-stone-600 text-xs flex items-start gap-2.5 leading-relaxed',
+        'p-3 rounded-xl bg-stone-100/90 dark:bg-[#131d16] border border-stone-200/80 dark:border-[#23382b] text-stone-600 dark:text-stone-400 text-xs flex items-start gap-2.5 leading-relaxed',
         className
       )}
     >
-      <InfoIcon size={15} className="text-stone-500 shrink-0 mt-0.5" />
+      <InfoIcon size={15} className="text-stone-500 dark:text-stone-400 shrink-0 mt-0.5" />
       <p>
-        <span className="font-semibold text-stone-800">Educational Nutrition Estimates:</span>{' '}
+        <span className="font-semibold text-stone-800 dark:text-stone-200">Educational Nutrition Estimates:</span>{' '}
         All values are approximations based on visual portion assessment and standard regional recipes. Not intended for medical or clinical diagnosis.
       </p>
     </div>

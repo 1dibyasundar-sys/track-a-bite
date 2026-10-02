@@ -243,10 +243,10 @@ export function ScanViewport({
   ];
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto rounded-3xl overflow-hidden bg-stone-900 border-2 border-stone-800 shadow-lg text-white">
+    <div className="card-3d relative w-full max-w-2xl mx-auto rounded-3xl overflow-hidden bg-[#0c130e] border-2 border-emerald-900/60 dark:border-emerald-500/20 shadow-[0_16px_40px_-8px_rgba(4,120,87,0.25)] text-white">
       {/* Top Overlay Bar */}
-      <div className="absolute top-0 inset-x-0 p-4 z-10 flex items-center justify-between bg-gradient-to-b from-stone-950/80 to-transparent">
-        <div className="flex items-center gap-2">
+      <div className="absolute top-0 inset-x-0 p-4 z-20 flex items-center justify-between bg-gradient-to-b from-black/85 via-black/40 to-transparent">
+        <div className="flex items-center gap-2.5">
           <span
             className={`w-2.5 h-2.5 rounded-full ${
               isScanning
@@ -254,22 +254,22 @@ export function ScanViewport({
                 : isPreview
                 ? 'bg-sky-400 animate-pulse'
                 : cameraState === 'live'
-                ? 'bg-emerald-400 animate-pulse'
+                ? 'bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse'
                 : 'bg-stone-500'
             }`}
           />
-          <span className="text-xs font-semibold tracking-wide text-white uppercase">
+          <span className="text-xs font-bold tracking-wide text-white uppercase flex items-center gap-1.5 font-mono">
             {stage === 'idle'
               ? cameraState === 'live'
-                ? 'Camera Active'
+                ? 'LIVE CAMERA • AI READY'
                 : cameraState === 'requesting'
-                ? 'Starting camera...'
-                : 'Ready to Scan'
+                ? 'STARTING CAMERA...'
+                : 'CAMERA READY'
               : stage === 'preview'
-              ? 'Photo Captured • Preview'
+              ? 'PHOTO CAPTURED • PREVIEW'
               : stage === 'analyzing'
-              ? 'Identifying Food...'
-              : `${items.length} Food Item${items.length === 1 ? '' : 's'} Detected`}
+              ? 'SCANNING PLATE NUTRITION...'
+              : `${items.length} FOOD ITEM${items.length === 1 ? '' : 'S'} DETECTED`}
           </span>
         </div>
 
@@ -278,7 +278,7 @@ export function ScanViewport({
             type="button"
             onClick={handleReset}
             disabled={isScanning}
-            className="text-xs px-2.5 py-1 rounded-lg bg-stone-800/80 hover:bg-stone-700 text-stone-200 flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+            className="text-xs px-3 py-1 rounded-xl bg-stone-800/90 hover:bg-stone-700 text-stone-200 border border-stone-700 flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 shadow-xs"
           >
             <RefreshCwIcon size={12} />
             <span>New Scan</span>
@@ -290,7 +290,7 @@ export function ScanViewport({
       {validationError && (
         <div
           role="alert"
-          className="relative z-20 m-3 p-3 rounded-xl bg-rose-950/90 border border-rose-500/60 text-rose-100 text-xs flex items-center justify-between gap-2 shadow-lg"
+          className="relative z-30 m-3 p-3 rounded-xl bg-rose-950/90 border border-rose-500/60 text-rose-100 text-xs flex items-center justify-between gap-2 shadow-lg"
         >
           <div className="flex items-center gap-2">
             <AlertCircleIcon size={16} className="text-rose-400 shrink-0" />
@@ -339,21 +339,24 @@ export function ScanViewport({
           </div>
         )}
 
-        {/* Live Camera Framing Guides (Shown in idle when camera is active) */}
+        {/* Live Camera Framing Guides & Reticle */}
         {cameraState === 'live' && !previewUrl && (
-          <div className="absolute inset-6 sm:inset-10 border border-white/20 rounded-2xl pointer-events-none flex items-center justify-center z-10">
+          <div className="absolute inset-6 sm:inset-10 border border-white/20 rounded-3xl pointer-events-none flex items-center justify-center z-10 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+            {/* AI Scanning Beam */}
+            <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] animate-scan-beam" />
+
             {/* Circular Plate Alignment Guide */}
-            <div className="w-52 h-52 sm:w-68 sm:h-68 rounded-full border-2 border-dashed border-emerald-400/80 pointer-events-none flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-              <span className="text-3xs tracking-widest text-emerald-300 uppercase font-mono px-2 py-0.5 rounded bg-black/60">
+            <div className="w-52 h-52 sm:w-68 sm:h-68 rounded-full border-2 border-dashed border-emerald-400/80 pointer-events-none flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.25)]">
+              <span className="text-3xs tracking-widest text-emerald-300 uppercase font-mono px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md border border-emerald-500/40">
                 Center Food Plate
               </span>
             </div>
 
-            {/* Corner Marks */}
-            <div className="absolute -top-1 -left-1 w-5 h-5 border-t-4 border-l-4 border-emerald-400 rounded-tl-md" />
-            <div className="absolute -top-1 -right-1 w-5 h-5 border-t-4 border-r-4 border-emerald-400 rounded-tr-md" />
-            <div className="absolute -bottom-1 -left-1 w-5 h-5 border-b-4 border-l-4 border-emerald-400 rounded-bl-md" />
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 border-b-4 border-r-4 border-emerald-400 rounded-br-md" />
+            {/* Corner Marks with Soft Glow */}
+            <div className="absolute -top-1 -left-1 w-6 h-6 border-t-3 border-l-3 border-emerald-400 rounded-tl-xl shadow-[0_0_8px_#34d399]" />
+            <div className="absolute -top-1 -right-1 w-6 h-6 border-t-3 border-r-3 border-emerald-400 rounded-tr-xl shadow-[0_0_8px_#34d399]" />
+            <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-3 border-l-3 border-emerald-400 rounded-bl-xl shadow-[0_0_8px_#34d399]" />
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-3 border-r-3 border-emerald-400 rounded-br-xl shadow-[0_0_8px_#34d399]" />
           </div>
         )}
 

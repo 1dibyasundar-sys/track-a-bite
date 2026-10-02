@@ -98,27 +98,27 @@ export function NutritionBreakdown({
   ];
 
   return (
-    <Card className={`border-stone-200/90 shadow-sm ${className}`}>
-      <CardHeader className="pb-3 border-b border-stone-100">
+    <Card className={`border-stone-200/90 dark:border-[#23382b] bg-white dark:bg-[#131d16] shadow-sm ${className}`}>
+      <CardHeader className="pb-3 border-b border-stone-100 dark:border-[#23382b]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <div className="flex items-center gap-2">
-              <CardTitle className="text-base sm:text-lg text-stone-900">{title}</CardTitle>
-              <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 border border-stone-200">
+              <CardTitle className="text-base sm:text-lg text-stone-900 dark:text-stone-100">{title}</CardTitle>
+              <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-stone-100 dark:bg-[#19271e] text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-[#23382b]">
                 Estimated nutrition
               </span>
             </div>
             {servingDescription && (
-              <p className="text-xs text-stone-500 mt-0.5">
-                Calculated for: <span className="font-semibold text-stone-700">{servingDescription}</span>
+              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                Calculated for: <span className="font-semibold text-stone-700 dark:text-stone-300">{servingDescription}</span>
               </p>
             )}
           </div>
 
-          <div className="flex items-baseline gap-1 self-start sm:self-auto bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200/70">
-            <span className="text-xs text-stone-500 font-medium">Estimated Energy:</span>
-            <span className="text-lg font-bold text-stone-900">{nutrition.calories}</span>
-            <span className="text-xs font-semibold text-stone-600">kcal</span>
+          <div className="flex items-baseline gap-1 self-start sm:self-auto bg-stone-50 dark:bg-[#19271e] px-3 py-1.5 rounded-xl border border-stone-200/70 dark:border-[#23382b]">
+            <span className="text-xs text-stone-500 dark:text-stone-400 font-medium">Estimated Energy:</span>
+            <span className="text-lg font-bold text-stone-900 dark:text-stone-100">{nutrition.calories}</span>
+            <span className="text-xs font-semibold text-stone-600 dark:text-stone-400">kcal</span>
           </div>
         </div>
 
@@ -138,14 +138,14 @@ export function NutritionBreakdown({
             <div key={i} className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-stone-900">{bar.label}</span>
+                  <span className="font-semibold text-stone-900 dark:text-stone-100">{bar.label}</span>
                   <span className={`text-3xs font-semibold px-1.5 py-0.2 rounded ${bar.badgeColor}`}>
                     {bar.badge}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-3xs text-stone-500">{bar.sub}</span>
-                  <span className="font-bold text-stone-900 text-sm">{bar.value}</span>
+                  <span className="text-3xs text-stone-500 dark:text-stone-400">{bar.sub}</span>
+                  <span className="font-bold text-stone-900 dark:text-stone-100 text-sm">{bar.value}</span>
                 </div>
               </div>
 
@@ -162,22 +162,22 @@ export function NutritionBreakdown({
 
         {/* Micronutrients / Electrolytes if present */}
         {nutrition.micronutrients && nutrition.micronutrients.length > 0 && (
-          <div className="pt-4 border-t border-stone-100">
-            <h4 className="text-2xs font-bold uppercase tracking-wider text-stone-500 mb-2">
+          <div className="pt-4 border-t border-stone-100 dark:border-[#23382b]">
+            <h4 className="text-2xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-2">
               Detected Micronutrient Contributions
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {nutrition.micronutrients.map((micro, idx) => (
                 <div
                   key={idx}
-                  className="p-2.5 rounded-xl bg-stone-50 border border-stone-200/70 text-xs"
+                  className="p-2.5 rounded-xl bg-stone-50 dark:bg-[#19271e] border border-stone-200/70 dark:border-[#23382b] text-xs"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-stone-800">{micro.name}</span>
-                    <span className="font-bold text-emerald-800">{micro.amount}</span>
+                    <span className="font-medium text-stone-800 dark:text-stone-200">{micro.name}</span>
+                    <span className="font-bold text-emerald-800 dark:text-emerald-400">{micro.amount}</span>
                   </div>
                   {micro.healthContext && (
-                    <span className="text-3xs text-stone-500 block mt-0.5 line-clamp-1">
+                    <span className="text-3xs text-stone-500 dark:text-stone-400 block mt-0.5 line-clamp-1">
                       {micro.healthContext}
                     </span>
                   )}
@@ -188,7 +188,7 @@ export function NutritionBreakdown({
         )}
 
         {/* Disclaimer Note */}
-        <p className="text-3xs text-stone-500 italic pt-1 text-center">
+        <p className="text-3xs text-stone-500 dark:text-stone-400 italic pt-1 text-center">
           Nutritional figures are educational estimates derived from visual plate segmentation and standard regional recipes, not lab chromatography.
         </p>
       </CardContent>

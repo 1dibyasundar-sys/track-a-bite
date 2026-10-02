@@ -68,17 +68,17 @@ export function FoodDetectionCard({
 
   return (
     <div
-      className={`p-4 sm:p-5 rounded-2xl bg-white border transition-colors space-y-4 shadow-sm ${
+      className={`p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131d16] border transition-colors space-y-4 shadow-sm ${
         confidenceTier === 'low' || item.needsConfirmation
-          ? 'border-amber-300 ring-1 ring-amber-200/50'
-          : 'border-stone-200 hover:border-emerald-300'
+          ? 'border-amber-300 dark:border-amber-700/80 ring-1 ring-amber-200/50 dark:ring-amber-900/30'
+          : 'border-stone-200 dark:border-[#23382b] hover:border-emerald-300 dark:hover:border-emerald-700'
       }`}
     >
       {/* Header: Food Identification & Confidence */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1.5">
-            <span className="text-2xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+            <span className="text-2xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
               Food Detected
             </span>
             <span
@@ -90,10 +90,10 @@ export function FoodDetectionCard({
             <span
               className={`text-2xs font-bold px-2 py-0.5 rounded-full border ${
                 item.identificationMode === 'research'
-                  ? 'bg-purple-50 text-purple-800 border-purple-200'
+                  ? 'bg-purple-50 dark:bg-purple-950/50 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-800/50'
                   : item.identificationMode === 'local'
-                    ? 'bg-teal-50 text-teal-800 border-teal-200'
-                    : 'bg-blue-50 text-blue-800 border-blue-200'
+                    ? 'bg-teal-50 dark:bg-teal-950/50 text-teal-800 dark:text-teal-300 border-teal-200 dark:border-teal-800/50'
+                    : 'bg-blue-50 dark:bg-blue-950/50 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800/50'
               }`}
             >
               {item.identificationMode === 'research'
@@ -104,7 +104,7 @@ export function FoodDetectionCard({
             </span>
             {item.isEstimatedNutrition && (
               <span
-                className="text-2xs font-medium px-2 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200"
+                className="text-2xs font-medium px-2 py-0.5 rounded-full bg-stone-100 dark:bg-[#19271e] text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-[#23382b]"
                 title="Estimated nutritional profile based on regional recipe reference data, not laboratory measurements"
               >
                 ~ Estimated Nutrition
@@ -116,33 +116,33 @@ export function FoodDetectionCard({
               </span>
             )}
             {item.isUserModified && (
-              <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+              <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50">
                 User edited
               </span>
             )}
             {(confidenceTier === 'low' || item.needsConfirmation || item.confidence < 0.60) && (
-              <span className="text-2xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
+              <span className="text-2xs font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800/60 flex items-center gap-1">
                 <span>⚠️</span>
                 <span>Please confirm this food</span>
               </span>
             )}
             {item.regions && item.regions.length > 1 && (
-              <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-sky-50 text-sky-800 border border-sky-200">
+              <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/50 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800/50">
                 {item.regions.length} compartments combined
               </span>
             )}
           </div>
 
-          <h3 className="text-base sm:text-lg font-bold text-stone-900 leading-snug">
+          <h3 className="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 leading-snug">
             {item.name}
           </h3>
 
-          <div className="flex items-center gap-2 text-xs text-stone-500 mt-0.5">
+          <div className="flex items-center gap-2 text-xs text-stone-500 dark:text-stone-400 mt-0.5">
             {item.localNameHindi && (
-              <span className="text-stone-600 font-medium">({item.localNameHindi})</span>
+              <span className="text-stone-600 dark:text-stone-400 font-medium">({item.localNameHindi})</span>
             )}
             <span>•</span>
-            <span className="text-stone-700 font-medium">
+            <span className="text-stone-700 dark:text-stone-300 font-medium">
               {item.regions && item.regions.length > 1
                 ? `Estimated total: ≈ ${item.estimatedGrams}g (${item.portionMultiplier}x ${item.portionUnit})`
                 : item.portionUnit === 'piece'
@@ -156,7 +156,7 @@ export function FoodDetectionCard({
         <button
           type="button"
           onClick={() => onRequestChangeFood(item.detectionId)}
-          className="shrink-0 text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200 transition-colors flex items-center gap-1 cursor-pointer"
+          className="shrink-0 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 px-2.5 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800/60 transition-colors flex items-center gap-1 cursor-pointer"
           title="Change detected food"
         >
           <EditIcon size={13} />
@@ -166,25 +166,25 @@ export function FoodDetectionCard({
 
       {/* Low-confidence guidance prompt: explicit user confirmation */}
       {(confidenceTier === 'low' || item.needsConfirmation || item.confidence < 0.60) && (
-        <div className="p-3 sm:p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-xs text-amber-900 flex items-start gap-2.5">
-          <AlertCircleIcon size={16} className="text-amber-700 shrink-0 mt-0.5" />
+        <div className="p-3 sm:p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800/60 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
+          <AlertCircleIcon size={16} className="text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
           <div className="space-y-1.5 flex-1">
             <div className="flex items-center justify-between flex-wrap gap-2">
-              <p className="font-bold text-amber-950 text-xs sm:text-sm">
+              <p className="font-bold text-amber-950 dark:text-amber-200 text-xs sm:text-sm">
                 Please confirm this food
               </p>
-              <span className="text-3xs font-semibold px-2 py-0.5 rounded bg-amber-200/80 text-amber-900">
+              <span className="text-3xs font-semibold px-2 py-0.5 rounded bg-amber-200/80 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200">
                 Visual match uncertain ({confidencePercent}%)
               </span>
             </div>
-            <p className="text-2xs text-amber-800 leading-relaxed">
+            <p className="text-2xs text-amber-800 dark:text-amber-300 leading-relaxed">
               Visual evidence for this item is ambiguous. Rather than assuming &quot;{item.name}&quot; is definitely correct, please verify or choose your exact meal dish.
             </p>
             <div className="flex items-center gap-2 pt-1 flex-wrap">
               <button
                 type="button"
                 onClick={() => onRequestChangeFood(item.detectionId)}
-                className="text-2xs font-bold text-emerald-800 bg-white hover:bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-300 transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
+                className="text-2xs font-bold text-emerald-800 dark:text-emerald-300 bg-white dark:bg-[#19271e] hover:bg-emerald-50 dark:hover:bg-emerald-950/50 px-2.5 py-1 rounded-lg border border-emerald-300 dark:border-emerald-800/60 transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
               >
                 <EditIcon size={11} />
                 <span>Change food / Correct</span>
@@ -193,7 +193,7 @@ export function FoodDetectionCard({
                 <button
                   type="button"
                   onClick={() => onRemoveItem(item.detectionId)}
-                  className="text-2xs font-medium text-rose-700 hover:text-rose-900 bg-white hover:bg-rose-50 px-2 py-1 rounded-lg border border-rose-200 transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
+                  className="text-2xs font-medium text-rose-700 dark:text-rose-400 hover:text-rose-900 dark:hover:text-rose-200 bg-white dark:bg-[#19271e] hover:bg-rose-50 dark:hover:bg-rose-950/40 px-2 py-1 rounded-lg border border-rose-200 dark:border-rose-900/40 transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
                 >
                   <TrashIcon size={11} />
                   <span>Remove item</span>
@@ -206,12 +206,12 @@ export function FoodDetectionCard({
 
       {/* Physical Compartment / Multi-region breakdown */}
       {item.regions && item.regions.length > 1 && (
-        <div className="p-2.5 rounded-xl bg-sky-50/60 border border-sky-200/80 text-xs space-y-1.5">
+        <div className="p-2.5 rounded-xl bg-sky-50/60 dark:bg-sky-950/20 border border-sky-200/80 dark:border-sky-900/40 text-xs space-y-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-3xs font-bold text-sky-800 uppercase tracking-wider block">
+            <span className="text-3xs font-bold text-sky-800 dark:text-sky-300 uppercase tracking-wider block">
               Grouped Physical Regions ({item.regions.length} compartments):
             </span>
-            <span className="text-3xs text-sky-700 font-medium">
+            <span className="text-3xs text-sky-700 dark:text-sky-400 font-medium">
               Total: ~{item.estimatedGrams}g
             </span>
           </div>
@@ -219,7 +219,7 @@ export function FoodDetectionCard({
             {item.regions.map((reg, idx) => (
               <span
                 key={reg.regionId || idx}
-                className="text-2xs py-0.5 px-2 rounded-md bg-white border border-sky-200 text-sky-900 font-mono"
+                className="text-2xs py-0.5 px-2 rounded-md bg-white dark:bg-[#19271e] border border-sky-200 dark:border-sky-800/50 text-sky-900 dark:text-sky-200 font-mono"
               >
                 Region #{idx + 1}: ~{reg.portion.rawGramsEquivalent || Math.round(reg.portion.quantity)}g ({Math.round(reg.confidence * 100)}% conf)
               </span>
@@ -230,8 +230,8 @@ export function FoodDetectionCard({
 
       {/* Alternative candidate quick switches */}
       {alternativeCandidates && alternativeCandidates.length > 0 && onSelectAlternative && (
-        <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-200/80 text-xs space-y-1.5">
-          <span className="text-3xs font-bold text-stone-500 uppercase tracking-wider block">
+        <div className="p-2.5 rounded-xl bg-stone-50 dark:bg-[#19271e] border border-stone-200/80 dark:border-[#23382b] text-xs space-y-1.5">
+          <span className="text-3xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
             Alternative Visual Matches:
           </span>
           <div className="flex flex-wrap items-center gap-2">
@@ -240,10 +240,10 @@ export function FoodDetectionCard({
                 key={alt.foodId}
                 type="button"
                 onClick={() => onSelectAlternative(item.detectionId, alt.foodId)}
-                className="text-xs py-1 px-2.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-500 hover:bg-emerald-50/50 text-stone-700 font-medium transition-colors cursor-pointer"
+                className="text-xs py-1 px-2.5 rounded-lg bg-white dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 text-stone-700 dark:text-stone-300 font-medium transition-colors cursor-pointer"
               >
                 <span>{alt.name}</span>
-                <span className="text-3xs text-stone-400 ml-1.5">({Math.round(alt.confidence * 100)}%)</span>
+                <span className="text-3xs text-stone-400 dark:text-stone-500 ml-1.5">({Math.round(alt.confidence * 100)}%)</span>
               </button>
             ))}
           </div>
@@ -252,11 +252,11 @@ export function FoodDetectionCard({
 
       {/* Fallback Notice for Uncertain Foods (Phase 6 Stage 12) */}
       {item.fallbackDescription && (
-        <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200/90 text-xs text-amber-900 flex items-start gap-2">
-          <span className="text-amber-600 mt-0.5 font-bold">ℹ️</span>
+        <div className="p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/90 dark:border-amber-900/40 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2">
+          <span className="text-amber-600 dark:text-amber-400 mt-0.5 font-bold">ℹ️</span>
           <div>
-            <span className="font-semibold block text-amber-950">Identification Note:</span>
-            <p className="text-2xs text-amber-800 leading-relaxed italic">
+            <span className="font-semibold block text-amber-950 dark:text-amber-100">Identification Note:</span>
+            <p className="text-2xs text-amber-800 dark:text-amber-300 leading-relaxed italic">
               &ldquo;{item.fallbackDescription}&rdquo;
             </p>
           </div>
@@ -269,18 +269,18 @@ export function FoodDetectionCard({
           <button
             type="button"
             onClick={() => setShowEvidence(!showEvidence)}
-            className="text-3xs font-semibold text-stone-500 hover:text-stone-800 flex items-center gap-1 cursor-pointer transition-colors py-1 px-1.5 rounded hover:bg-stone-50"
+            className="text-3xs font-semibold text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 flex items-center gap-1 cursor-pointer transition-colors py-1 px-1.5 rounded hover:bg-stone-50 dark:hover:bg-stone-800/40"
           >
             <span>{showEvidence ? '▼ Hide' : '▶ Show'} Grounding Evidence & Sources ({item.evidence.length})</span>
           </button>
           {showEvidence && (
-            <div className="mt-1.5 p-2.5 rounded-xl bg-stone-50 border border-stone-200 text-2xs space-y-2 text-stone-700">
+            <div className="mt-1.5 p-2.5 rounded-xl bg-stone-50 dark:bg-[#19271e] border border-stone-200 dark:border-[#23382b] text-2xs space-y-2 text-stone-700 dark:text-stone-300">
               {item.visualObservation && (
-                <div className="pb-1.5 border-b border-stone-200/60">
-                  <span className="font-bold text-stone-800 block text-3xs uppercase tracking-wider mb-0.5">
+                <div className="pb-1.5 border-b border-stone-200/60 dark:border-[#23382b]">
+                  <span className="font-bold text-stone-800 dark:text-stone-200 block text-3xs uppercase tracking-wider mb-0.5">
                     Visual Evidence Observed:
                   </span>
-                  <p className="text-3xs text-stone-600 leading-relaxed">
+                  <p className="text-3xs text-stone-600 dark:text-stone-400 leading-relaxed">
                     {[
                       item.visualObservation.appearance && `Appearance: ${item.visualObservation.appearance}`,
                       item.visualObservation.color && `Color: ${item.visualObservation.color}`,
@@ -302,14 +302,14 @@ export function FoodDetectionCard({
                       {ev.type === 'web' ? '🌐' : ev.type === 'visual' ? '👁️' : '⚡'}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <span className="font-semibold text-stone-800">{ev.title || ev.type}: </span>
-                      <span className="text-stone-600">{ev.relevance}</span>
+                      <span className="font-semibold text-stone-800 dark:text-stone-200">{ev.title || ev.type}: </span>
+                      <span className="text-stone-600 dark:text-stone-400">{ev.relevance}</span>
                       {ev.source && ev.type === 'web' && (
                         <a
                           href={ev.source}
                           target="_blank"
                           rel="noreferrer"
-                          className="block text-3xs text-emerald-700 hover:underline truncate max-w-xs mt-0.5"
+                          className="block text-3xs text-emerald-700 dark:text-emerald-400 hover:underline truncate max-w-xs mt-0.5"
                         >
                           {ev.source}
                         </a>
@@ -325,93 +325,93 @@ export function FoodDetectionCard({
 
       {/* UNKNOWN / UNCONFIRMED FOOD: Do not invent nutrition */}
       {item.nutritionAvailable === false ? (
-        <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1.5">
+        <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-xs text-amber-900 dark:text-amber-200 space-y-1.5">
           <div className="flex items-center gap-2">
-            <AlertCircleIcon size={15} className="text-amber-700 shrink-0" />
+            <AlertCircleIcon size={15} className="text-amber-700 dark:text-amber-400 shrink-0" />
             <span className="font-bold">Nutrition Unverified</span>
           </div>
-          <p className="text-2xs text-amber-800 leading-relaxed">
+          <p className="text-2xs text-amber-800 dark:text-amber-300 leading-relaxed">
             This item is not yet matched to our internal database. Tap <span className="font-semibold underline cursor-pointer" onClick={() => onRequestChangeFood(item.detectionId)}>&quot;Not correct?&quot;</span> above to select your exact dish and calculate real nutrition.
           </p>
         </div>
       ) : (
         <>
           {/* Nutrient Breakdown Strip */}
-          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 pt-2 border-t border-stone-100 text-center text-xs">
-            <div className="p-2 rounded-xl bg-stone-50 border border-stone-200/80">
-              <span className="block text-3xs font-semibold text-stone-500 uppercase">Calories</span>
-              <span className="text-sm font-bold text-stone-900">{item.isUserModified ? '' : '≈ '}{item.nutrition.calories}</span>
-              <span className="text-3xs text-stone-500 block">kcal</span>
+          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 pt-2 border-t border-stone-100 dark:border-[#23382b] text-center text-xs">
+            <div className="p-2 rounded-xl bg-stone-50 dark:bg-[#19271e] border border-stone-200/80 dark:border-[#23382b]">
+              <span className="block text-3xs font-semibold text-stone-500 dark:text-stone-400 uppercase">Calories</span>
+              <span className="text-sm font-bold text-stone-900 dark:text-stone-100">{item.isUserModified ? '' : '≈ '}{item.nutrition.calories}</span>
+              <span className="text-3xs text-stone-500 dark:text-stone-400 block">kcal</span>
             </div>
-            <div className="p-2 rounded-xl bg-emerald-50/60 border border-emerald-100">
-              <span className="block text-3xs font-semibold text-emerald-700 uppercase">Protein</span>
-              <span className="text-sm font-bold text-emerald-800">{item.isUserModified ? '' : '≈ '}{item.nutrition.protein}g</span>
-              <span className="text-3xs text-emerald-600 block">
+            <div className="p-2 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40">
+              <span className="block text-3xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase">Protein</span>
+              <span className="text-sm font-bold text-emerald-800 dark:text-emerald-300">{item.isUserModified ? '' : '≈ '}{item.nutrition.protein}g</span>
+              <span className="text-3xs text-emerald-600 dark:text-emerald-400 block">
                 {Math.round((item.nutrition.protein * 4 / Math.max(1, item.nutrition.calories)) * 100)}% cals
               </span>
             </div>
-            <div className="p-2 rounded-xl bg-amber-50/60 border border-amber-100">
-              <span className="block text-3xs font-semibold text-amber-700 uppercase">Carbs</span>
-              <span className="text-sm font-bold text-amber-800">{item.isUserModified ? '' : '≈ '}{item.nutrition.carbohydrates}g</span>
-              <span className="text-3xs text-amber-600 block">
+            <div className="p-2 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/40">
+              <span className="block text-3xs font-semibold text-amber-700 dark:text-amber-400 uppercase">Carbs</span>
+              <span className="text-sm font-bold text-amber-800 dark:text-amber-300">{item.isUserModified ? '' : '≈ '}{item.nutrition.carbohydrates}g</span>
+              <span className="text-3xs text-amber-600 dark:text-amber-400 block">
                 {Math.round((item.nutrition.carbohydrates * 4 / Math.max(1, item.nutrition.calories)) * 100)}% cals
               </span>
             </div>
-            <div className="p-2 rounded-xl bg-rose-50/60 border border-rose-100">
-              <span className="block text-3xs font-semibold text-rose-700 uppercase">Fat</span>
-              <span className="text-sm font-bold text-rose-800">{item.isUserModified ? '' : '≈ '}{item.nutrition.fat}g</span>
-              <span className="text-3xs text-rose-600 block">
+            <div className="p-2 rounded-xl bg-rose-50/60 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/40">
+              <span className="block text-3xs font-semibold text-rose-700 dark:text-rose-400 uppercase">Fat</span>
+              <span className="text-sm font-bold text-rose-800 dark:text-rose-300">{item.isUserModified ? '' : '≈ '}{item.nutrition.fat}g</span>
+              <span className="text-3xs text-rose-600 dark:text-rose-400 block">
                 {Math.round((item.nutrition.fat * 9 / Math.max(1, item.nutrition.calories)) * 100)}% cals
               </span>
             </div>
-            <div className="hidden sm:block p-2 rounded-xl bg-teal-50/60 border border-teal-100">
-              <span className="block text-3xs font-semibold text-teal-700 uppercase">Fiber</span>
-              <span className="text-sm font-bold text-teal-800">{item.isUserModified ? '' : '≈ '}{item.nutrition.fiber}g</span>
-              <span className="text-3xs text-teal-600 block">gut fiber</span>
+            <div className="hidden sm:block p-2 rounded-xl bg-teal-50/60 dark:bg-teal-950/30 border border-teal-100 dark:border-teal-900/40">
+              <span className="block text-3xs font-semibold text-teal-700 dark:text-teal-400 uppercase">Fiber</span>
+              <span className="text-sm font-bold text-teal-800 dark:text-teal-300">{item.isUserModified ? '' : '≈ '}{item.nutrition.fiber}g</span>
+              <span className="text-3xs text-teal-600 dark:text-teal-400 block">gut fiber</span>
             </div>
           </div>
 
           {/* Secondary Expandable Micronutrients Section */}
           {hasMicronutrients && (
-            <div className="pt-1 border-t border-stone-100">
+            <div className="pt-1 border-t border-stone-100 dark:border-[#23382b]">
               <button
                 type="button"
                 onClick={() => setShowMicronutrients(!showMicronutrients)}
-                className="text-3xs font-bold text-stone-500 hover:text-emerald-700 uppercase tracking-wider flex items-center justify-between w-full transition-colors cursor-pointer py-1"
+                className="text-3xs font-bold text-stone-500 dark:text-stone-400 hover:text-emerald-700 dark:hover:text-emerald-400 uppercase tracking-wider flex items-center justify-between w-full transition-colors cursor-pointer py-1"
               >
                 <span>Micronutrients & Minerals</span>
-                <span className="text-emerald-700 font-semibold">{showMicronutrients ? '▲ Hide' : '▼ View'}</span>
+                <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{showMicronutrients ? '▲ Hide' : '▼ View'}</span>
               </button>
               {showMicronutrients && (
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 pt-2 text-xs animate-in fade-in duration-200">
                   {item.micronutrients?.iron !== undefined && (
-                    <div className="p-1.5 rounded-lg bg-stone-50 border border-stone-200/80 text-center">
-                      <span className="block text-3xs text-stone-500 font-semibold uppercase">Iron</span>
-                      <span className="font-bold text-stone-800">{item.micronutrients.iron} mg</span>
+                    <div className="p-1.5 rounded-lg bg-stone-50 dark:bg-[#19271e] border border-stone-200/80 dark:border-[#23382b] text-center">
+                      <span className="block text-3xs text-stone-500 dark:text-stone-400 font-semibold uppercase">Iron</span>
+                      <span className="font-bold text-stone-800 dark:text-stone-200">{item.micronutrients.iron} mg</span>
                     </div>
                   )}
                   {item.micronutrients?.calcium !== undefined && (
-                    <div className="p-1.5 rounded-lg bg-stone-50 border border-stone-200/80 text-center">
-                      <span className="block text-3xs text-stone-500 font-semibold uppercase">Calcium</span>
-                      <span className="font-bold text-stone-800">{item.micronutrients.calcium} mg</span>
+                    <div className="p-1.5 rounded-lg bg-stone-50 dark:bg-[#19271e] border border-stone-200/80 dark:border-[#23382b] text-center">
+                      <span className="block text-3xs text-stone-500 dark:text-stone-400 font-semibold uppercase">Calcium</span>
+                      <span className="font-bold text-stone-800 dark:text-stone-200">{item.micronutrients.calcium} mg</span>
                     </div>
                   )}
                   {item.micronutrients?.vitaminC !== undefined && (
-                    <div className="p-1.5 rounded-lg bg-stone-50 border border-stone-200/80 text-center">
-                      <span className="block text-3xs text-stone-500 font-semibold uppercase">Vitamin C</span>
-                      <span className="font-bold text-stone-800">{item.micronutrients.vitaminC} mg</span>
+                    <div className="p-1.5 rounded-lg bg-stone-50 dark:bg-[#19271e] border border-stone-200/80 dark:border-[#23382b] text-center">
+                      <span className="block text-3xs text-stone-500 dark:text-stone-400 font-semibold uppercase">Vitamin C</span>
+                      <span className="font-bold text-stone-800 dark:text-stone-200">{item.micronutrients.vitaminC} mg</span>
                     </div>
                   )}
                   {item.micronutrients?.vitaminA !== undefined && (
-                    <div className="p-1.5 rounded-lg bg-stone-50 border border-stone-200/80 text-center">
-                      <span className="block text-3xs text-stone-500 font-semibold uppercase">Vitamin A</span>
-                      <span className="font-bold text-stone-800">{item.micronutrients.vitaminA} mcg</span>
+                    <div className="p-1.5 rounded-lg bg-stone-50 dark:bg-[#19271e] border border-stone-200/80 dark:border-[#23382b] text-center">
+                      <span className="block text-3xs text-stone-500 dark:text-stone-400 font-semibold uppercase">Vitamin A</span>
+                      <span className="font-bold text-stone-800 dark:text-stone-200">{item.micronutrients.vitaminA} mcg</span>
                     </div>
                   )}
                   {item.micronutrients?.potassium !== undefined && (
-                    <div className="p-1.5 rounded-lg bg-stone-50 border border-stone-200/80 text-center">
-                      <span className="block text-3xs text-stone-500 font-semibold uppercase">Potassium</span>
-                      <span className="font-bold text-stone-800">{item.micronutrients.potassium} mg</span>
+                    <div className="p-1.5 rounded-lg bg-stone-50 dark:bg-[#19271e] border border-stone-200/80 dark:border-[#23382b] text-center">
+                      <span className="block text-3xs text-stone-500 dark:text-stone-400 font-semibold uppercase">Potassium</span>
+                      <span className="font-bold text-stone-800 dark:text-stone-200">{item.micronutrients.potassium} mg</span>
                     </div>
                   )}
                 </div>
@@ -422,18 +422,18 @@ export function FoodDetectionCard({
       )}
 
       {/* Portion Adjuster & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-stone-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-stone-100 dark:border-[#23382b]">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-stone-500 font-medium">Portion:</span>
+          <span className="text-xs text-stone-500 dark:text-stone-400 font-medium">Portion:</span>
           {/* Quick presets */}
-          <div className="inline-flex items-center gap-1 p-0.5 rounded-lg bg-stone-100 border border-stone-200">
+          <div className="inline-flex items-center gap-1 p-0.5 rounded-lg bg-stone-100 dark:bg-[#19271e] border border-stone-200 dark:border-[#23382b]">
             <button
               type="button"
               onClick={() => onUpdatePortion(item.detectionId, Math.round((0.75 - item.portionMultiplier) * 100) / 100)}
               className={`px-2 py-0.5 text-2xs font-semibold rounded-md transition-colors cursor-pointer ${
                 Math.abs(item.portionMultiplier - 0.75) < 0.05
                   ? 'bg-emerald-700 text-white shadow-2xs'
-                  : 'text-stone-600 hover:text-stone-900'
+                  : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
               }`}
             >
               Small (0.75x)
@@ -444,7 +444,7 @@ export function FoodDetectionCard({
               className={`px-2 py-0.5 text-2xs font-semibold rounded-md transition-colors cursor-pointer ${
                 Math.abs(item.portionMultiplier - 1.0) < 0.05
                   ? 'bg-emerald-700 text-white shadow-2xs'
-                  : 'text-stone-600 hover:text-stone-900'
+                  : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
               }`}
             >
               Regular (1x)
@@ -455,7 +455,7 @@ export function FoodDetectionCard({
               className={`px-2 py-0.5 text-2xs font-semibold rounded-md transition-colors cursor-pointer ${
                 Math.abs(item.portionMultiplier - 1.5) < 0.05
                   ? 'bg-emerald-700 text-white shadow-2xs'
-                  : 'text-stone-600 hover:text-stone-900'
+                  : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
               }`}
             >
               Large (1.5x)
@@ -463,17 +463,17 @@ export function FoodDetectionCard({
           </div>
 
           {/* Fine-tuning +/- */}
-          <div className="flex items-center gap-1 bg-stone-100 p-0.5 rounded-lg border border-stone-200">
+          <div className="flex items-center gap-1 bg-stone-100 dark:bg-[#19271e] p-0.5 rounded-lg border border-stone-200 dark:border-[#23382b]">
             <button
               type="button"
               aria-label="Decrease portion"
               onClick={() => onUpdatePortion(item.detectionId, -0.25)}
               disabled={item.portionMultiplier <= 0.25}
-              className="w-7 h-7 sm:w-6 sm:h-6 rounded bg-white text-stone-700 hover:text-stone-900 flex items-center justify-center disabled:opacity-40 shadow-2xs cursor-pointer min-w-[28px] min-h-[28px]"
+              className="w-7 h-7 sm:w-6 sm:h-6 rounded bg-white dark:bg-[#131d16] text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 flex items-center justify-center disabled:opacity-40 shadow-2xs cursor-pointer min-w-[28px] min-h-[28px]"
             >
               <MinusIcon size={12} />
             </button>
-            <span className="text-2xs font-bold text-stone-800 px-1.5 min-w-[32px] text-center font-mono">
+            <span className="text-2xs font-bold text-stone-800 dark:text-stone-200 px-1.5 min-w-[32px] text-center font-mono">
               {item.portionMultiplier}x
             </span>
             <button
@@ -481,7 +481,7 @@ export function FoodDetectionCard({
               aria-label="Increase portion"
               onClick={() => onUpdatePortion(item.detectionId, 0.25)}
               disabled={item.portionMultiplier >= 4.0}
-              className="w-7 h-7 sm:w-6 sm:h-6 rounded bg-white text-stone-700 hover:text-stone-900 flex items-center justify-center disabled:opacity-40 shadow-2xs cursor-pointer min-w-[28px] min-h-[28px]"
+              className="w-7 h-7 sm:w-6 sm:h-6 rounded bg-white dark:bg-[#131d16] text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 flex items-center justify-center disabled:opacity-40 shadow-2xs cursor-pointer min-w-[28px] min-h-[28px]"
             >
               <PlusIcon size={12} />
             </button>
@@ -489,14 +489,14 @@ export function FoodDetectionCard({
         </div>
 
         <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
-          <span className="text-3xs text-stone-400 italic">
+          <span className="text-3xs text-stone-400 dark:text-stone-500 italic">
             AI estimate — verify portion if needed
           </span>
           {canRemove && onRemoveItem && (
             <button
               type="button"
               onClick={() => onRemoveItem(item.detectionId)}
-              className="text-xs text-stone-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-colors flex items-center gap-1 cursor-pointer"
+              className="text-xs text-stone-400 hover:text-rose-600 dark:hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors flex items-center gap-1 cursor-pointer"
               title="Remove item"
             >
               <TrashIcon size={14} />

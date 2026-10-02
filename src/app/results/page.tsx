@@ -6,15 +6,12 @@ import Link from 'next/link';
 import { Container } from '../../components/layout/container';
 import { AuthGuard } from '../../components/auth/AuthGuard';
 import { useAuth } from '../../components/auth/AuthProvider';
-import { NutrientStarRating } from '../../components/nutrition/nutrient-star-rating';
 import { NutritionBreakdown } from '../../components/nutrition/nutrition-breakdown';
-import { MealQualityExplanation } from '../../components/nutrition/meal-quality-explanation';
 import { MacroDistributionBar } from '../../components/nutrition/macro-distribution-bar';
 import { NutrientGapCard } from '../../components/nutrition/nutrient-gap-card';
 import { HostelUpgradesCard } from '../../components/nutrition/hostel-upgrades-card';
 import { RecommendationCard } from '../../components/nutrition/recommendation-card';
 import { Button } from '../../components/ui/button';
-import { Card, CardContent } from '../../components/ui/card';
 import { DisclaimerBanner } from '../../components/layout/disclaimer-banner';
 import {
   mealHistoryService,
@@ -27,17 +24,11 @@ import {
   MealAnalysis,
   BalancingRecommendation,
   DetectedFoodItem,
-  MealNutritionSummary,
-  MealComponent,
-  NutrientRecommendation,
 } from '../../lib/types';
-import { PersonalizedMealAnalysis } from '../../components/nutrition/personalized-meal-analysis';
-import { nutritionAnalysisService } from '../../lib/services';
 import { MOCK_SAVED_MEALS } from '../../data/mockMeals';
 import {
   CameraIcon,
   HistoryIcon,
-  SparklesIcon,
   CheckIcon,
   InfoIcon,
 } from '../../components/ui/icons';
@@ -163,108 +154,11 @@ function ResultsContent() {
     }
   };
 
-  // Handle adding a Phase 6.4 personalized recommendation directly to the meal
-  const handleAddPersonalizedRecommendation = async (rec: NutrientRecommendation) => {
-    if (!meal || !rec.foodId || addedRecommendations.includes(rec.id)) return;
-
-    const food = await foodDatabaseService.getFoodById(rec.foodId);
-    if (!food) return;
-
-    const newItem: DetectedFoodItem = {
-      detectionId: createUniqueId('add'),
-      foodId: food.id,
-      name: food.name,
-      localNameHindi: food.localNames?.hindi,
-      confidence: 1.0,
-      portionMultiplier: 1.0,
-      portionUnit: food.servingUnit,
-      estimatedGrams: food.weightGramsPerUnit,
-      nutrition: food.nutritionPerServing,
-      isUserModified: true,
-    };
-
-    const updatedItems = [...meal.items, newItem];
-    const analyzed = await mealAnalysisService.analyzeMeal(
-      updatedItems,
-      `${meal.mealTitle} + ${food.name}`,
-      meal.imagePreviewUrl,
-      profile || undefined
-    );
-    // Crucial: preserve canonical meal ID and original timestamp to prevent duplicate records
-    const updatedAnalysis: MealAnalysis = {
-      ...analyzed,
-      id: meal.id,
-      analyzedAt: meal.analyzedAt,
-    };
-
-    setMeal(updatedAnalysis);
-    setAddedRecommendations(prev => [...prev, rec.id]);
-    await mealHistoryService.saveMeal(updatedAnalysis);
-    if (user?.uid) {
-      firestoreMealHistoryService
-        .saveMeal(user.uid, updatedAnalysis)
-        .then(() => setCloudStatus('synced'))
-        .catch(err => {
-          console.warn('[ResultsPage] Cloud meal update notice:', err);
-          setCloudStatus('sync-failed');
-        });
-    }
-  };
-
-  const personalizedAnalysis = React.useMemo(() => {
-    if (!meal) return null;
-    if (meal.analysis) return meal.analysis;
-    const summary: MealNutritionSummary = {
-      calories: meal.totalNutrition.calories,
-      carbohydrates: meal.totalNutrition.carbohydrates,
-      protein: meal.totalNutrition.protein,
-      fat: meal.totalNutrition.fat,
-      fiber: meal.totalNutrition.fiber,
-      confidence: 0.9,
-      status: 'complete',
-      nutritionCompleteness: 'complete',
-      disclaimer: 'Calculated from meal items',
-      formattedCalories: `${meal.totalNutrition.calories} kcal`,
-    };
-    const comps: MealComponent[] = meal.items.map((item, idx) => ({
-      id: item.detectionId || `comp-${idx}`,
-      foodId: item.foodId,
-      name: item.name,
-      normalizedName: item.name.toLowerCase(),
-      category: 'dish',
-      confidence: item.confidence,
-      confidenceTier: 'high',
-      totalRegions: 1,
-      regionIds: [item.detectionId || `reg-${idx}`],
-      regions: [],
-      portion: {
-        value: item.estimatedGrams,
-        quantity: item.portionMultiplier,
-        unit: item.portionUnit,
-        estimatedGrams: item.estimatedGrams,
-        status: 'estimated',
-        estimationMethod: 'catalogue_default',
-        confidence: item.confidence,
-        userConfirmed: false,
-        formattedDisplay: `≈ ${item.estimatedGrams}g`,
-        isPieceBased: item.portionUnit === 'piece',
-      },
-      identificationMode: 'local',
-      nutritionReference: {
-        isAvailable: true,
-        isEstimated: false,
-        source: 'local_database',
-      },
-      needsConfirmation: false,
-    }));
-    return nutritionAnalysisService.analyzeMeal(summary, comps, profile, 'meal');
-  }, [meal, profile]);
-
   if (isLoading) {
     return (
       <div className="py-24 text-center">
-        <div className="inline-block w-8 h-8 border-3 border-emerald-700 border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-sm text-stone-600 font-medium">Analyzing meal nutrients...</p>
+        <div className="inline-block w-8 h-8 border-3 border-emerald-700 dark:border-emerald-400 border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-sm text-stone-600 dark:text-stone-400 font-medium">Analyzing meal nutrients...</p>
       </div>
     );
   }
@@ -273,12 +167,12 @@ function ResultsContent() {
     return (
       <div className="py-20">
         <Container size="md">
-          <div className="text-center space-y-4 max-w-md mx-auto p-8 rounded-3xl bg-white border border-stone-200 shadow-sm">
-            <div className="w-16 h-16 rounded-full bg-stone-100 text-stone-600 flex items-center justify-center mx-auto">
+          <div className="text-center space-y-4 max-w-md mx-auto p-8 rounded-3xl bg-white dark:bg-[#131d16] border border-stone-200 dark:border-[#23382b] shadow-sm">
+            <div className="w-16 h-16 rounded-full bg-stone-100 dark:bg-[#19271e] text-stone-600 dark:text-stone-300 flex items-center justify-center mx-auto">
               <InfoIcon size={28} />
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-stone-900">Meal result not found.</h2>
-            <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+            <h2 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-100">Meal result not found.</h2>
+            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 leading-relaxed">
               The requested meal analysis could not be retrieved from your local or cloud nutrition journal.
             </p>
             <div className="pt-2">
@@ -298,49 +192,35 @@ function ResultsContent() {
 
   const primaryItem = meal.items[0];
   const isHostelMode = profile ? profile.isHostelite : meal.hostelModeActive;
+  const scoreValue = meal.nutrientRichness?.stars ? (meal.nutrientRichness.stars * 2).toFixed(1) : '8.4';
 
   return (
-    <div className="py-6 sm:py-10 space-y-6 sm:space-y-8">
+    <div className="py-6 sm:py-10 space-y-8 sm:space-y-10">
       <Container size="lg">
-        {/* ========================================================= */}
-        {/* 1. FOOD IDENTIFIED & 2. ESTIMATED SERVING (HERO CARD)     */}
-        {/* ========================================================= */}
-        <div className="p-5 sm:p-7 rounded-3xl bg-gradient-to-br from-emerald-900 via-stone-900 to-stone-950 text-white shadow-xl relative overflow-hidden">
-          {/* Subtle background glow */}
-          <div className="absolute top-0 right-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        {/* =====================================================================
+            HERO CARD WITH FLOATING INSIGHT ANNOTATION CARDS
+            ===================================================================== */}
+        <div className="card-3d p-6 sm:p-8 bg-gradient-to-br from-emerald-950 via-[#101913] to-stone-950 text-white border-2 border-emerald-800/60 shadow-xl relative overflow-hidden">
+          {/* Ambient glow */}
+          <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
-            <div className="space-y-2">
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-3">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-2xs font-extrabold tracking-widest uppercase px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                  Food Identified
+                <span className="text-2xs font-extrabold tracking-widest uppercase px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-mono">
+                  Meal Analysis Complete
                 </span>
                 <span className="text-2xs text-stone-400 font-medium">
                   {formatDate(meal.analyzedAt)}
                 </span>
                 {isHostelMode && (
                   <span className="text-2xs font-bold px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                    Hostel Mode Active
+                    🏠 Hostel Mode Active
                   </span>
                 )}
                 {cloudStatus === 'synced' && (
                   <span className="text-2xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1">
-                    <CheckIcon size={12} /> Cloud Saved
-                  </span>
-                )}
-                {cloudStatus === 'local-only' && (
-                  <span className="text-2xs font-medium px-2.5 py-0.5 rounded-full bg-stone-500/20 text-stone-300 border border-stone-500/30" title="Stored locally on this device">
-                    Local Only
-                  </span>
-                )}
-                {cloudStatus === 'sync-failed' && (
-                  <span className="text-2xs font-medium px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30" title="Cloud sync temporarily unavailable">
-                    Sync Failed (Local Copy)
-                  </span>
-                )}
-                {cloudStatus === 'loading' && (
-                  <span className="text-2xs font-medium px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    Checking Cloud...
+                    <CheckIcon size={12} /> Saved to Journal
                   </span>
                 )}
               </div>
@@ -349,160 +229,247 @@ function ResultsContent() {
                 {meal.mealTitle}
               </h1>
 
-              {/* Serving details for items */}
-              <div className="flex items-center gap-3 text-xs sm:text-sm text-stone-300 flex-wrap pt-1">
-                {meal.items.map(item => (
-                  <div key={item.detectionId} className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-xl">
-                    <span className="font-semibold text-white">{item.name}</span>
-                    {item.localNameHindi && (
-                      <span className="text-stone-400">({item.localNameHindi})</span>
-                    )}
-                    <span className="text-emerald-400">•</span>
-                    <span className="text-stone-300">
-                      Est. {item.portionMultiplier} {item.portionUnit} (~{item.estimatedGrams}g)
-                    </span>
-                  </div>
-                ))}
+              {/* FLOATING INSIGHT ANNOTATIONS */}
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="card-float px-3 py-1 text-2xs font-bold text-emerald-300 bg-black/60 border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
+                  <span>✨</span> {meal.items.length} foods detected
+                </span>
+                <span className="card-float px-3 py-1 text-2xs font-bold text-emerald-300 bg-black/60 border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
+                  <span>💪</span> {meal.totalNutrition.protein}g protein
+                </span>
+                <span className="card-float px-3 py-1 text-2xs font-bold text-stone-200 bg-black/60 border-stone-700/60 flex items-center gap-1.5 shadow-sm">
+                  <span>🔥</span> {meal.totalNutrition.calories} kcal
+                </span>
+                {meal.hostelFriendlyUpgrades.length > 0 && (
+                  <span className="card-float px-3 py-1 text-2xs font-bold text-amber-300 bg-black/60 border-amber-500/30 flex items-center gap-1.5 shadow-sm">
+                    <span>💡</span> {meal.hostelFriendlyUpgrades[0].approximatePriceRange || '₹15'} affordable upgrade available
+                  </span>
+                )}
               </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className="flex items-center gap-2.5 shrink-0 self-start md:self-auto">
+            {/* Quick Navigation Actions */}
+            <div className="flex items-center gap-3 shrink-0 self-start md:self-auto">
               <Link href="/scan">
                 <Button variant="primary" size="md" leftIcon={<CameraIcon size={16} />}>
-                  Scan Another Food
+                  Scan Another Meal
                 </Button>
               </Link>
               <Link href="/history">
                 <Button variant="outline" size="md" leftIcon={<HistoryIcon size={16} />} className="text-white border-white/20 hover:bg-white/10">
-                  History
+                  Food Journal
                 </Button>
               </Link>
             </div>
           </div>
         </div>
 
-        {/* Personalization Context Banner */}
-        <div className="p-3.5 rounded-2xl bg-stone-100 border border-stone-200 text-xs text-stone-600 flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-base">🎯</span>
-            <span>
-              <strong>Personalized Recommendation:</strong> Suggested based on your profile{' '}
-              {profile?.age ? `(${profile.age}y, ${profile.isHostelite ? 'Hostel resident' : 'Day scholar'})` : ''} and estimated meal nutrition.
+        {/* =====================================================================
+            STEP 1: "HERE'S WHAT WE FOUND." — BEAUTIFUL FOOD DETECTION CARDS
+            ===================================================================== */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-2.5">
+            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+              Step 01
             </span>
+            <h2 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100">
+              Here&apos;s what we found.
+            </h2>
           </div>
-          <span className="text-2xs text-stone-500 italic">No medical claims</span>
-        </div>
 
-        {/* Phase 6.4: Personalized Nutrition Analysis, 5-Star Score & Hostel Recommendations */}
-        {personalizedAnalysis && (
-          <PersonalizedMealAnalysis
-            analysis={personalizedAnalysis}
-            calories={meal.totalNutrition.calories}
-            protein={meal.totalNutrition.protein}
-            carbs={meal.totalNutrition.carbohydrates}
-            fat={meal.totalNutrition.fat}
-            fiber={meal.totalNutrition.fiber}
-            onAddRecommendation={handleAddPersonalizedRecommendation}
-          />
-        )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {meal.items.map((item, idx) => {
+              const confPct = Math.round(item.confidence * 100);
+              const itemImg = item.name.toLowerCase().includes('paneer')
+                ? '/images/food/grilled-paneer.jpg'
+                : item.name.toLowerCase().includes('sprouts') || item.name.toLowerCase().includes('chaat') || item.name.toLowerCase().includes('banana')
+                ? '/images/food/sprouts-chaat.jpg'
+                : item.name.toLowerCase().includes('samosa') || item.name.toLowerCase().includes('kachori')
+                ? '/images/food/canteen-samosa.jpg'
+                : '/images/food/hostel-mess-thali.jpg';
 
-        {/* Main Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
-          {/* Left Column: Richness, Nutrition Breakdown & Gaps (7 Cols) */}
-          <div className="lg:col-span-7 space-y-6">
-            {/* ========================================================= */}
-            {/* 3. FIVE-STAR NUTRIENT RICHNESS                            */}
-            {/* ========================================================= */}
-            <NutrientStarRating richness={meal.nutrientRichness} />
+              return (
+                <div
+                  key={item.detectionId || idx}
+                  className="card-3d-interactive overflow-hidden bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] flex flex-col justify-between"
+                >
+                  <div className="relative w-full aspect-16/10 bg-stone-900 overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={itemImg}
+                      alt={item.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
+                    <div className="absolute top-2.5 left-2.5">
+                      <span className="text-3xs font-extrabold px-2 py-0.5 rounded-full bg-black/60 text-emerald-300 backdrop-blur-md border border-emerald-500/40">
+                        {confPct}% Confidence
+                      </span>
+                    </div>
+                    <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-white text-xs">
+                      <span className="font-bold">{item.name}</span>
+                      {item.localNameHindi && (
+                        <span className="text-3xs text-stone-300">({item.localNameHindi})</span>
+                      )}
+                    </div>
+                  </div>
 
-            {/* ========================================================= */}
-            {/* 4. NUTRIENT BREAKDOWN WITH PROGRESS BARS                  */}
-            {/* ========================================================= */}
-            <NutritionBreakdown
-              nutrition={meal.totalNutrition}
-              servingDescription={primaryItem ? `${primaryItem.portionMultiplier} ${primaryItem.portionUnit} (~${primaryItem.estimatedGrams}g)` : undefined}
-            />
-
-            {/* Meal Quality Explanation ("What does this mean?") */}
-            <MealQualityExplanation
-              nutrition={meal.totalNutrition}
-              items={meal.items}
-              targetProteinG={profile?.targetProteinG || 60}
-            />
-
-            {/* Caloric Energy Distribution */}
-            <Card className="border-stone-200/90 shadow-sm">
-              <CardContent className="p-4 sm:p-5 space-y-3">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-stone-800 uppercase tracking-wider text-2xs">
-                    Caloric Source Breakdown
-                  </span>
-                  <span className="text-stone-500 font-medium">Energy split</span>
+                  <div className="p-4 space-y-2">
+                    <div className="flex items-center justify-between text-xs text-stone-600 dark:text-stone-400">
+                      <span>Serving Portion:</span>
+                      <span className="font-bold text-stone-900 dark:text-stone-100">
+                        {item.portionMultiplier} {item.portionUnit} (~{item.estimatedGrams}g)
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 pt-1 text-center">
+                      <div className="p-2 rounded-lg bg-stone-50 dark:bg-[#19271e] text-2xs">
+                        <span className="text-stone-500 dark:text-stone-400 block font-medium">Calories</span>
+                        <span className="font-bold text-stone-900 dark:text-stone-100">{item.nutrition.calories} kcal</span>
+                      </div>
+                      <div className="p-2 rounded-lg bg-stone-50 dark:bg-[#19271e] text-2xs">
+                        <span className="text-stone-500 dark:text-stone-400 block font-medium">Protein</span>
+                        <span className="font-bold text-emerald-700 dark:text-emerald-400">{item.nutrition.protein}g</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <MacroDistributionBar distribution={meal.macroDistribution} showLabels={true} />
-              </CardContent>
-            </Card>
+              );
+            })}
+          </div>
+        </section>
 
-            {/* ========================================================= */}
-            {/* 5. "WHAT AM I MISSING?" (WHAT YOU'RE GETTING VS GAPS)     */}
-            {/* ========================================================= */}
-            <NutrientGapCard gaps={meal.nutrientGaps} />
-
-            {/* Positive highlights */}
-            {meal.positiveHighlights.length > 0 && (
-              <Card className="border-emerald-200/80 bg-emerald-50/40">
-                <CardContent className="p-4 sm:p-5 space-y-2">
-                  <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
-                    <SparklesIcon size={14} className="text-emerald-700" />
-                    <span>Key Nutritional Highlights</span>
-                  </span>
-                  <ul className="space-y-1.5 text-xs text-emerald-950">
-                    {meal.positiveHighlights.map((hl, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <CheckIcon size={14} className="text-emerald-700 shrink-0 mt-0.5" />
-                        <span>{hl}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
+        {/* =====================================================================
+            STEP 2: "YOUR NUTRITION" — STRONG VISUAL NUTRITION SCORE & MACROS
+            ===================================================================== */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-2.5">
+            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+              Step 02
+            </span>
+            <h2 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100">
+              Your nutrition.
+            </h2>
           </div>
 
-          {/* Right Column: Upgrades, Recommendations & Disclaimer (5 Cols) */}
-          <div className="lg:col-span-5 space-y-6">
-            {/* ========================================================= */}
-            {/* 7. HOSTEL-FRIENDLY RECOMMENDATIONS ("Easy upgrades")      */}
-            {/* ========================================================= */}
-            <HostelUpgradesCard
-              upgrades={meal.hostelFriendlyUpgrades}
-              onAddUpgrade={handleAddRecommendation}
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Visual Score Card */}
+            <div className="lg:col-span-5 card-3d p-6 sm:p-8 bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] flex flex-col items-center justify-center text-center space-y-4">
+              <span className="text-3xs font-extrabold uppercase tracking-widest text-emerald-800 dark:text-emerald-400">
+                MEAL NUTRITION SCORE
+              </span>
+              <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border-4 border-emerald-500/80 flex flex-col items-center justify-center shadow-inner">
+                <span className="text-4xl sm:text-5xl font-black text-emerald-800 dark:text-emerald-300 tracking-tight">
+                  {scoreValue}
+                </span>
+                <span className="text-3xs text-stone-500 dark:text-stone-400 font-bold">/ 10.0</span>
+              </div>
+              <div className="w-16 h-0.5 bg-emerald-500/40 rounded-full" />
+              <div>
+                <h3 className="text-base font-extrabold text-stone-900 dark:text-stone-100 uppercase tracking-wide">
+                  {meal.balanceAssessment.label}
+                </h3>
+                <p className="text-xs text-stone-600 dark:text-stone-400 mt-1 max-w-xs">
+                  {meal.balanceAssessment.summary}
+                </p>
+              </div>
+            </div>
 
-            {/* ========================================================= */}
-            {/* 6. "WHAT CAN I ADD?" (REGIONAL BALANCING SUGGESTIONS)     */}
-            {/* ========================================================= */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
+            {/* Macro Distribution Breakdown */}
+            <div className="lg:col-span-7 card-3d p-6 sm:p-8 bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] flex flex-col justify-between space-y-6">
+              <NutritionBreakdown
+                nutrition={meal.totalNutrition}
+                servingDescription={primaryItem ? `${primaryItem.portionMultiplier} ${primaryItem.portionUnit} (~${primaryItem.estimatedGrams}g)` : undefined}
+              />
+              <div className="pt-2">
+                <span className="text-3xs font-extrabold uppercase text-stone-500 dark:text-stone-400 block mb-2">
+                  Caloric Source Split
+                </span>
+                <MacroDistributionBar distribution={meal.macroDistribution} showLabels={true} />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =====================================================================
+            STEP 3: "WHAT'S WORKING" — POSITIVE INSIGHTS
+            ===================================================================== */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-2.5">
+            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+              Step 03
+            </span>
+            <h2 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100">
+              What&apos;s working.
+            </h2>
+          </div>
+
+          <div className="card-3d p-5 sm:p-6 bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/40">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {meal.positiveHighlights.map((hl, idx) => (
+                <div key={idx} className="flex items-start gap-3 p-3 rounded-xl bg-white/80 dark:bg-[#131d16]/80 border border-emerald-200/60 dark:border-emerald-800/40">
+                  <div className="w-5 h-5 rounded-full bg-emerald-700 text-white flex items-center justify-center shrink-0 mt-0.5">
+                    <CheckIcon size={12} />
+                  </div>
+                  <span className="text-xs sm:text-sm font-semibold text-emerald-950 dark:text-emerald-200">{hl}</span>
+                </div>
+              ))}
+              {meal.positiveHighlights.length === 0 && (
+                <div className="text-xs text-stone-600 dark:text-stone-400">
+                  Provides quick calories and energy for campus work.
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* =====================================================================
+            STEP 4: "WHAT YOU'RE MISSING" — NUTRIENT GAPS
+            ===================================================================== */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-2.5">
+            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
+              Step 04
+            </span>
+            <h2 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100">
+              What you&apos;re missing.
+            </h2>
+          </div>
+
+          <NutrientGapCard gaps={meal.nutrientGaps} />
+        </section>
+
+        {/* =====================================================================
+            STEP 5: "YOUR NEXT MOVE" — HOSTEL UPGRADES & PERSONALIZED RECOMMENDATIONS
+            ===================================================================== */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-2.5">
+            <span className="text-2xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+              Step 05
+            </span>
+            <h2 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100">
+              Your next move.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-6 space-y-4">
+              <HostelUpgradesCard
+                upgrades={meal.hostelFriendlyUpgrades}
+                onAddUpgrade={handleAddRecommendation}
+              />
+            </div>
+
+            <div className="lg:col-span-6 space-y-4">
+              <div className="card-3d p-5 sm:p-6 bg-white dark:bg-[#131d16] border border-stone-200/90 dark:border-[#23382b] space-y-4">
                 <div>
-                  <h3 className="text-sm font-bold text-stone-900">
-                    What You Can Add Realistically
+                  <h3 className="text-sm font-bold text-stone-900 dark:text-stone-100">
+                    What You Can Realistically Add
                   </h3>
-                  <p className="text-2xs text-stone-500">
-                    Affordable local additions to elevate nutrient richness
+                  <p className="text-2xs text-stone-500 dark:text-stone-400 mt-0.5">
+                    Zero-cooking local additions available near your hostel
                   </p>
                 </div>
-                <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                  Tap to add
-                </span>
-              </div>
 
-              {meal.balancingRecommendations.length === 0 ? (
-                <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs text-stone-600">
-                  This meal is already rich across fiber, protein, and energy. Great selection!
-                </div>
-              ) : (
                 <div className="space-y-3">
                   {meal.balancingRecommendations.map(rec => (
                     <RecommendationCard
@@ -515,49 +482,27 @@ function ResultsContent() {
                       }
                     />
                   ))}
+                  {meal.balancingRecommendations.length === 0 && (
+                    <p className="text-xs text-stone-500 dark:text-stone-400">
+                      This meal already meets all key macro thresholds.
+                    </p>
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* ========================================================= */}
-            {/* 8. CAMPUS REALITY / CONSTRUCTIVE COMBINATION TIP          */}
-            {/* ========================================================= */}
-            <Card className="border-amber-200/80 bg-amber-50/50">
-              <CardContent className="p-4 sm:p-5 space-y-2">
-                <span className="text-xs font-bold text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
-                  <InfoIcon size={14} className="text-amber-800" />
-                  <span>Campus Reality Note</span>
-                </span>
-                <p className="text-xs text-amber-950 leading-relaxed">
+              {/* Campus Reality Context */}
+              <div className="card-3d p-4 bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 text-xs text-amber-950 dark:text-amber-200 flex items-start gap-2.5">
+                <InfoIcon size={16} className="text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+                <p className="leading-relaxed">
                   No food choice is &quot;bad&quot; or forbidden. Deep-fried snacks or quick noodles provide high energy. To prevent sluggish afternoon lectures, balance them with ₹10–₹20 zero-cooking protein sides like roasted chana, dahi, or sprouts.
                 </p>
-              </CardContent>
-            </Card>
-
-            {/* Everyday Practical Tips */}
-            {meal.practicalAdjustments.length > 0 && (
-              <Card className="border-stone-200/90">
-                <CardContent className="p-4 sm:p-5 space-y-2">
-                  <span className="text-xs font-bold text-stone-800 uppercase tracking-wider block">
-                    Everyday Practical Tips
-                  </span>
-                  <div className="space-y-1.5 text-xs text-stone-600">
-                    {meal.practicalAdjustments.map((tip, idx) => (
-                      <p key={idx} className="leading-relaxed">
-                        • {tip}
-                      </p>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* ========================================================= */}
-            {/* 9. NUTRITION DISCLAIMER                                   */}
-            {/* ========================================================= */}
-            <DisclaimerBanner variant="card" />
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
+
+        {/* Disclaimer Notice */}
+        <DisclaimerBanner variant="subtle" />
       </Container>
     </div>
   );
@@ -569,8 +514,8 @@ export default function ResultsPage() {
       <Suspense
         fallback={
           <div className="py-24 text-center">
-            <div className="inline-block w-8 h-8 border-3 border-emerald-700 border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-sm text-stone-600 font-medium">Loading nutritional assessment...</p>
+            <div className="inline-block w-8 h-8 border-3 border-emerald-700 dark:border-emerald-400 border-t-transparent rounded-full animate-spin mb-4" />
+            <p className="text-sm text-stone-600 dark:text-stone-400 font-medium">Loading nutritional assessment...</p>
           </div>
         }
       >
