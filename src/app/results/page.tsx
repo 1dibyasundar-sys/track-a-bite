@@ -15,6 +15,7 @@ import { HostelUpgradesCard } from '../../components/nutrition/hostel-upgrades-c
 import { RecommendationCard } from '../../components/nutrition/recommendation-card';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
+import { DisclaimerBanner } from '../../components/layout/disclaimer-banner';
 import {
   mealHistoryService,
   firestoreMealHistoryService,
@@ -35,7 +36,6 @@ import { nutritionAnalysisService } from '../../lib/services';
 import { MOCK_SAVED_MEALS } from '../../data/mockMeals';
 import {
   CameraIcon,
-  ShieldCheckIcon,
   HistoryIcon,
   SparklesIcon,
   CheckIcon,
@@ -555,18 +555,7 @@ function ResultsContent() {
             {/* ========================================================= */}
             {/* 9. NUTRITION DISCLAIMER                                   */}
             {/* ========================================================= */}
-            <div className="p-4 rounded-2xl bg-stone-100/90 border border-stone-200 text-stone-700 text-2xs leading-relaxed flex items-start gap-2.5">
-              <ShieldCheckIcon size={16} className="text-stone-500 shrink-0 mt-0.5" />
-              <div className="space-y-1">
-                <span className="font-bold text-stone-900 block">
-                  Educational Nutrition Disclaimer:
-                </span>
-                <p>
-                  {meal.disclaimer ||
-                    'Track-a-Bite provides educational nutrition estimates based on standard regional recipes and visual plate volume. It does not provide medical diagnoses or prescribe treatment.'}
-                </p>
-              </div>
-            </div>
+            <DisclaimerBanner variant="card" />
           </div>
         </div>
       </Container>

@@ -93,4 +93,12 @@ export interface MealAnalysis {
   practicalAdjustments: string[];
   disclaimer: string;
   analysis?: import('./personalizedAnalysis').MealPersonalizedAnalysis;
+  source?: 'vision' | 'barcode';
+  barcode?: string;
+  brand?: string;
+  manufacturingDate?: string;
+  expiryDate?: string;
+  batchNumber?: string;
+  expiryStatus?: import('./barcode').ExpiryStatus;
+  packageDetails?: import('./barcode').PackageOcrResult;
 }

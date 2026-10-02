@@ -11,6 +11,7 @@ import { FoodDetectionCard } from '../../components/scan/food-detection-card';
 import { FoodSelectorModal } from '../../components/scan/food-selector-modal';
 import { MacroDistributionBar } from '../../components/nutrition/macro-distribution-bar';
 import { MealIntelligenceCard } from '../../components/nutrition/meal-intelligence-card';
+import { DisclaimerBanner } from '../../components/layout/disclaimer-banner';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
 import {
@@ -47,6 +48,11 @@ import {
   InfoIcon,
   RefreshCwIcon,
 } from '../../components/ui/icons';
+import { BarcodeScannerViewport } from '../../components/scan/BarcodeScannerViewport';
+import { PackageOcrScanner } from '../../components/scan/PackageOcrScanner';
+import { PackagedFoodResultCard } from '../../components/scan/PackagedFoodResultCard';
+import { barcodeProductService } from '../../lib/services/barcodeProductService';
+import { PackagedProduct, PackageOcrResult } from '../../lib/types/barcode';
 
 export const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 export const ALLOWED_IMAGE_MIME_TYPES = [
@@ -110,6 +116,86 @@ export default function ScanPage() {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
+  // Phase 1 / Phase 6: Top-level mode switcher: 'cooked' (meal plate) vs 'packaged' (barcode + OCR)
+  const [scanCategory, setScanCategory] = useState<'cooked' | 'packaged'>('cooked');
+
+  // Packaged food scanner states
+  const [, setScannedBarcode] = useState<string | null>(null);
+  const [isLookingUpBarcode, setIsLookingUpBarcode] = useState(false);
+  const [barcodeLookupError, setBarcodeLookupError] = useState<string | null>(null);
+  const [scannedProduct, setScannedProduct] = useState<PackagedProduct | null>(null);
+  const [isOcrModalOpen, setIsOcrModalOpen] = useState(false);
+  const [isSavingPackagedMeal, setIsSavingPackagedMeal] = useState(false);
+
+  const handleBarcodeDetected = async (barcode: string) => {
+    setScannedBarcode(barcode);
+    setIsLookingUpBarcode(true);
+    setBarcodeLookupError(null);
+
+    try {
+      const result = await barcodeProductService.lookupProduct(barcode);
+      if (result.status === 'found' && result.product) {
+        setScannedProduct(result.product);
+      } else if (result.status === 'not_found') {
+        setScannedProduct(null);
+        setBarcodeLookupError(
+          result.errorMessage || `Product with barcode "${barcode}" was not found in the food database.`
+        );
+      } else if (result.status === 'rate_limited') {
+        setBarcodeLookupError('Database lookup is temporarily rate limited. Please try again in a few moments.');
+      } else {
+        setScannedProduct(null);
+        setBarcodeLookupError(result.errorMessage || 'Failed to retrieve product details.');
+      }
+    } catch (err: unknown) {
+      const error = err as Error;
+      setScannedProduct(null);
+      setBarcodeLookupError(error.message || 'An unexpected error occurred during lookup.');
+    } finally {
+      setIsLookingUpBarcode(false);
+    }
+  };
+
+  const handleApplyPackageDetails = (details: PackageOcrResult) => {
+    if (!scannedProduct) return;
+    setScannedProduct({
+      ...scannedProduct,
+      packageDetails: details,
+      manufacturingDate: details.manufacturingDate || scannedProduct.manufacturingDate || null,
+      expiryDate: details.expiryDate || scannedProduct.expiryDate || null,
+      batchNumber: details.batchNumber || scannedProduct.batchNumber || null,
+      expiryStatus: details.expiryStatus || scannedProduct.expiryStatus,
+    });
+  };
+
+  const handleSavePackagedMeal = async () => {
+    if (!scannedProduct) return;
+    setIsSavingPackagedMeal(true);
+    try {
+      const meal = barcodeProductService.convertProductToMealAnalysis(scannedProduct);
+
+      if (user?.uid) {
+        await firestoreMealHistoryService.saveMeal(user.uid, meal);
+      } else {
+        await mealHistoryService.saveMeal(meal);
+      }
+
+      router.push('/history');
+    } catch (err: unknown) {
+      console.error('Failed to save packaged food item to meal history:', err);
+      alert('Could not save meal item. Please try again.');
+    } finally {
+      setIsSavingPackagedMeal(false);
+    }
+  };
+
+  const handleResetPackaged = () => {
+    setScannedProduct(null);
+    setScannedBarcode(null);
+    setBarcodeLookupError(null);
+    setIsLookingUpBarcode(false);
+  };
+
   // Clean up object URLs when unmounting or changing preview
   React.useEffect(() => {
     return () => {
@@ -119,16 +205,34 @@ export default function ScanPage() {
     };
   }, [previewUrl]);
 
-  // 1. Trigger capture action
-  const handleCapture = () => {
+  // 1. Trigger capture action from live camera or preset
+  const handleCapture = (capturedItem?: unknown) => {
     setValidationError(null);
-    const imagePayload: AppImage = {
-      id: `capture-${Date.now()}`,
-      sourceType: 'camera',
-      scenarioHintId: selectedScenarioId,
-      capturedAt: new Date().toISOString(),
-    };
-    setActiveImage(imagePayload);
+    if (capturedItem && capturedItem instanceof File) {
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      const url = URL.createObjectURL(capturedItem);
+      setPreviewUrl(url);
+
+      const imagePayload: AppImage = {
+        id: `capture-${Date.now()}`,
+        sourceType: 'camera',
+        file: capturedItem,
+        uri: url,
+        scenarioHintId: selectedScenarioId,
+        capturedAt: new Date().toISOString(),
+      };
+      setActiveImage(imagePayload);
+    } else {
+      const imagePayload: AppImage = {
+        id: `capture-${Date.now()}`,
+        sourceType: 'camera',
+        scenarioHintId: selectedScenarioId,
+        capturedAt: new Date().toISOString(),
+      };
+      setActiveImage(imagePayload);
+    }
     setStage('preview');
   };
 
@@ -500,8 +604,38 @@ export default function ScanPage() {
     <AuthGuard>
       <div className="py-6 sm:py-10">
         <Container size="lg">
-        {/* Header */}
-        <div className="text-center max-w-xl mx-auto mb-6">
+        {/* Primary Scanner Switcher: Identify Meal vs Scan Packaged Food */}
+        <div className="flex justify-center mb-6">
+          <div className="inline-flex items-center p-1 bg-stone-100 border border-stone-200 rounded-2xl shadow-xs">
+            <button
+              type="button"
+              onClick={() => setScanCategory('cooked')}
+              className={`px-4 sm:px-5 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
+                scanCategory === 'cooked'
+                  ? 'bg-emerald-700 text-white shadow-xs'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <span>🍛</span> Identify Meal
+            </button>
+            <button
+              type="button"
+              onClick={() => setScanCategory('packaged')}
+              className={`px-4 sm:px-5 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
+                scanCategory === 'packaged'
+                  ? 'bg-emerald-700 text-white shadow-xs'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <span>🔳</span> Scan Packaged Food
+            </button>
+          </div>
+        </div>
+
+        {scanCategory === 'cooked' ? (
+          <>
+            {/* Header */}
+            <div className="text-center max-w-xl mx-auto mb-6">
           <div className="flex items-center justify-center gap-2 mb-2">
             <span className="text-2xs font-bold tracking-widest text-emerald-800 uppercase px-3 py-1 rounded-full bg-emerald-100 border border-emerald-200 inline-block">
               Perception Pipeline • Phase 3
@@ -618,7 +752,7 @@ export default function ScanPage() {
                     </p>
                   </div>
                   <Button
-                    onClick={handleCapture}
+                    onClick={() => handleCapture()}
                     fullWidth
                     size="lg"
                     leftIcon={<SparklesIcon size={16} />}
@@ -933,10 +1067,77 @@ export default function ScanPage() {
                     isHostelite={profile.isHostelite}
                   />
                 )}
+
+                {/* Contextual Educational Disclaimer */}
+                <DisclaimerBanner variant="subtle" className="mt-4" />
               </div>
             )}
           </div>
         </div>
+        </>
+        ) : (
+          <div className="space-y-6">
+            <div className="text-center max-w-xl mx-auto mb-6">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <span className="text-2xs font-bold tracking-widest text-emerald-800 uppercase px-3 py-1 rounded-full bg-emerald-100 border border-emerald-200 inline-block">
+                  Barcode &amp; Package Intelligence
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+                Scan Packaged Food
+              </h1>
+              <p className="text-xs sm:text-sm text-stone-600 mt-1.5">
+                Scan product barcodes to inspect nutrition, ingredients, and verify package expiry dates.
+              </p>
+            </div>
+
+            <div className="max-w-2xl mx-auto space-y-6">
+              {!scannedProduct ? (
+                <div className="space-y-4">
+                  <BarcodeScannerViewport
+                    onBarcodeDetected={handleBarcodeDetected}
+                    isProcessing={isLookingUpBarcode}
+                  />
+
+                  {barcodeLookupError && (
+                    <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs flex items-start gap-3 shadow-xs">
+                      <AlertCircleIcon size={18} className="text-rose-600 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <span className="font-bold block">Product Not Found</span>
+                        <p className="text-rose-800 leading-relaxed">{barcodeLookupError}</p>
+                        <button
+                          type="button"
+                          onClick={handleResetPackaged}
+                          className="mt-1 text-2xs font-bold text-rose-700 hover:underline cursor-pointer"
+                        >
+                          Try another barcode →
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="p-4 rounded-2xl bg-stone-100 border border-stone-200 text-xs text-stone-600 flex items-start gap-2.5">
+                    <InfoIcon size={16} className="text-stone-500 shrink-0 mt-0.5" />
+                    <div className="space-y-0.5 leading-relaxed">
+                      <span className="font-semibold text-stone-800">
+                        Zero Hallucination Guarantee:
+                      </span>{' '}
+                      Barcodes identify products and official nutrition facts. Manufacturing and expiry dates are never fabricated; they are verified using optical text recognition directly from printed package stamps.
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <PackagedFoodResultCard
+                  product={scannedProduct}
+                  onOpenOcr={() => setIsOcrModalOpen(true)}
+                  onAddToMeal={handleSavePackagedMeal}
+                  onReset={handleResetPackaged}
+                  isSaving={isSavingPackagedMeal}
+                />
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Food Selector Modal for Customizing / Swapping Items */}
         <FoodSelectorModal
@@ -949,6 +1150,14 @@ export default function ScanPage() {
               ? 'Select the dish or snack that was actually on your plate instead of the auto-detected item.'
               : 'Add any side dish, banana, boiled egg, curd, or drink to your meal.'
           }
+        />
+
+        {/* Package OCR Scanner Modal for Printed Dates */}
+        <PackageOcrScanner
+          isOpen={isOcrModalOpen}
+          onClose={() => setIsOcrModalOpen(false)}
+          onApplyDetails={handleApplyPackageDetails}
+          currentDetails={scannedProduct?.packageDetails}
         />
       </Container>
     </div>

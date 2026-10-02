@@ -54,3 +54,6 @@ export * from './firestoreHydrationService';
 export * from './hydrationStorageService';
 export * from './hydrationService';
 export * from './diagnosticLogger';
+export * from './expiryCalculationService';
+export * from './barcodeProductService';
+export * from './packageOcrService';

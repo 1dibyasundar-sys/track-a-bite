@@ -4,7 +4,6 @@ import './globals.css';
 import { Navbar } from '../components/layout/navbar';
 import { MobileBottomNav } from '../components/layout/mobile-bottom-nav';
 import { Footer } from '../components/layout/footer';
-import { DisclaimerBanner } from '../components/layout/disclaimer-banner';
 import { AuthProvider } from '../components/auth/AuthProvider';
 
 const geistSans = Geist({
@@ -91,7 +90,6 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-[#faf8f5] text-[#1c1917]">
         <AuthProvider>
-          <DisclaimerBanner />
           <Navbar />
           <main className="flex-1 flex flex-col pb-16 md:pb-0">{children}</main>
           <Footer />

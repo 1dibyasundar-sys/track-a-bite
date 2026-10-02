@@ -246,9 +246,28 @@ export default function HistoryPage() {
                         <span className="text-2xs font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800">
                           {meal.balanceAssessment.label}
                         </span>
-                        {meal.hostelModeActive && (
+                        {meal.source === 'barcode' ? (
+                          <span className="text-2xs font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-200">
+                            🔳 Packaged Food
+                          </span>
+                        ) : meal.hostelModeActive && (
                           <span className="text-2xs font-medium px-1.5 py-0.2 rounded bg-stone-100 text-stone-600">
                             Hostel Scan
+                          </span>
+                        )}
+                        {meal.expiryStatus === 'EXPIRED' && (
+                          <span className="text-2xs font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200">
+                            🔴 Expired
+                          </span>
+                        )}
+                        {meal.expiryStatus === 'EXPIRING_SOON' && (
+                          <span className="text-2xs font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">
+                            🟡 Expiring Soon
+                          </span>
+                        )}
+                        {meal.expiryStatus === 'VALID' && (
+                          <span className="text-2xs font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            🟢 Valid
                           </span>
                         )}
                       </div>

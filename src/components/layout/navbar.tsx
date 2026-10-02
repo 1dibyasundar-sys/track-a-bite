@@ -50,28 +50,29 @@ export function Navbar() {
             {/* Brand Logo */}
             <Link
               href="/"
-              className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 rounded-lg p-1"
+              className="flex items-center gap-2.5 sm:gap-3 shrink-0 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 rounded-xl py-1 px-1 -ml-1 transition-colors"
+              aria-label="Track-a-Bite Home"
             >
-              <div className="w-9 h-9 rounded-xl bg-emerald-800 text-white flex items-center justify-center shadow-xs group-hover:bg-emerald-900 transition-colors">
-                <LeafIcon size={19} className="text-emerald-300" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-800 text-white flex items-center justify-center shadow-xs group-hover:bg-emerald-900 transition-colors shrink-0">
+                <LeafIcon size={20} className="text-emerald-300" />
               </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-lg font-bold tracking-tight text-stone-900 font-sans">
+              <div className="flex flex-col justify-center min-w-0">
+                <div className="flex items-center gap-1.5 leading-none">
+                  <span className="text-base sm:text-lg font-bold tracking-tight text-stone-900 font-sans whitespace-nowrap">
                     Track-a-Bite
                   </span>
-                  <span className="text-2xs font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                  <span className="text-3xs sm:text-2xs font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 shrink-0 whitespace-nowrap border border-emerald-200/60">
                     Campus
                   </span>
                 </div>
-                <span className="text-2xs text-stone-500 font-medium tracking-wide">
+                <span className="text-3xs sm:text-2xs text-stone-500 font-medium tracking-wide whitespace-nowrap mt-0.5">
                   Student Food Intelligence
                 </span>
               </div>
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-1" aria-label="Main Navigation">
+            <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1" aria-label="Main Navigation">
               {navLinks.map(link => {
                 const active = isActive(link.href);
                 return (
@@ -79,7 +80,7 @@ export function Navbar() {
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      'px-3.5 py-2 text-sm font-medium rounded-lg transition-colors',
+                      'px-2.5 xl:px-3.5 py-2 text-xs xl:text-sm font-medium rounded-lg transition-colors whitespace-nowrap',
                       active
                         ? 'text-emerald-900 bg-emerald-50 font-semibold'
                         : 'text-stone-600 hover:text-stone-900 hover:bg-stone-50'
@@ -92,13 +93,13 @@ export function Navbar() {
             </nav>
 
             {/* Desktop Quick Actions: Hostel Mode Toggle, Auth & Scan */}
-            <div className="hidden md:flex items-center gap-2.5">
+            <div className="hidden lg:flex items-center gap-2 xl:gap-2.5 shrink-0">
               {/* Hostel Mode Pill Switch */}
               <button
                 type="button"
                 onClick={handleToggleHostelMode}
                 className={cn(
-                  'px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border cursor-pointer',
+                  'px-2.5 xl:px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border cursor-pointer shrink-0 whitespace-nowrap',
                   profile.isHostelite
                     ? 'bg-amber-100/90 text-amber-950 border-amber-300 hover:bg-amber-200'
                     : 'bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200'
@@ -106,8 +107,9 @@ export function Navbar() {
                 title="Toggle Hostel Mode for campus-friendly recommendations"
               >
                 <span className="text-sm">{profile.isHostelite ? '🏠' : '🍽️'}</span>
-                <span>Hostel Mode:</span>
-                <span className={cn('text-2xs font-extrabold uppercase px-1 rounded', profile.isHostelite ? 'bg-amber-200 text-amber-950' : 'bg-stone-200 text-stone-700')}>
+                <span className="hidden xl:inline">Hostel Mode:</span>
+                <span className="xl:hidden">Hostel:</span>
+                <span className={cn('text-3xs xl:text-2xs font-extrabold uppercase px-1 rounded', profile.isHostelite ? 'bg-amber-200 text-amber-950' : 'bg-stone-200 text-stone-700')}>
                   {profile.isHostelite ? 'ON' : 'OFF'}
                 </span>
               </button>
@@ -118,13 +120,13 @@ export function Navbar() {
                   {/* User Identity Pill */}
                   <Link
                     href="/profile"
-                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200/80 border border-stone-200/80 text-xs text-stone-800 transition-colors group"
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200/80 border border-stone-200/80 text-xs text-stone-800 transition-colors group shrink-0 whitespace-nowrap"
                     title={`Signed in as ${user?.displayName || user?.email || 'User'}`}
                   >
                     <div className="w-6 h-6 rounded-full bg-emerald-800 text-white flex items-center justify-center text-3xs font-bold uppercase shadow-2xs group-hover:bg-emerald-900">
                       {((user?.displayName || user?.email || 'U')[0]).toUpperCase()}
                     </div>
-                    <span className="font-semibold max-w-[100px] truncate text-xs">
+                    <span className="font-semibold max-w-[80px] xl:max-w-[110px] truncate text-xs">
                       {user?.displayName || user?.email?.split('@')[0] || 'User'}
                     </span>
                   </Link>
@@ -132,13 +134,13 @@ export function Navbar() {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="px-3 py-2 text-xs font-semibold rounded-xl text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors cursor-pointer"
+                    className="px-2.5 xl:px-3 py-2 text-xs font-semibold rounded-xl text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
                   >
                     Sign Out
                   </button>
                   <Link
                     href="/scan"
-                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl bg-emerald-800 text-white hover:bg-emerald-900 transition-colors shadow-2xs"
+                    className="inline-flex items-center gap-1.5 xl:gap-2 px-3.5 xl:px-4 py-2 text-xs xl:text-sm font-semibold rounded-xl bg-emerald-800 text-white hover:bg-emerald-900 transition-colors shadow-2xs shrink-0 whitespace-nowrap"
                   >
                     <CameraIcon size={16} className="text-emerald-200" />
                     <span>Scan Food</span>
@@ -148,13 +150,13 @@ export function Navbar() {
                 <>
                   <Link
                     href="/login"
-                    className="px-3.5 py-2 text-xs font-semibold rounded-xl text-stone-700 hover:text-stone-950 hover:bg-stone-100 transition-colors"
+                    className="px-3 xl:px-3.5 py-2 text-xs font-semibold rounded-xl text-stone-700 hover:text-stone-950 hover:bg-stone-100 transition-colors shrink-0 whitespace-nowrap"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/register"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-800 text-white hover:bg-emerald-900 transition-colors shadow-2xs"
+                    className="inline-flex items-center gap-1.5 px-3.5 xl:px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-800 text-white hover:bg-emerald-900 transition-colors shadow-2xs shrink-0 whitespace-nowrap"
                   >
                     <span>Register</span>
                   </Link>
@@ -162,25 +164,27 @@ export function Navbar() {
               )}
             </div>
 
-            {/* Mobile Actions */}
-            <div className="flex items-center gap-1.5 md:hidden">
+            {/* Mobile / Tablet Actions (< 1024px) */}
+            <div className="flex items-center gap-1.5 sm:gap-2 lg:hidden shrink-0">
               <button
                 type="button"
                 onClick={handleToggleHostelMode}
                 className={cn(
-                  'p-1.5 px-2 rounded-lg text-2xs font-bold border transition-colors flex items-center gap-1',
+                  'p-1.5 px-2 rounded-lg text-2xs font-bold border transition-colors flex items-center gap-1 shrink-0 whitespace-nowrap',
                   profile.isHostelite ? 'bg-amber-100 text-amber-950 border-amber-300' : 'bg-stone-100 text-stone-600 border-stone-200'
                 )}
                 aria-label="Toggle Hostel Mode"
+                title={`Hostel Mode: ${profile.isHostelite ? 'ON' : 'OFF'}`}
               >
                 <span>{profile.isHostelite ? '🏠' : '🍽️'}</span>
-                <span>Hostel</span>
+                <span className="hidden min-[360px]:inline">Hostel</span>
               </button>
 
               <Link
                 href="/scan"
-                className="p-2 text-emerald-800 bg-emerald-50 rounded-lg hover:bg-emerald-100"
+                className="p-2 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors shrink-0"
                 aria-label="Quick Scan"
+                title="Scan Food"
               >
                 <CameraIcon size={20} />
               </Link>
@@ -188,7 +192,7 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-100 focus:outline-none"
+                className="p-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-100 focus:outline-none transition-colors shrink-0"
                 aria-label="Toggle Navigation Menu"
                 aria-expanded={mobileMenuOpen}
               >
@@ -207,7 +211,7 @@ export function Navbar() {
 
           {/* Mobile Dropdown */}
           {mobileMenuOpen && (
-            <div className="md:hidden py-4 border-t border-stone-200 animate-in fade-in slide-in-from-top-2 duration-150 space-y-3">
+            <div className="lg:hidden py-4 border-t border-stone-200 animate-in fade-in slide-in-from-top-2 duration-150 space-y-3">
               {/* Authenticated User Identity Header in Mobile Drawer */}
               {isAuthenticated && (
                 <div className="p-3 rounded-xl bg-stone-50 border border-stone-200/80 flex items-center gap-3">

@@ -269,6 +269,14 @@ export function mapDocToMeal(data: Record<string, unknown>, docId: string): Meal
     analysis: data.analysis
       ? (data.analysis as import('../types/personalizedAnalysis').MealPersonalizedAnalysis)
       : undefined,
+    source: (data.source as 'vision' | 'barcode') || 'vision',
+    barcode: (data.barcode as string) || undefined,
+    brand: (data.brand as string) || undefined,
+    manufacturingDate: (data.manufacturingDate as string) || undefined,
+    expiryDate: (data.expiryDate as string) || undefined,
+    batchNumber: (data.batchNumber as string) || undefined,
+    expiryStatus: (data.expiryStatus as import('../types/barcode').ExpiryStatus) || undefined,
+    packageDetails: data.packageDetails ? (data.packageDetails as import('../types/barcode').PackageOcrResult) : undefined,
   };
 }
 
