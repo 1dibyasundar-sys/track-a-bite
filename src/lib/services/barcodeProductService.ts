@@ -210,8 +210,8 @@ export class BarcodeProductService {
       hostelModeActive: true,
       practicalAdjustments: [],
       disclaimer: product.nutrition.isNutritionAvailable
-        ? 'Nutrition facts retrieved from product packaging database (Open Food Facts).'
-        : 'Nutrition data was unavailable from product packaging database (Open Food Facts).',
+        ? `Nutrition facts retrieved from product packaging source (${product.sourceProvider || 'Open Food Facts'}).`
+        : `Nutrition data was unavailable from product packaging source (${product.sourceProvider || 'Open Food Facts'}).`,
       source: 'barcode',
       barcode: product.barcode,
       brand: product.brand || undefined,

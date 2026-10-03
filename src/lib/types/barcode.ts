@@ -65,6 +65,40 @@ export interface PackagedProductNutrition {
   isNutritionAvailable: boolean;
 }
 
+export interface ProductDiscoveryResult {
+  barcode: string;
+  productName: string | null;
+  brand: string | null;
+  manufacturer: string | null;
+  imageUrl: string | null;
+  category: string | null;
+  quantity: string | null;
+  ingredients: string | null;
+  nutrition: {
+    calories: number | null;
+    proteinGrams: number | null;
+    carbsGrams: number | null;
+    fatGrams: number | null;
+    saturatedFatGrams: number | null;
+    sugarGrams: number | null;
+    fiberGrams: number | null;
+    sodiumMilligrams: number | null;
+  };
+  nutritionBasis: '100g' | '100ml' | 'serving' | 'unknown';
+  isNutritionAvailable: boolean;
+  source: {
+    provider: string;
+    url: string | null;
+    retrievedAt: string;
+  };
+  verification: {
+    status: 'verified' | 'partially_verified' | 'unverified';
+    confidence: 'high' | 'medium' | 'low';
+    matchedBarcode: boolean;
+    reason?: string;
+  };
+}
+
 export interface PackagedProduct {
   barcode: string;
   barcodeType?: BarcodeType;
@@ -86,13 +120,23 @@ export interface PackagedProduct {
   expiryDate?: string | null;
   batchNumber?: string | null;
   expiryStatus: ExpiryStatus;
-  source: 'openfoodfacts' | 'manual' | 'local';
+  source: 'openfoodfacts' | 'manual' | 'local' | 'web_search' | 'ai_verified_search' | 'product_database' | string;
+  sourceProvider?: string;
+  sourceUrl?: string | null;
+  retrievedAt?: string;
+  verificationStatus?: 'verified' | 'partially_verified' | 'unverified';
+  verificationConfidence?: 'high' | 'medium' | 'low';
+  matchedBarcode?: boolean;
+  verificationReason?: string;
   found: boolean;
 }
 
 export interface BarcodeLookupResult {
   status: 'found' | 'not_found' | 'error' | 'rate_limited';
   barcode: string;
+  source?: string;
+  provider?: string;
   product?: PackagedProduct;
   errorMessage?: string;
 }
+

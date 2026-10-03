@@ -8,7 +8,9 @@
 
 export const GEMINI_CONFIG = {
   // Configured in one central server location as required
-  model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+  get model(): string {
+    return process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
+  },
   apiEndpoint: 'https://generativelanguage.googleapis.com/v1beta/models',
   requestTimeoutMs: 15000,
   maxImageSizeBytes: 10 * 1024 * 1024, // 10 MB limit

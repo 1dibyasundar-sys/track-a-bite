@@ -222,6 +222,36 @@ export function PackagedFoodResultCard({
                 Package net weight: {product.quantity}
               </p>
             )}
+
+            {/* Source Provenance */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              <span className="text-3xs text-stone-500 dark:text-stone-400 font-medium">Data source:</span>
+              <span className="text-3xs font-semibold text-stone-700 dark:text-stone-300 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-md border border-stone-200 dark:border-stone-700 inline-flex items-center gap-1">
+                {product.sourceProvider || (product.source === 'openfoodfacts' ? 'Open Food Facts' : 'Product Database')}
+              </span>
+              {product.verificationConfidence && (
+                <span
+                  className={`text-3xs font-semibold px-2 py-0.5 rounded-md border ${
+                    product.verificationConfidence === 'high'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60'
+                      : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/60'
+                  }`}
+                >
+                  {product.verificationConfidence === 'high' ? '✓ Verified Match' : 'Partially Verified'}
+                </span>
+              )}
+              {product.sourceUrl && (
+                <a
+                  href={product.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-3xs font-semibold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-0.5"
+                  title="View original product page"
+                >
+                  <span>↗ View Source</span>
+                </a>
+              )}
+            </div>
           </div>
         </div>
 
@@ -242,7 +272,7 @@ export function PackagedFoodResultCard({
               <div className="text-xs">
                 <span className="font-bold">Nutrition data unavailable</span>
                 <p className="text-2xs text-amber-800 dark:text-amber-300 mt-0.5">
-                  The product database does not have nutritional values recorded on packaging for this barcode.
+                  The connected product databases and verified listings do not have nutritional values recorded for this barcode.
                 </p>
               </div>
             </div>

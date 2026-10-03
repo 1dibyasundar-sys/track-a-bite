@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchProductFromOpenFoodFacts, normalizeBarcode } from '../../../lib/server/openFoodFactsService';
+import { productDiscoveryService } from '../../../lib/server/productDiscoveryService';
+import { normalizeBarcode } from '../../../lib/server/openFoodFactsService';
 import { BarcodeLookupResult } from '../../../lib/types/barcode';
 
 export const dynamic = 'force-dynamic';
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const result = await fetchProductFromOpenFoodFacts(normalized);
+  const result = await productDiscoveryService.discoverProduct(normalized);
 
   if (result.status === 'not_found') {
     return NextResponse.json<BarcodeLookupResult>(result, { status: 404 });
@@ -47,3 +48,4 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json<BarcodeLookupResult>(result, { status: 200 });
 }
+

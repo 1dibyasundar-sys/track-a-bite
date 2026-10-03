@@ -1170,7 +1170,7 @@ function ScanContent() {
                           Product Not Found
                         </h2>
                         <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
-                          {barcodeLookupError}
+                          {barcodeLookupError || 'Product not found in connected databases.'}
                         </p>
                       </div>
 
@@ -1180,13 +1180,13 @@ function ScanContent() {
                         </span>
                         <ul className="list-disc list-inside space-y-1 text-2xs text-stone-500 dark:text-stone-400 leading-relaxed">
                           <li>
-                            Barcode <span className="font-mono font-bold text-stone-700 dark:text-stone-300">{scannedBarcode}</span> was accurately captured and queried against Open Food Facts.
+                            Barcode <span className="font-mono font-bold text-stone-700 dark:text-stone-300">{scannedBarcode}</span> was accurately captured and queried across Open Food Facts and connected product discovery catalogs.
                           </li>
                           <li>
-                            This product is not yet cataloged in the open packaging database.
+                            The barcode was successfully read, but no sufficiently reliable product match was found.
                           </li>
                           <li>
-                            You can scan another product or photograph printed packaging dates.
+                            You can scan another barcode or enter the digits manually.
                           </li>
                         </ul>
                       </div>
@@ -1198,6 +1198,13 @@ function ScanContent() {
                           className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-[#E86A33] hover:bg-[#d65f2c] text-white font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md"
                         >
                           <RefreshCwIcon size={14} /> Scan Another Barcode
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleResetPackaged}
+                          className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer border border-stone-300 dark:border-stone-700"
+                        >
+                          ⌨️ Enter Barcode Manually
                         </button>
                       </div>
                     </div>
