@@ -48,7 +48,7 @@ import {
   InfoIcon,
   RefreshCwIcon,
 } from '../../components/ui/icons';
-import { BarcodeScannerViewport } from '../../components/scan/BarcodeScannerViewport';
+import { BarcodeScannerViewport, normalizeBarcodeFormat } from '../../components/scan/BarcodeScannerViewport';
 import { PackageOcrScanner } from '../../components/scan/PackageOcrScanner';
 import { PackagedFoodResultCard } from '../../components/scan/PackagedFoodResultCard';
 import { barcodeProductService } from '../../lib/services/barcodeProductService';
@@ -125,28 +125,54 @@ function ScanContent() {
   const [scanCategory, setScanCategory] = useState<'cooked' | 'packaged'>('cooked');
 
   // Packaged food scanner states
-  const [, setScannedBarcode] = useState<string | null>(null);
+  const [scannedBarcode, setScannedBarcode] = useState<string | null>(null);
+  const [scannedFormat, setScannedFormat] = useState<string | null>(null);
   const [isLookingUpBarcode, setIsLookingUpBarcode] = useState(false);
   const [barcodeLookupError, setBarcodeLookupError] = useState<string | null>(null);
   const [scannedProduct, setScannedProduct] = useState<PackagedProduct | null>(null);
   const [isOcrModalOpen, setIsOcrModalOpen] = useState(false);
   const [isSavingPackagedMeal, setIsSavingPackagedMeal] = useState(false);
 
-  const handleBarcodeDetected = async (barcode: string) => {
-    setScannedBarcode(barcode);
+  const handleBarcodeDetected = async (barcode: string, format?: string) => {
+    const cleanBarcode = barcode.replace(/[^0-9A-Za-z]/g, '').trim();
+    const inferredFormat = normalizeBarcodeFormat(cleanBarcode, format);
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[ScanPage] onBarcodeDetected arguments received:', {
+        rawBarcode: barcode,
+        cleanBarcode,
+        format: inferredFormat,
+        lookupUrl: `/api/barcode-lookup?barcode=${encodeURIComponent(cleanBarcode)}`,
+      });
+    }
+
+    setScannedBarcode(cleanBarcode);
+    setScannedFormat(inferredFormat);
     setIsLookingUpBarcode(true);
     setBarcodeLookupError(null);
 
     try {
-      const result = await barcodeProductService.lookupProduct(barcode);
+      const result = await barcodeProductService.lookupProduct(cleanBarcode);
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[ScanPage] lookup result:', {
+          barcode: cleanBarcode,
+          status: result.status,
+          hasProduct: Boolean(result.product),
+          productName: result.product?.productName,
+          errorMessage: result.errorMessage,
+        });
+      }
+
       if (result.status === 'found' && result.product) {
         setScannedProduct(result.product);
       } else if (result.status === 'not_found') {
         setScannedProduct(null);
         setBarcodeLookupError(
-          result.errorMessage || `Product with barcode "${barcode}" was not found in the food database.`
+          result.errorMessage || `Product with barcode "${cleanBarcode}" was not found in the food database.`
         );
       } else if (result.status === 'rate_limited') {
+        setScannedProduct(null);
         setBarcodeLookupError('Database lookup is temporarily rate limited. Please try again in a few moments.');
       } else {
         setScannedProduct(null);
@@ -154,6 +180,9 @@ function ScanContent() {
       }
     } catch (err: unknown) {
       const error = err as Error;
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('[ScanPage] lookup error:', error);
+      }
       setScannedProduct(null);
       setBarcodeLookupError(error.message || 'An unexpected error occurred during lookup.');
     } finally {
@@ -197,6 +226,7 @@ function ScanContent() {
   const handleResetPackaged = () => {
     setScannedProduct(null);
     setScannedBarcode(null);
+    setScannedFormat(null);
     setBarcodeLookupError(null);
     setIsLookingUpBarcode(false);
   };
@@ -1114,39 +1144,82 @@ function ScanContent() {
 
             <div className="max-w-2xl mx-auto space-y-6">
               {!scannedProduct ? (
-                <div className="space-y-4">
-                  <BarcodeScannerViewport
-                    onBarcodeDetected={handleBarcodeDetected}
-                    isProcessing={isLookingUpBarcode}
-                  />
+                barcodeLookupError ? (
+                  /* Dedicated Product Not Found Card (replaces scanner so user doesn't silently remain on frozen camera) */
+                  <div className="bg-white dark:bg-[#1D1A17] rounded-3xl border border-stone-200 dark:border-[#38312A] text-stone-900 dark:text-stone-100 shadow-md overflow-hidden transition-all">
+                    {/* Header */}
+                    <div className="bg-stone-900 dark:bg-[#151311] px-5 py-3 text-white flex items-center justify-between border-b border-stone-800 dark:border-[#38312A]">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">🔳</span>
+                        <span className="text-xs font-extrabold tracking-wider uppercase text-[#E86A33] dark:text-[#F4A340]">
+                          Barcode Detected
+                        </span>
+                      </div>
+                      <span className="text-2xs font-mono text-stone-400 bg-stone-800 dark:bg-[#25211D] px-2.5 py-1 rounded-md">
+                        {scannedFormat || 'EAN-13'}: {scannedBarcode}
+                      </span>
+                    </div>
 
-                  {barcodeLookupError && (
-                    <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 text-rose-900 dark:text-rose-200 text-xs flex items-start gap-3 shadow-xs">
-                      <AlertCircleIcon size={18} className="text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
-                      <div className="space-y-1">
-                        <span className="font-bold block">Product Not Found</span>
-                        <p className="text-rose-800 dark:text-rose-300 leading-relaxed">{barcodeLookupError}</p>
+                    <div className="p-6 sm:p-8 text-center space-y-5">
+                      <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto shadow-xs">
+                        <AlertCircleIcon size={32} />
+                      </div>
+
+                      <div className="space-y-2 max-w-md mx-auto">
+                        <h2 className="text-xl sm:text-2xl font-extrabold text-stone-900 dark:text-stone-100 leading-tight">
+                          Product Not Found
+                        </h2>
+                        <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
+                          {barcodeLookupError}
+                        </p>
+                      </div>
+
+                      <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#25211D] border border-stone-200 dark:border-[#38312A] text-left text-xs text-stone-600 dark:text-stone-400 space-y-2 max-w-md mx-auto">
+                        <span className="font-bold text-stone-800 dark:text-stone-200 block">
+                          Detection Verified:
+                        </span>
+                        <ul className="list-disc list-inside space-y-1 text-2xs text-stone-500 dark:text-stone-400 leading-relaxed">
+                          <li>
+                            Barcode <span className="font-mono font-bold text-stone-700 dark:text-stone-300">{scannedBarcode}</span> was accurately captured and queried against Open Food Facts.
+                          </li>
+                          <li>
+                            This product is not yet cataloged in the open packaging database.
+                          </li>
+                          <li>
+                            You can scan another product or photograph printed packaging dates.
+                          </li>
+                        </ul>
+                      </div>
+
+                      <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
                         <button
                           type="button"
                           onClick={handleResetPackaged}
-                          className="mt-1 text-2xs font-bold text-rose-700 dark:text-rose-400 hover:underline cursor-pointer"
+                          className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-[#E86A33] hover:bg-[#d65f2c] text-white font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md"
                         >
-                          Try another barcode →
+                          <RefreshCwIcon size={14} /> Scan Another Barcode
                         </button>
                       </div>
                     </div>
-                  )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <BarcodeScannerViewport
+                      onBarcodeDetected={handleBarcodeDetected}
+                      isProcessing={isLookingUpBarcode}
+                    />
 
-                  <div className="p-4 rounded-2xl bg-stone-100 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-xs text-stone-600 dark:text-stone-400 flex items-start gap-2.5">
-                    <InfoIcon size={16} className="text-stone-500 shrink-0 mt-0.5" />
-                    <div className="space-y-0.5 leading-relaxed">
-                      <span className="font-semibold text-stone-800 dark:text-stone-200">
-                        Zero Hallucination Guarantee:
-                      </span>{' '}
-                      Barcodes identify products and official nutrition facts. Manufacturing and expiry dates are never fabricated; they are verified using optical text recognition directly from printed package stamps.
+                    <div className="p-4 rounded-2xl bg-stone-100 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-xs text-stone-600 dark:text-stone-400 flex items-start gap-2.5">
+                      <InfoIcon size={16} className="text-stone-500 shrink-0 mt-0.5" />
+                      <div className="space-y-0.5 leading-relaxed">
+                        <span className="font-semibold text-stone-800 dark:text-stone-200">
+                          Zero Hallucination Guarantee:
+                        </span>{' '}
+                        Barcodes identify products and official nutrition facts. Manufacturing and expiry dates are never fabricated; they are verified using optical text recognition directly from printed package stamps.
+                      </div>
                     </div>
                   </div>
-                </div>
+                )
               ) : (
                 <PackagedFoodResultCard
                   product={scannedProduct}
