@@ -34,7 +34,16 @@ class ApiBarcodeProductProvider implements IBarcodeProductProvider {
         return {
           status: 'not_found',
           barcode,
-          errorMessage: body.errorMessage || 'Product not found in database.',
+          errorMessage: body.errorMessage || 'Barcode was verified, but no reliable product match was found.',
+        };
+      }
+
+      if (res.status === 503) {
+        const body = await res.json().catch(() => ({}));
+        return {
+          status: 'discovery_unavailable',
+          barcode,
+          errorMessage: body.errorMessage || 'The barcode was detected, but product discovery services are temporarily unavailable.',
         };
       }
 

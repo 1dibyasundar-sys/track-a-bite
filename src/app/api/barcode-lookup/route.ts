@@ -38,6 +38,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json<BarcodeLookupResult>(result, { status: 404 });
   }
 
+  if (result.status === 'discovery_unavailable') {
+    return NextResponse.json<BarcodeLookupResult>(result, { status: 503 });
+  }
+
   if (result.status === 'rate_limited') {
     return NextResponse.json<BarcodeLookupResult>(result, { status: 429 });
   }

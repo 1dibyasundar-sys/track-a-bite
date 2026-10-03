@@ -132,7 +132,7 @@ export interface PackagedProduct {
 }
 
 export interface BarcodeLookupResult {
-  status: 'found' | 'not_found' | 'error' | 'rate_limited';
+  status: 'found' | 'not_found' | 'discovery_unavailable' | 'error' | 'rate_limited';
   barcode: string;
   source?: string;
   provider?: string;

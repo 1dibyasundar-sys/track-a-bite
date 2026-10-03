@@ -169,7 +169,12 @@ function ScanContent() {
       } else if (result.status === 'not_found') {
         setScannedProduct(null);
         setBarcodeLookupError(
-          result.errorMessage || `Product with barcode "${cleanBarcode}" was not found in the food database.`
+          result.errorMessage || 'Barcode was verified, but no reliable product match was found.'
+        );
+      } else if (result.status === 'discovery_unavailable') {
+        setScannedProduct(null);
+        setBarcodeLookupError(
+          result.errorMessage || 'The barcode was detected, but product discovery services are temporarily unavailable.'
         );
       } else if (result.status === 'rate_limited') {
         setScannedProduct(null);
@@ -1161,16 +1166,22 @@ function ScanContent() {
                     </div>
 
                     <div className="p-6 sm:p-8 text-center space-y-5">
-                      <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto shadow-xs">
+                      <div className={`w-16 h-16 rounded-full border flex items-center justify-center mx-auto shadow-xs ${
+                        barcodeLookupError?.toLowerCase().includes('unavailable')
+                          ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800/60 text-amber-600 dark:text-amber-400'
+                          : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400'
+                      }`}>
                         <AlertCircleIcon size={32} />
                       </div>
 
                       <div className="space-y-2 max-w-md mx-auto">
                         <h2 className="text-xl sm:text-2xl font-extrabold text-stone-900 dark:text-stone-100 leading-tight">
-                          Product Not Found
+                          {barcodeLookupError?.toLowerCase().includes('unavailable')
+                            ? 'Discovery Services Unavailable'
+                            : 'Product Not Found'}
                         </h2>
                         <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
-                          {barcodeLookupError || 'Product not found in connected databases.'}
+                          {barcodeLookupError || 'Barcode was verified, but no reliable product match was found.'}
                         </p>
                       </div>
 
@@ -1180,11 +1191,17 @@ function ScanContent() {
                         </span>
                         <ul className="list-disc list-inside space-y-1 text-2xs text-stone-500 dark:text-stone-400 leading-relaxed">
                           <li>
-                            Barcode <span className="font-mono font-bold text-stone-700 dark:text-stone-300">{scannedBarcode}</span> was accurately captured and queried across Open Food Facts and connected product discovery catalogs.
+                            Barcode <span className="font-mono font-bold text-stone-700 dark:text-stone-300">{scannedBarcode}</span> was accurately captured by the scanner.
                           </li>
-                          <li>
-                            The barcode was successfully read, but no sufficiently reliable product match was found.
-                          </li>
+                          {barcodeLookupError?.toLowerCase().includes('unavailable') ? (
+                            <li>
+                              External product discovery catalogs are temporarily unreachable from the server.
+                            </li>
+                          ) : (
+                            <li>
+                              The barcode was successfully read, but no sufficiently reliable product match was found.
+                            </li>
+                          )}
                           <li>
                             You can scan another barcode or enter the digits manually.
                           </li>
