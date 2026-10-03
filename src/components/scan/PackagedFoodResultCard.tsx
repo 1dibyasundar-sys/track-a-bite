@@ -5,6 +5,51 @@ import { PackagedProduct, ExpiryStatus } from '../../lib/types/barcode';
 import { expiryCalculationService } from '../../lib/services/expiryCalculationService';
 import { AlertCircleIcon, PlusIcon, RefreshCwIcon } from '../ui/icons';
 
+/**
+ * Cleanly formats a nutrition value:
+ * - number -> formatted string (preserving explicit 0 and meaningful precision)
+ * - null / undefined / NaN -> '—'
+ * Never converts missing values to zero.
+ */
+export function formatNutrientValue(
+  value: number | null | undefined,
+  unit: string,
+  preferredDecimals: number = 1
+): { valueText: string; unitText: string; isAvailable: boolean } {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return {
+      valueText: '—',
+      unitText: '',
+      isAvailable: false,
+    };
+  }
+
+  if (value === 0) {
+    return {
+      valueText: '0',
+      unitText: unit,
+      isAvailable: true,
+    };
+  }
+
+  // Preserve meaningful precision for small values (e.g. 0.04) without floating-point artifacts
+  let decimals = preferredDecimals;
+  if (Math.abs(value) < 0.1 && preferredDecimals < 2) {
+    decimals = 2;
+  }
+  if (Math.abs(value) < 0.01 && preferredDecimals < 3) {
+    decimals = 3;
+  }
+
+  const factor = Math.pow(10, decimals);
+  const rounded = Math.round(value * factor) / factor;
+  return {
+    valueText: rounded.toString(),
+    unitText: unit,
+    isAvailable: true,
+  };
+}
+
 interface PackagedFoodResultCardProps {
   product: PackagedProduct;
   onOpenOcr: () => void;
@@ -45,12 +90,46 @@ export function PackagedFoodResultCard({
     null;
 
   const displayImage = product.imageUrl || product.productImage;
-  const proteinDisplay = nutrition.protein ?? nutrition.proteinGrams ?? 0;
-  const carbsDisplay = nutrition.carbohydrates ?? nutrition.carbsGrams ?? 0;
-  const fatDisplay = nutrition.fat ?? nutrition.fatGrams ?? 0;
-  const sugarDisplay = nutrition.sugar ?? nutrition.sugarGrams;
-  const sodiumDisplay = nutrition.sodium ?? nutrition.sodiumMilligrams;
-  const fiberDisplay = nutrition.fiber ?? nutrition.fiberGrams;
+
+  // Formatted nutrition displays (preserving null -> '—' and explicit 0 -> '0')
+  const energyFormatted = formatNutrientValue(
+    nutrition.caloriesKcal ?? nutrition.calories,
+    'kcal',
+    0
+  );
+  const proteinFormatted = formatNutrientValue(
+    nutrition.protein ?? nutrition.proteinGrams,
+    'g',
+    1
+  );
+  const carbsFormatted = formatNutrientValue(
+    nutrition.carbohydrates ?? nutrition.carbsGrams,
+    'g',
+    1
+  );
+  const fatFormatted = formatNutrientValue(
+    nutrition.fat ?? nutrition.fatGrams,
+    'g',
+    1
+  );
+  const sugarFormatted = formatNutrientValue(
+    nutrition.sugar ?? nutrition.sugarGrams,
+    'g',
+    1
+  );
+  const sodiumFormatted = formatNutrientValue(
+    nutrition.sodium ?? nutrition.sodiumMilligrams,
+    'mg',
+    0
+  );
+  const fiberFormatted = formatNutrientValue(
+    nutrition.fiber ?? nutrition.fiberGrams,
+    'g',
+    1
+  );
+
+  const basisLabel =
+    nutrition.nutritionBasis === 'serving' ? 'Per serving' : 'Per 100g / ml';
 
   return (
     <div className="bg-white dark:bg-[#1D1A17] rounded-3xl border border-stone-200 dark:border-[#38312A] text-stone-900 dark:text-stone-100 shadow-md overflow-hidden transition-all">
@@ -152,50 +231,66 @@ export function PackagedFoodResultCard({
             <h3 className="text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
               Nutrition Information
             </h3>
-            <span className="text-3xs text-stone-400 dark:text-stone-500">
-              {product.servingSize ? `Per ${product.servingSize}` : 'Per 100g / ml'}
+            <span className="text-3xs text-stone-400 dark:text-stone-500 font-medium">
+              {basisLabel}
             </span>
           </div>
 
+          {!nutrition.isNutritionAvailable && (
+            <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-amber-900 dark:text-amber-200 flex items-center gap-2.5">
+              <span className="text-base shrink-0">ℹ️</span>
+              <div className="text-xs">
+                <span className="font-bold">Nutrition data unavailable</span>
+                <p className="text-2xs text-amber-800 dark:text-amber-300 mt-0.5">
+                  The product database does not have nutritional values recorded on packaging for this barcode.
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            {/* Calories */}
-            <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/40 text-center">
+            {/* Calories / Energy */}
+            <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/40 text-center flex flex-col justify-center">
               <span className="text-3xs font-semibold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider block">
                 Energy
               </span>
               <span className="text-lg font-black text-emerald-950 dark:text-emerald-100">
-                {Math.round(nutrition.calories || 0)}
+                {energyFormatted.valueText}
               </span>
-              <span className="text-3xs text-emerald-700 dark:text-emerald-400 block">kcal</span>
+              {energyFormatted.isAvailable && (
+                <span className="text-3xs text-emerald-700 dark:text-emerald-400 block">
+                  {energyFormatted.unitText}
+                </span>
+              )}
             </div>
 
             {/* Protein */}
-            <div className="p-3 rounded-2xl bg-stone-50 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-center">
+            <div className="p-3 rounded-2xl bg-stone-50 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-center flex flex-col justify-center">
               <span className="text-3xs font-semibold text-stone-600 dark:text-stone-400 uppercase tracking-wider block">
                 Protein
               </span>
               <span className="text-lg font-black text-[#E86A33] dark:text-[#F4A340]">
-                {proteinDisplay}g
+                {proteinFormatted.valueText}{proteinFormatted.unitText ? ` ${proteinFormatted.unitText}` : ''}
               </span>
             </div>
 
             {/* Carbohydrates */}
-            <div className="p-3 rounded-2xl bg-stone-50 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-center">
+            <div className="p-3 rounded-2xl bg-stone-50 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-center flex flex-col justify-center">
               <span className="text-3xs font-semibold text-stone-600 dark:text-stone-400 uppercase tracking-wider block">
                 Carbs
               </span>
               <span className="text-lg font-black text-stone-900 dark:text-stone-100">
-                {carbsDisplay}g
+                {carbsFormatted.valueText}{carbsFormatted.unitText ? ` ${carbsFormatted.unitText}` : ''}
               </span>
             </div>
 
             {/* Fat */}
-            <div className="p-3 rounded-2xl bg-stone-50 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-center">
+            <div className="p-3 rounded-2xl bg-stone-50 dark:bg-[#1D1A17] border border-stone-200 dark:border-[#38312A] text-center flex flex-col justify-center">
               <span className="text-3xs font-semibold text-stone-600 dark:text-stone-400 uppercase tracking-wider block">
                 Fat
               </span>
               <span className="text-lg font-black text-stone-900 dark:text-stone-100">
-                {fatDisplay}g
+                {fatFormatted.valueText}{fatFormatted.unitText ? ` ${fatFormatted.unitText}` : ''}
               </span>
             </div>
           </div>
@@ -205,19 +300,19 @@ export function PackagedFoodResultCard({
             <div className="p-2 rounded-xl bg-stone-50/70 dark:bg-[#1D1A17]/70 border border-stone-200/70 dark:border-[#38312A]/70">
               <span className="text-3xs text-stone-500 dark:text-stone-400 block">Sugar</span>
               <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
-                {sugarDisplay !== undefined && sugarDisplay !== null ? `${sugarDisplay}g` : '—'}
+                {sugarFormatted.valueText}{sugarFormatted.unitText ? ` ${sugarFormatted.unitText}` : ''}
               </span>
             </div>
             <div className="p-2 rounded-xl bg-stone-50/70 dark:bg-[#1D1A17]/70 border border-stone-200/70 dark:border-[#38312A]/70">
               <span className="text-3xs text-stone-500 dark:text-stone-400 block">Sodium</span>
               <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
-                {sodiumDisplay !== undefined && sodiumDisplay !== null ? `${sodiumDisplay}mg` : '—'}
+                {sodiumFormatted.valueText}{sodiumFormatted.unitText ? ` ${sodiumFormatted.unitText}` : ''}
               </span>
             </div>
             <div className="p-2 rounded-xl bg-stone-50/70 dark:bg-[#1D1A17]/70 border border-stone-200/70 dark:border-[#38312A]/70">
               <span className="text-3xs text-stone-500 dark:text-stone-400 block">Dietary Fiber</span>
               <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
-                {fiberDisplay !== undefined && fiberDisplay !== null ? `${fiberDisplay}g` : '—'}
+                {fiberFormatted.valueText}{fiberFormatted.unitText ? ` ${fiberFormatted.unitText}` : ''}
               </span>
             </div>
           </div>

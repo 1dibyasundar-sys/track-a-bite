@@ -44,6 +44,8 @@ export interface PackageOcrResult {
 
 export interface PackagedProductNutrition {
   calories: number | null;
+  caloriesKcal?: number | null;
+  energyUnit?: 'kcal' | 'kJ' | null;
   proteinGrams: number | null;
   protein?: number | null;
   carbsGrams: number | null;
@@ -59,6 +61,8 @@ export interface PackagedProductNutrition {
   fiber?: number | null;
   servingSize?: string | null;
   servingQuantityGrams?: number | null;
+  nutritionBasis: '100g' | 'serving';
+  isNutritionAvailable: boolean;
 }
 
 export interface PackagedProduct {

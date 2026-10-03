@@ -21,6 +21,35 @@ export function normalizeBarcode(rawBarcode: string): string {
 }
 
 /**
+ * Normalizes nutrition field value from Open Food Facts API:
+ * - Returns finite number if valid numeric or non-empty numeric string.
+ * - Preserves 0 as a valid number.
+ * - Returns null for null, undefined, empty string, or non-finite values.
+ * Never converts missing values to zero.
+ */
+export function normalizeNutritionValue(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  return null;
+}
+
+/**
+ * Cleans float precision inaccuracies (e.g. 6.300000000000001 -> 6.3) while preserving 0 and null.
+ */
+export function cleanRound(value: number | null, decimals: number = 1): number | null {
+  if (value === null || !Number.isFinite(value)) return null;
+  const factor = Math.pow(10, decimals);
+  return Math.round(value * factor) / factor;
+}
+
+/**
  * Queries Open Food Facts for a product barcode.
  */
 export async function fetchProductFromOpenFoodFacts(rawBarcode: string): Promise<BarcodeLookupResult> {
@@ -97,92 +126,169 @@ export async function fetchProductFromOpenFoodFacts(rawBarcode: string): Promise
     const servingSize = p.serving_size || null;
     const servingQuantityGrams = typeof p.serving_quantity === 'number' ? p.serving_quantity : null;
 
-    // Parse Nutriments
-    const n = p.nutriments || {};
+    // Parse Nutriments according to Open Food Facts normalized schema
+    const n = (p.nutriments && typeof p.nutriments === 'object') ? p.nutriments : {};
+    const hasNoNutritionFlag =
+      p.no_nutrition_data === 'on' ||
+      p.no_nutrition_data === '1' ||
+      p.no_nutrition_data === true ||
+      p.no_nutrition_data === 'true';
 
-    // Energy / Calories (kcal preference, fallback from kJ)
+    // Open Food Facts field priority: Prefer normalized per-100g/per-100ml values whenever available.
+    // Do not mix serving values and 100g values.
+    const has100gData = !hasNoNutritionFlag && (
+      p.nutrition_data_per === '100g' ||
+      normalizeNutritionValue(n['energy-kcal_100g']) !== null ||
+      normalizeNutritionValue(n['energy-kj_100g']) !== null ||
+      normalizeNutritionValue(n['energy_100g']) !== null ||
+      normalizeNutritionValue(n['proteins_100g']) !== null ||
+      normalizeNutritionValue(n['carbohydrates_100g']) !== null ||
+      normalizeNutritionValue(n['fat_100g']) !== null ||
+      normalizeNutritionValue(n['fiber_100g']) !== null ||
+      normalizeNutritionValue(n['sugars_100g']) !== null ||
+      normalizeNutritionValue(n['sodium_100g']) !== null
+    );
+
+    const hasServingData = !hasNoNutritionFlag && !has100gData && (
+      p.nutrition_data_per === 'serving' ||
+      normalizeNutritionValue(n['energy-kcal_serving']) !== null ||
+      normalizeNutritionValue(n['energy-kj_serving']) !== null ||
+      normalizeNutritionValue(n['energy_serving']) !== null ||
+      normalizeNutritionValue(n['proteins_serving']) !== null ||
+      normalizeNutritionValue(n['carbohydrates_serving']) !== null ||
+      normalizeNutritionValue(n['fat_serving']) !== null ||
+      normalizeNutritionValue(n['fiber_serving']) !== null ||
+      normalizeNutritionValue(n['sugars_serving']) !== null ||
+      normalizeNutritionValue(n['sodium_serving']) !== null
+    );
+
+    const nutritionBasis: '100g' | 'serving' = hasServingData ? 'serving' : '100g';
+
     let calories: number | null = null;
-    if (typeof n['energy-kcal_serving'] === 'number') {
-      calories = Math.round(n['energy-kcal_serving']);
-    } else if (typeof n['energy-kcal_100g'] === 'number') {
-      calories = Math.round(n['energy-kcal_100g']);
-    } else if (typeof n['energy-kcal'] === 'number') {
-      calories = Math.round(n['energy-kcal']);
-    } else if (typeof n['energy_100g'] === 'number') {
-      // kJ to kcal conversion
-      calories = Math.round(n['energy_100g'] / 4.184);
-    }
-
-    // Protein
-    const proteinGrams =
-      typeof n.proteins_serving === 'number'
-        ? Math.round(n.proteins_serving * 10) / 10
-        : typeof n.proteins_100g === 'number'
-        ? Math.round(n.proteins_100g * 10) / 10
-        : null;
-
-    // Carbs
-    const carbsGrams =
-      typeof n.carbohydrates_serving === 'number'
-        ? Math.round(n.carbohydrates_serving * 10) / 10
-        : typeof n.carbohydrates_100g === 'number'
-        ? Math.round(n.carbohydrates_100g * 10) / 10
-        : null;
-
-    // Fat
-    const fatGrams =
-      typeof n.fat_serving === 'number'
-        ? Math.round(n.fat_serving * 10) / 10
-        : typeof n.fat_100g === 'number'
-        ? Math.round(n.fat_100g * 10) / 10
-        : null;
-
-    // Saturated Fat
-    const saturatedFatGrams =
-      typeof n['saturated-fat_serving'] === 'number'
-        ? Math.round(n['saturated-fat_serving'] * 10) / 10
-        : typeof n['saturated-fat_100g'] === 'number'
-        ? Math.round(n['saturated-fat_100g'] * 10) / 10
-        : null;
-
-    // Sugar
-    const sugarGrams =
-      typeof n.sugars_serving === 'number'
-        ? Math.round(n.sugars_serving * 10) / 10
-        : typeof n.sugars_100g === 'number'
-        ? Math.round(n.sugars_100g * 10) / 10
-        : null;
-
-    // Sodium (in mg)
+    let proteinGrams: number | null = null;
+    let carbsGrams: number | null = null;
+    let fatGrams: number | null = null;
+    let saturatedFatGrams: number | null = null;
+    let sugarGrams: number | null = null;
+    let fiberGrams: number | null = null;
     let sodiumMilligrams: number | null = null;
-    if (typeof n.sodium_serving === 'number') {
-      sodiumMilligrams = Math.round(n.sodium_serving * 1000);
-    } else if (typeof n.sodium_100g === 'number') {
-      sodiumMilligrams = Math.round(n.sodium_100g * 1000);
-    } else if (typeof n.salt_100g === 'number') {
-      // 1g salt ~ 400mg sodium
-      sodiumMilligrams = Math.round(n.salt_100g * 400);
+
+    if (!hasNoNutritionFlag) {
+      if (nutritionBasis === '100g') {
+        // --- 100g / 100ml BASIS ---
+
+        // Energy: Prefer energy-kcal_100g. Do not blindly use energy (which is in kJ in Open Food Facts).
+        const kcal100 = normalizeNutritionValue(n['energy-kcal_100g']);
+        if (kcal100 !== null) {
+          calories = Math.round(kcal100);
+        } else {
+          const kcalVal = normalizeNutritionValue(n['energy-kcal_value']);
+          const kcalUnit = typeof n['energy-kcal_unit'] === 'string' ? n['energy-kcal_unit'].toLowerCase() : '';
+          if (kcalVal !== null && (kcalUnit === 'kcal' || kcalUnit === '') && p.nutrition_data_per === '100g') {
+            calories = Math.round(kcalVal);
+          } else {
+            // Fallback: If kcal is unavailable, check kJ and convert correctly (kJ / 4.184)
+            const kjVal = normalizeNutritionValue(n['energy-kj_100g']) ?? normalizeNutritionValue(n['energy_100g']);
+            if (kjVal !== null) {
+              calories = Math.round(kjVal / 4.184);
+            }
+          }
+        }
+
+        // Protein: Prefer proteins_100g
+        proteinGrams = cleanRound(normalizeNutritionValue(n['proteins_100g']), 1);
+
+        // Carbohydrates: Prefer carbohydrates_100g
+        carbsGrams = cleanRound(normalizeNutritionValue(n['carbohydrates_100g']), 1);
+
+        // Fat: Prefer fat_100g
+        fatGrams = cleanRound(normalizeNutritionValue(n['fat_100g']), 1);
+
+        // Saturated Fat: Prefer saturated-fat_100g
+        saturatedFatGrams = cleanRound(normalizeNutritionValue(n['saturated-fat_100g']), 1);
+
+        // Sugar: Prefer sugars_100g
+        sugarGrams = cleanRound(normalizeNutritionValue(n['sugars_100g']), 1);
+
+        // Fiber: Prefer fiber_100g (preserves legitimate 0, e.g. Nutella fiber = 0)
+        fiberGrams = cleanRound(normalizeNutritionValue(n['fiber_100g']), 1);
+
+        // Sodium: Prefer sodium_100g (default unit in Open Food Facts is grams)
+        const sodiumVal = normalizeNutritionValue(n['sodium_100g']);
+        if (sodiumVal !== null) {
+          const unit = typeof n['sodium_unit'] === 'string' ? n['sodium_unit'].toLowerCase() : 'g';
+          sodiumMilligrams = unit === 'mg' ? cleanRound(sodiumVal, 0) : cleanRound(sodiumVal * 1000, 0);
+        } else {
+          // Fallback: salt_100g (1g salt ~ 400mg sodium)
+          const saltVal = normalizeNutritionValue(n['salt_100g']);
+          if (saltVal !== null) {
+            sodiumMilligrams = cleanRound(saltVal * 400, 0);
+          }
+        }
+      } else if (nutritionBasis === 'serving') {
+        // --- SERVING BASIS ---
+
+        const kcalServing = normalizeNutritionValue(n['energy-kcal_serving']);
+        if (kcalServing !== null) {
+          calories = Math.round(kcalServing);
+        } else {
+          const kjServing = normalizeNutritionValue(n['energy-kj_serving']) ?? normalizeNutritionValue(n['energy_serving']);
+          if (kjServing !== null) {
+            calories = Math.round(kjServing / 4.184);
+          }
+        }
+
+        proteinGrams = cleanRound(normalizeNutritionValue(n['proteins_serving']), 1);
+        carbsGrams = cleanRound(normalizeNutritionValue(n['carbohydrates_serving']), 1);
+        fatGrams = cleanRound(normalizeNutritionValue(n['fat_serving']), 1);
+        saturatedFatGrams = cleanRound(normalizeNutritionValue(n['saturated-fat_serving']), 1);
+        sugarGrams = cleanRound(normalizeNutritionValue(n['sugars_serving']), 1);
+        fiberGrams = cleanRound(normalizeNutritionValue(n['fiber_serving']), 1);
+
+        const sodiumVal = normalizeNutritionValue(n['sodium_serving']);
+        if (sodiumVal !== null) {
+          const unit = typeof n['sodium_unit'] === 'string' ? n['sodium_unit'].toLowerCase() : 'g';
+          sodiumMilligrams = unit === 'mg' ? cleanRound(sodiumVal, 0) : cleanRound(sodiumVal * 1000, 0);
+        } else {
+          const saltVal = normalizeNutritionValue(n['salt_serving']);
+          if (saltVal !== null) {
+            sodiumMilligrams = cleanRound(saltVal * 400, 0);
+          }
+        }
+      }
     }
 
-    // Fiber
-    const fiberGrams =
-      typeof n.fiber_serving === 'number'
-        ? Math.round(n.fiber_serving * 10) / 10
-        : typeof n.fiber_100g === 'number'
-        ? Math.round(n.fiber_100g * 10) / 10
-        : null;
+    const isNutritionAvailable =
+      !hasNoNutritionFlag &&
+      (calories !== null ||
+        proteinGrams !== null ||
+        carbsGrams !== null ||
+        fatGrams !== null ||
+        fiberGrams !== null ||
+        sugarGrams !== null ||
+        sodiumMilligrams !== null);
 
     const nutrition: PackagedProductNutrition = {
       calories,
+      caloriesKcal: calories,
+      energyUnit: 'kcal',
       proteinGrams,
+      protein: proteinGrams,
       carbsGrams,
+      carbohydrates: carbsGrams,
       fatGrams,
+      fat: fatGrams,
       saturatedFatGrams,
       sugarGrams,
+      sugar: sugarGrams,
       sodiumMilligrams,
+      sodium: sodiumMilligrams,
       fiberGrams,
+      fiber: fiberGrams,
       servingSize,
       servingQuantityGrams,
+      nutritionBasis,
+      isNutritionAvailable,
     };
 
     // Ingredients

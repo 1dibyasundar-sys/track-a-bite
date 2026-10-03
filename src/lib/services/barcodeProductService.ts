@@ -162,7 +162,8 @@ export class BarcodeProductService {
       portionUnit: product.servingSize || 'package',
       estimatedGrams: product.servingSizeGrams || n.servingQuantityGrams || 100,
       nutrition,
-      nutritionAvailable: true,
+      nutritionAvailable: product.nutrition.isNutritionAvailable,
+      isEstimatedNutrition: false,
       fallbackDescription: product.brand ? `Brand: ${product.brand}` : undefined,
     };
 
@@ -192,7 +193,9 @@ export class BarcodeProductService {
             ? 'balanced'
             : 'balanced',
         label: `${product.brand || 'Packaged Product'} — ${product.productName}`,
-        summary: `Packaged item scanned via barcode (${product.barcode}).`,
+        summary: product.nutrition.isNutritionAvailable
+          ? `Packaged item scanned via barcode (${product.barcode}).`
+          : `Packaged item scanned via barcode (${product.barcode}). Official nutrition data unavailable on packaging database.`,
         detail: product.ingredientsText
           ? `Ingredients: ${product.ingredientsText.slice(0, 150)}${product.ingredientsText.length > 150 ? '...' : ''}`
           : 'Official product packaging details.',
@@ -201,12 +204,14 @@ export class BarcodeProductService {
             ? 'High'
             : 'Moderate',
       },
-      positiveHighlights: nutrientRichness.highlights,
+      positiveHighlights: product.nutrition.isNutritionAvailable ? nutrientRichness.highlights : [],
       balancingRecommendations: [],
       hostelFriendlyUpgrades: [],
       hostelModeActive: true,
       practicalAdjustments: [],
-      disclaimer: 'Nutrition facts retrieved from product packaging database (Open Food Facts).',
+      disclaimer: product.nutrition.isNutritionAvailable
+        ? 'Nutrition facts retrieved from product packaging database (Open Food Facts).'
+        : 'Nutrition data was unavailable from product packaging database (Open Food Facts).',
       source: 'barcode',
       barcode: product.barcode,
       brand: product.brand || undefined,
