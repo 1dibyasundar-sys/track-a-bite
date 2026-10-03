@@ -221,7 +221,7 @@ export function formatPackageDate(isoDateStr: string | null | undefined): string
     ];
     const mIdx = parseInt(month, 10) - 1;
     if (mIdx >= 0 && mIdx < 12) {
-      return `${parseInt(day, 10)} ${months[mIdx]} ${year}`;
+      return `${day.padStart(2, '0')} ${months[mIdx]} ${year}`;
     }
     return isoDateStr;
   } catch {
@@ -268,11 +268,16 @@ export function evaluatePackageOcr(
     bestBeforePeriodText: ocr.bestBeforePeriodText || null,
     isEstimatedExpiry: isEstimated,
     estimatedBestBeforeDate: estimatedBestBefore,
-    batchNumber: ocr.batchNumber || ocr.rawBatchText || null,
+    batchNumber: ocr.batchNumber || ocr.batchLot || ocr.rawBatchText || null,
+    batchLot: ocr.batchLot || ocr.batchNumber || ocr.rawBatchText || null,
     rawBatchText: ocr.rawBatchText || null,
     confidence,
     unverifiedReason: !exp ? 'Manufacturing/expiry date could not be verified from the package.' : undefined,
     rawOcrText: ocr.rawOcrText || undefined,
+    source: 'package_ocr',
+    isVerified: Boolean(exp || mfd || ocr.batchNumber || ocr.batchLot),
+    isAmbiguous: Boolean(ocr.isAmbiguous),
+    ambiguityReason: ocr.ambiguityReason || (ocr.isAmbiguous ? 'Date detected — please verify' : undefined),
   };
 
   return {

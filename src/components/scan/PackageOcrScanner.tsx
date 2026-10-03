@@ -192,6 +192,9 @@ export function PackageOcrScanner({
       rawOcrText: rawText.trim() || undefined,
       confidence: isUncertain ? 'medium' : 'high',
       needsUserConfirmation: false,
+      batchLot: batchNumber.trim() || null,
+      source: 'package_ocr',
+      isVerified: true,
     };
 
     onApplyDetails(details);

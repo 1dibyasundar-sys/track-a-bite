@@ -9,7 +9,7 @@
 export const GEMINI_CONFIG = {
   // Configured in one central server location as required
   get model(): string {
-    return process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
+    return process.env.GEMINI_MODEL || 'gemini-3.8-flash';
   },
   apiEndpoint: 'https://generativelanguage.googleapis.com/v1beta/models',
   requestTimeoutMs: 15000,

@@ -40,6 +40,11 @@ export interface PackageOcrResult {
   rawOcrText?: string;
   expiryStatus?: ExpiryStatus;
   expiryExplanation?: string;
+  batchLot?: string | null;               // alias for batchNumber
+  source?: 'package_ocr' | string;       // provenance: physical package OCR
+  isVerified?: boolean;
+  isAmbiguous?: boolean;
+  ambiguityReason?: string;
 }
 
 export interface PackagedProductNutrition {
@@ -63,6 +68,11 @@ export interface PackagedProductNutrition {
   servingQuantityGrams?: number | null;
   nutritionBasis: '100g' | 'serving';
   isNutritionAvailable: boolean;
+  nutritionSource?: string | null;
+  nutritionSourceUrl?: string | null;
+  nutritionRetrievedAt?: string | null;
+  nutritionVerificationStatus?: 'verified' | 'partially_verified' | 'unverified';
+  nutritionVerificationConfidence?: 'high' | 'medium' | 'low';
 }
 
 export interface ProductDiscoveryResult {
@@ -124,6 +134,11 @@ export interface PackagedProduct {
   sourceProvider?: string;
   sourceUrl?: string | null;
   retrievedAt?: string;
+  nutritionSource?: string | null;
+  nutritionSourceUrl?: string | null;
+  nutritionRetrievedAt?: string | null;
+  nutritionVerificationStatus?: 'verified' | 'partially_verified' | 'unverified';
+  nutritionVerificationConfidence?: 'high' | 'medium' | 'low';
   verificationStatus?: 'verified' | 'partially_verified' | 'unverified';
   verificationConfidence?: 'high' | 'medium' | 'low';
   matchedBarcode?: boolean;

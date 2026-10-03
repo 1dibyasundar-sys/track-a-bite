@@ -65,29 +65,54 @@ export function PackagedFoodResultCard({
   onReset,
   isSaving = false,
 }: PackagedFoodResultCardProps) {
-  const { nutrition, packageDetails } = product;
+  const nutrition = product.nutrition || {
+    calories: null,
+    caloriesKcal: null,
+    energyUnit: 'kcal',
+    proteinGrams: null,
+    protein: null,
+    carbsGrams: null,
+    carbohydrates: null,
+    fatGrams: null,
+    fat: null,
+    saturatedFatGrams: null,
+    sugarGrams: null,
+    sugar: null,
+    sodiumMilligrams: null,
+    sodium: null,
+    fiberGrams: null,
+    fiber: null,
+    servingSize: null,
+    nutritionBasis: '100g',
+    isNutritionAvailable: false,
+  };
+  const packageDetails = product.packageDetails;
 
   // Determine current effective expiry status
   const effectiveStatus: ExpiryStatus =
     packageDetails?.expiryStatus || product.expiryStatus || 'UNKNOWN';
 
-  const mfgDisplay =
-    packageDetails?.manufacturingDate ||
-    product.manufacturingDate ||
-    null;
+  // Physical Package OCR verification state (never mix barcode product data with package OCR)
+  const isPackageOcrVerified = Boolean(
+    packageDetails &&
+      (packageDetails.isVerified ??
+        Boolean(
+          packageDetails.manufacturingDate ||
+            packageDetails.expiryDate ||
+            packageDetails.batchNumber ||
+            packageDetails.batchLot
+        ))
+  );
 
-  const expDisplay =
-    packageDetails?.expiryDate ||
-    product.expiryDate ||
-    null;
+  const mfgDisplay = packageDetails?.manufacturingDate || null;
+  const expDisplay = packageDetails?.expiryDate || null;
+  const derivedExpDisplay = packageDetails?.derivedBestBeforeDate || null;
+  const batchDisplay = packageDetails?.batchLot || packageDetails?.batchNumber || null;
+  const isAmbiguousDate = Boolean(packageDetails?.isAmbiguous);
 
-  const derivedExpDisplay =
-    packageDetails?.derivedBestBeforeDate || null;
-
-  const batchDisplay =
-    packageDetails?.batchNumber ||
-    product.batchNumber ||
-    null;
+  const nutritionSourceLabel =
+    nutrition.nutritionSource || product.nutritionSource || 'Official product label';
+  const nutritionSourceUrl = nutrition.nutritionSourceUrl || product.nutritionSourceUrl || null;
 
   const displayImage = product.imageUrl || product.productImage;
 
@@ -142,7 +167,7 @@ export function PackagedFoodResultCard({
           </span>
         </div>
         <span className="text-2xs font-mono text-stone-400 bg-stone-800 dark:bg-[#25211D] px-2.5 py-1 rounded-md">
-          GTIN / EAN: {product.barcode}
+          Barcode: {product.barcode}
         </span>
       </div>
 
@@ -225,19 +250,17 @@ export function PackagedFoodResultCard({
 
             {/* Source Provenance */}
             <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              <span className="text-3xs text-stone-500 dark:text-stone-400 font-medium">Data source:</span>
+              <span className="text-3xs text-stone-500 dark:text-stone-400 font-medium">Source:</span>
               <span className="text-3xs font-semibold text-stone-700 dark:text-stone-300 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-md border border-stone-200 dark:border-stone-700 inline-flex items-center gap-1">
-                {product.sourceProvider || (product.source === 'openfoodfacts' ? 'Open Food Facts' : 'Product Database')}
+                {product.sourceProvider || (product.source === 'openfoodfacts' ? 'Open Food Facts' : 'BigBasket')}
+              </span>
+              <span className="text-3xs text-stone-500 dark:text-stone-400 font-medium ml-1">Verification:</span>
+              <span className="text-3xs font-semibold px-2 py-0.5 rounded-md border bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60 inline-flex items-center gap-1">
+                ✓ Verified Match
               </span>
               {product.verificationConfidence && (
-                <span
-                  className={`text-3xs font-semibold px-2 py-0.5 rounded-md border ${
-                    product.verificationConfidence === 'high'
-                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60'
-                      : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/60'
-                  }`}
-                >
-                  {product.verificationConfidence === 'high' ? '✓ Verified Match' : 'Partially Verified'}
+                <span className="text-3xs font-medium text-stone-500 dark:text-stone-400">
+                  ({product.verificationConfidence === 'high' ? 'High confidence' : 'Verified'})
                 </span>
               )}
               {product.sourceUrl && (
@@ -245,10 +268,10 @@ export function PackagedFoodResultCard({
                   href={product.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-3xs font-semibold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-0.5"
+                  className="text-3xs font-semibold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-0.5 ml-auto sm:ml-0"
                   title="View original product page"
                 >
-                  <span>↗ View Source</span>
+                  <span>View Source ↗</span>
                 </a>
               )}
             </div>
@@ -266,7 +289,25 @@ export function PackagedFoodResultCard({
             </span>
           </div>
 
-          {!nutrition.isNutritionAvailable && (
+          {nutrition.isNutritionAvailable ? (
+            <div className="flex flex-wrap items-center gap-1.5 text-3xs text-stone-500 dark:text-stone-400 pb-1">
+              <span className="font-medium">Nutrition source:</span>
+              <span className="font-semibold text-stone-700 dark:text-stone-300 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-md border border-stone-200 dark:border-stone-700 inline-flex items-center gap-1">
+                {nutritionSourceLabel}
+              </span>
+              {nutritionSourceUrl && (
+                <a
+                  href={nutritionSourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sky-600 dark:text-sky-400 hover:underline inline-flex items-center gap-0.5 ml-1 font-semibold"
+                  title="View nutrition source"
+                >
+                  <span>View Label ↗</span>
+                </a>
+              )}
+            </div>
+          ) : (
             <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-amber-900 dark:text-amber-200 flex items-center gap-2.5">
               <span className="text-base shrink-0">ℹ️</span>
               <div className="text-xs">
@@ -377,7 +418,7 @@ export function PackagedFoodResultCard({
               onClick={onOpenOcr}
               className="text-2xs font-bold text-[#E86A33] dark:text-[#F4A340] hover:text-[#d65f2c] underline cursor-pointer"
             >
-              {packageDetails ? 'Re-scan / Edit Details' : 'Scan Package Details'}
+              {isPackageOcrVerified ? 'Re-scan / Edit Details' : 'Scan Package Details'}
             </button>
           </div>
 
@@ -387,11 +428,23 @@ export function PackagedFoodResultCard({
               <span className="text-3xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
                 MFG Date
               </span>
-              <span className="font-bold text-stone-900 dark:text-stone-100 font-mono mt-0.5 block truncate">
-                {mfgDisplay
-                  ? expiryCalculationService.formatHumanDate(mfgDisplay)
-                  : 'Unverified'}
-              </span>
+              {isPackageOcrVerified ? (
+                <span className="font-bold text-stone-900 dark:text-stone-100 font-mono mt-0.5 block truncate">
+                  {isAmbiguousDate && !mfgDisplay
+                    ? 'Date detected — please verify'
+                    : mfgDisplay
+                    ? expiryCalculationService.formatHumanDate(mfgDisplay)
+                    : '—'}
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onOpenOcr}
+                  className="font-medium text-amber-700 dark:text-amber-400 mt-0.5 block hover:underline text-left cursor-pointer"
+                >
+                  Scan package
+                </button>
+              )}
             </div>
 
             {/* Expiry Date */}
@@ -399,11 +452,23 @@ export function PackagedFoodResultCard({
               <span className="text-3xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
                 EXP Date
               </span>
-              <span className="font-bold text-stone-900 dark:text-stone-100 font-mono mt-0.5 block truncate">
-                {expDisplay
-                  ? expiryCalculationService.formatHumanDate(expDisplay)
-                  : 'Unverified'}
-              </span>
+              {isPackageOcrVerified ? (
+                <span className="font-bold text-stone-900 dark:text-stone-100 font-mono mt-0.5 block truncate">
+                  {isAmbiguousDate && !expDisplay
+                    ? 'Date detected — please verify'
+                    : expDisplay
+                    ? expiryCalculationService.formatHumanDate(expDisplay)
+                    : '—'}
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onOpenOcr}
+                  className="font-medium text-amber-700 dark:text-amber-400 mt-0.5 block hover:underline text-left cursor-pointer"
+                >
+                  Scan package
+                </button>
+              )}
             </div>
 
             {/* Batch / Lot */}
@@ -411,9 +476,19 @@ export function PackagedFoodResultCard({
               <span className="text-3xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
                 Batch / Lot
               </span>
-              <span className="font-bold text-stone-900 dark:text-stone-100 font-mono mt-0.5 block truncate">
-                {batchDisplay || 'Unverified'}
-              </span>
+              {isPackageOcrVerified ? (
+                <span className="font-bold text-stone-900 dark:text-stone-100 font-mono mt-0.5 block truncate">
+                  {batchDisplay || '—'}
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onOpenOcr}
+                  className="font-medium text-amber-700 dark:text-amber-400 mt-0.5 block hover:underline text-left cursor-pointer"
+                >
+                  Scan package
+                </button>
+              )}
             </div>
 
             {/* Status */}
@@ -422,24 +497,35 @@ export function PackagedFoodResultCard({
                 Status
               </span>
               <div className="mt-0.5">
-                {effectiveStatus === 'VALID' && (
-                  <span className="text-2xs font-bold text-emerald-700 dark:text-emerald-400">🟢 Valid</span>
-                )}
-                {effectiveStatus === 'EXPIRING_SOON' && (
-                  <span className="text-2xs font-bold text-amber-700 dark:text-amber-400">🟡 Expiring Soon</span>
-                )}
-                {effectiveStatus === 'EXPIRED' && (
-                  <span className="text-2xs font-bold text-rose-700 dark:text-rose-400">🔴 Expired</span>
-                )}
-                {effectiveStatus === 'UNKNOWN' && (
-                  <span className="text-2xs font-medium text-stone-500 dark:text-stone-400">⚪ Unverified</span>
+                {isPackageOcrVerified ? (
+                  <span className="text-2xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                    <span>✓</span> Package Verified
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={onOpenOcr}
+                    className="text-2xs font-medium text-stone-500 dark:text-stone-400 hover:underline cursor-pointer"
+                  >
+                    Scan package
+                  </button>
                 )}
               </div>
             </div>
           </div>
 
+          {/* Source Provenance for Package OCR */}
+          {isPackageOcrVerified && (
+            <div className="flex flex-wrap items-center gap-1.5 pt-1 text-3xs text-stone-600 dark:text-stone-400">
+              <span className="font-medium">Source:</span>
+              <span className="font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800/60 inline-flex items-center gap-1">
+                Verified from package print using OCR
+              </span>
+            </div>
+          )}
+
           {/* Derived Best Before notice */}
-          {derivedExpDisplay && (
+          {isPackageOcrVerified && derivedExpDisplay && (
             <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 text-2xs text-emerald-900 dark:text-emerald-200">
               <span className="font-bold">Estimated Best Before:</span>{' '}
               {expiryCalculationService.formatHumanDate(derivedExpDisplay)}{' '}
@@ -447,15 +533,8 @@ export function PackagedFoodResultCard({
             </div>
           )}
 
-          {/* Explicit unverified date disclaimer when neither date is known */}
-          {!mfgDisplay && !expDisplay && (
-            <p className="text-2xs text-stone-500 dark:text-stone-400 italic">
-              &quot;Manufacturing/expiry date could not be verified from the package.&quot;
-            </p>
-          )}
-
           {/* Call-to-action to scan package details if not done yet */}
-          {!packageDetails && (
+          {!isPackageOcrVerified && (
             <button
               type="button"
               onClick={onOpenOcr}

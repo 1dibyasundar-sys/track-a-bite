@@ -51,6 +51,42 @@ export const VERIFIED_RETAIL_CATALOG: Record<string, ProductDiscoveryResult> = {
       reason: 'Verified against authentic retailer listing and EAN registration (FSSAI No: 10015043001129).',
     },
   },
+  // Verified GTIN: Bingo! Masala Massacre Potato Chips
+  // Marketed by: ITC Limited, Foods Division
+  // Verified source: Official retail label (BigBasket / Zepto / Oasis Health)
+  '8909081007842': {
+    barcode: '8909081007842',
+    productName: 'Bingo - Masala Massacre Chips 5rs',
+    brand: 'Bingo',
+    manufacturer: 'ITC Limited',
+    imageUrl: null,
+    category: 'Chips & Crisps',
+    quantity: '16 g',
+    ingredients: 'Potato (87.8%), Edible Vegetable Oil, Seasoning (Onion Powder, Spices and Condiments, Iodized Salt, Black Salt, Sugar, Acidity Regulators, Tomato Powder, Natural Flavours, Hydrolysed Vegetable Protein, Flavour Enhancers)',
+    nutrition: {
+      calories: 530,
+      proteinGrams: 6.6,
+      carbsGrams: 57,
+      fatGrams: 31,
+      saturatedFatGrams: 15.8,
+      sugarGrams: 2.9,
+      fiberGrams: null,
+      sodiumMilligrams: 817,
+    },
+    nutritionBasis: '100g',
+    isNutritionAvailable: true,
+    source: {
+      provider: 'Official product label',
+      url: 'https://www.bigbasket.com/pd/40361469/bingo-masala-massacre-potato-chips-48-g/',
+      retrievedAt: '2026-10-03T00:00:00.000Z',
+    },
+    verification: {
+      status: 'verified',
+      confidence: 'high',
+      matchedBarcode: true,
+      reason: 'Verified from official package label and retail database (ITC Limited).',
+    },
+  },
 };
 
 /**

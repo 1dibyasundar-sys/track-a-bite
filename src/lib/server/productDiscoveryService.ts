@@ -27,6 +27,7 @@ import {
 import { fetchProductFromOpenFoodFacts, normalizeBarcode } from './openFoodFactsService';
 import { GEMINI_CONFIG, getGeminiApiKey } from './geminiConfig';
 import { getVerifiedProductFromCatalog } from './verifiedProductCatalog';
+import { nutritionDiscoveryService } from './nutritionDiscoveryService';
 
 export interface ProviderCandidate {
   barcode: string;
@@ -778,12 +779,13 @@ export class ProductDiscoveryService {
     const cached = discoveryCache.get(cacheKey);
     if (cached && cached.expiresAt > Date.now()) {
       logObservability('Cache', `hit=true barcode="${barcode}" product="${cached.result.productName}"`);
+      const cachedProduct = await this.ensureNutrition(barcode, discoveryResultToPackagedProduct(cached.result));
       return {
         status: 'found',
         barcode,
         source: cached.result.source.provider,
         provider: cached.result.source.provider,
-        product: discoveryResultToPackagedProduct(cached.result),
+        product: cachedProduct,
         discoveryResult: cached.result,
       };
     }
@@ -797,12 +799,13 @@ export class ProductDiscoveryService {
         expiresAt: Date.now() + CACHE_TTL_MS,
       });
 
+      const offProduct = await this.ensureNutrition(barcode, discoveryResultToPackagedProduct(offResult.product));
       return {
         status: 'found',
         barcode,
         source: 'openfoodfacts',
         provider: 'Open Food Facts',
-        product: discoveryResultToPackagedProduct(offResult.product),
+        product: offProduct,
         discoveryResult: offResult.product,
       };
     }
@@ -831,12 +834,13 @@ export class ProductDiscoveryService {
         expiresAt: Date.now() + CACHE_TTL_MS,
       });
 
+      const catalogProduct = await this.ensureNutrition(barcode, discoveryResultToPackagedProduct(catalogResult.product));
       return {
         status: 'found',
         barcode,
         source: catalogResult.product.source.provider,
         provider: catalogResult.product.source.provider,
-        product: discoveryResultToPackagedProduct(catalogResult.product),
+        product: catalogProduct,
         discoveryResult: catalogResult.product,
       };
     }
@@ -861,12 +865,13 @@ export class ProductDiscoveryService {
           expiresAt: Date.now() + CACHE_TTL_MS,
         });
 
+        const aiProduct = await this.ensureNutrition(barcode, discoveryResultToPackagedProduct(aiResult));
         return {
           status: 'found',
           barcode,
           source: 'ai_verified_search',
           provider: aiResult.source.provider,
-          product: discoveryResultToPackagedProduct(aiResult),
+          product: aiProduct,
           discoveryResult: aiResult,
         };
       }
@@ -889,6 +894,60 @@ export class ProductDiscoveryService {
       status: 'not_found',
       barcode,
       errorMessage: 'Barcode was verified, but no reliable product match was found.',
+    };
+  }
+
+  private async ensureNutrition(
+    barcode: string,
+    rawProduct: PackagedProduct
+  ): Promise<PackagedProduct> {
+    const hasCoreNutrition =
+      rawProduct.nutrition &&
+      rawProduct.nutrition.isNutritionAvailable &&
+      (rawProduct.nutrition.calories !== null ||
+        rawProduct.nutrition.proteinGrams !== null ||
+        rawProduct.nutrition.carbsGrams !== null ||
+        rawProduct.nutrition.fatGrams !== null);
+
+    if (hasCoreNutrition) {
+      const source =
+        rawProduct.nutrition.nutritionSource ||
+        (rawProduct.source === 'openfoodfacts' ? 'Open Food Facts' : 'Official product label');
+      const nutritionWithMeta: PackagedProductNutrition = {
+        ...rawProduct.nutrition,
+        nutritionSource: source,
+        nutritionSourceUrl: rawProduct.nutrition.nutritionSourceUrl || rawProduct.sourceUrl || null,
+        nutritionRetrievedAt: rawProduct.nutrition.nutritionRetrievedAt || rawProduct.retrievedAt || new Date().toISOString(),
+        nutritionVerificationStatus: rawProduct.nutrition.nutritionVerificationStatus || 'verified',
+        nutritionVerificationConfidence: rawProduct.nutrition.nutritionVerificationConfidence || 'high',
+      };
+      return {
+        ...rawProduct,
+        nutrition: nutritionWithMeta,
+        nutritionSource: source,
+        nutritionSourceUrl: nutritionWithMeta.nutritionSourceUrl,
+        nutritionRetrievedAt: nutritionWithMeta.nutritionRetrievedAt,
+        nutritionVerificationStatus: nutritionWithMeta.nutritionVerificationStatus,
+        nutritionVerificationConfidence: nutritionWithMeta.nutritionVerificationConfidence,
+      };
+    }
+
+    // Trigger secondary nutrition discovery
+    const discovered = await nutritionDiscoveryService.discoverNutrition(
+      barcode,
+      rawProduct.productName,
+      rawProduct.brand,
+      rawProduct.nutrition
+    );
+
+    return {
+      ...rawProduct,
+      nutrition: discovered,
+      nutritionSource: discovered.nutritionSource,
+      nutritionSourceUrl: discovered.nutritionSourceUrl,
+      nutritionRetrievedAt: discovered.nutritionRetrievedAt,
+      nutritionVerificationStatus: discovered.nutritionVerificationStatus,
+      nutritionVerificationConfidence: discovered.nutritionVerificationConfidence,
     };
   }
 

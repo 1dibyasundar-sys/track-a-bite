@@ -51,7 +51,7 @@ import {
 import { BarcodeScannerViewport, normalizeBarcodeFormat } from '../../components/scan/BarcodeScannerViewport';
 import { PackageOcrScanner } from '../../components/scan/PackageOcrScanner';
 import { PackagedFoodResultCard } from '../../components/scan/PackagedFoodResultCard';
-import { barcodeProductService } from '../../lib/services/barcodeProductService';
+import { barcodeProductService, normalizeBarcodeLookupResult } from '../../lib/services/barcodeProductService';
 import { PackagedProduct, PackageOcrResult } from '../../lib/types/barcode';
 
 export const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
@@ -138,11 +138,10 @@ function ScanContent() {
     const inferredFormat = normalizeBarcodeFormat(cleanBarcode, format);
 
     if (process.env.NODE_ENV !== 'production') {
-      console.log('[ScanPage] onBarcodeDetected arguments received:', {
+      console.log('[Barcode UI] DETECTED', {
         rawBarcode: barcode,
         cleanBarcode,
         format: inferredFormat,
-        lookupUrl: `/api/barcode-lookup?barcode=${encodeURIComponent(cleanBarcode)}`,
       });
     }
 
@@ -151,42 +150,81 @@ function ScanContent() {
     setIsLookingUpBarcode(true);
     setBarcodeLookupError(null);
 
+    const lookupUrl = `/api/barcode-lookup?barcode=${encodeURIComponent(cleanBarcode)}`;
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[Barcode UI] LOOKUP START', {
+        barcode: cleanBarcode,
+        url: lookupUrl,
+      });
+    }
+
     try {
-      const result = await barcodeProductService.lookupProduct(cleanBarcode);
+      const res = await fetch(lookupUrl, {
+        headers: { Accept: 'application/json' },
+      });
 
       if (process.env.NODE_ENV !== 'production') {
-        console.log('[ScanPage] lookup result:', {
-          barcode: cleanBarcode,
-          status: result.status,
-          hasProduct: Boolean(result.product),
-          productName: result.product?.productName,
-          errorMessage: result.errorMessage,
+        console.log('[Barcode UI] LOOKUP HTTP STATUS', {
+          status: res.status,
+          ok: res.ok,
+          statusText: res.statusText,
         });
       }
 
-      if (result.status === 'found' && result.product) {
-        setScannedProduct(result.product);
-      } else if (result.status === 'not_found') {
+      const data = await res.json().catch(() => ({}));
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[Barcode UI] LOOKUP JSON', data);
+        console.log('[Barcode UI] RESULT STATUS', { status: data?.status });
+      }
+
+      if (res.ok && data?.status === 'found') {
+        const normalized = normalizeBarcodeLookupResult(data);
+
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('[Barcode UI] PRODUCT', {
+            exists: Boolean(normalized),
+            productName: normalized?.productName,
+            barcode: normalized?.barcode,
+            verificationStatus: normalized?.verificationStatus,
+            verificationConfidence: normalized?.verificationConfidence,
+            sourceProvider: normalized?.sourceProvider,
+            source: normalized?.source,
+            nutritionAvailable: normalized?.nutrition?.isNutritionAvailable,
+          });
+          console.log('[Barcode UI] SET SCANNED PRODUCT', normalized?.productName);
+        }
+
+        if (normalized) {
+          setScannedProduct(normalized);
+          setBarcodeLookupError(null);
+          barcodeProductService.primeCache(cleanBarcode, normalized);
+        } else {
+          setScannedProduct(null);
+          setBarcodeLookupError('Could not process product details from the response.');
+        }
+      } else if (res.status === 404 || data?.status === 'not_found') {
         setScannedProduct(null);
         setBarcodeLookupError(
-          result.errorMessage || 'Barcode was verified, but no reliable product match was found.'
+          data?.errorMessage || 'Barcode was verified, but no reliable product match was found.'
         );
-      } else if (result.status === 'discovery_unavailable') {
+      } else if (res.status === 503 || data?.status === 'discovery_unavailable') {
         setScannedProduct(null);
         setBarcodeLookupError(
-          result.errorMessage || 'The barcode was detected, but product discovery services are temporarily unavailable.'
+          data?.errorMessage || 'The barcode was detected, but product discovery services are temporarily unavailable.'
         );
-      } else if (result.status === 'rate_limited') {
+      } else if (res.status === 429 || data?.status === 'rate_limited') {
         setScannedProduct(null);
         setBarcodeLookupError('Database lookup is temporarily rate limited. Please try again in a few moments.');
       } else {
         setScannedProduct(null);
-        setBarcodeLookupError(result.errorMessage || 'Failed to retrieve product details.');
+        setBarcodeLookupError(data?.errorMessage || `Lookup failed (HTTP ${res.status}).`);
       }
     } catch (err: unknown) {
       const error = err as Error;
       if (process.env.NODE_ENV !== 'production') {
-        console.error('[ScanPage] lookup error:', error);
+        console.error('[Barcode UI] lookup error:', error);
       }
       setScannedProduct(null);
       setBarcodeLookupError(error.message || 'An unexpected error occurred during lookup.');
@@ -1245,13 +1283,27 @@ function ScanContent() {
                   </div>
                 )
               ) : (
-                <PackagedFoodResultCard
-                  product={scannedProduct}
-                  onOpenOcr={() => setIsOcrModalOpen(true)}
-                  onAddToMeal={handleSavePackagedMeal}
-                  onReset={handleResetPackaged}
-                  isSaving={isSavingPackagedMeal}
-                />
+                (() => {
+                  if (process.env.NODE_ENV !== 'production') {
+                    console.log('[Barcode UI] RENDER RESULT', {
+                      productName: scannedProduct.productName,
+                      barcode: scannedProduct.barcode,
+                      sourceProvider: scannedProduct.sourceProvider,
+                      verificationConfidence: scannedProduct.verificationConfidence,
+                      hasNutrition: Boolean(scannedProduct.nutrition),
+                      isNutritionAvailable: scannedProduct.nutrition?.isNutritionAvailable,
+                    });
+                  }
+                  return (
+                    <PackagedFoodResultCard
+                      product={scannedProduct}
+                      onOpenOcr={() => setIsOcrModalOpen(true)}
+                      onAddToMeal={handleSavePackagedMeal}
+                      onReset={handleResetPackaged}
+                      isSaving={isSavingPackagedMeal}
+                    />
+                  );
+                })()
               )}
             </div>
           </div>
