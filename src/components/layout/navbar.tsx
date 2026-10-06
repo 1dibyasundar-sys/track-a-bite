@@ -32,6 +32,7 @@ export function Navbar() {
     { href: '/', label: 'Home' },
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/scan', label: 'Scan Food' },
+    { href: '/assistant', label: 'TAB Voice' },
     { href: '/foods', label: 'Food Database' },
     { href: '/history', label: 'History' },
     { href: '/reports', label: 'Reports' },

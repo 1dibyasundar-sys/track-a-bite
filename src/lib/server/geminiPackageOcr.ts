@@ -96,8 +96,6 @@ export async function extractPackageDetailsWithGemini(
     };
   }
 
-  const url = `${GEMINI_CONFIG.apiEndpoint}/${GEMINI_CONFIG.model}:generateContent?key=${apiKey}`;
-
   const requestBody = {
     system_instruction: {
       parts: [{ text: PACKAGE_OCR_SYSTEM_PROMPT }],
@@ -126,56 +124,68 @@ export async function extractPackageDetailsWithGemini(
     },
   };
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 12000);
+  const candidateModels = [
+    GEMINI_CONFIG.model || 'gemini-3.8-flash',
+    'gemini-3.7-flash',
+    'gemini-3.5-flash',
+  ];
+
+  let candidateText: string | null = null;
+
+  for (const model of candidateModels) {
+    const url = `${GEMINI_CONFIG.apiEndpoint}/${model}:generateContent?key=${apiKey}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey,
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const json = await response.json();
+        candidateText = json.candidates?.[0]?.content?.parts?.[0]?.text || null;
+        if (candidateText) {
+          break;
+        }
+      } else if (response.status === 503 || response.status === 404) {
+        console.warn(`[PackageOCR] Model ${model} returned HTTP ${response.status}, attempting fallback...`);
+        continue;
+      } else {
+        console.warn(`[PackageOCR] Gemini API returned HTTP ${response.status}`);
+        break;
+      }
+    } catch (err: unknown) {
+      clearTimeout(timeoutId);
+      console.warn(`[PackageOCR] Error with ${model}: ${(err as Error).message}`);
+      continue;
+    }
+  }
+
+  if (!candidateText) {
+    return {
+      manufacturingDate: null,
+      rawManufacturingDateText: null,
+      expiryDate: null,
+      rawExpiryDateText: null,
+      bestBeforePeriodText: null,
+      isEstimatedExpiry: false,
+      batchNumber: null,
+      rawBatchText: null,
+      confidence: 'unverified',
+      unverifiedReason: 'Manufacturing/expiry date could not be verified from the package.',
+    };
+  }
 
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': apiKey,
-      },
-      body: JSON.stringify(requestBody),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      console.warn(`[PackageOCR] Gemini API returned HTTP ${response.status}`);
-      return {
-        manufacturingDate: null,
-        rawManufacturingDateText: null,
-        expiryDate: null,
-        rawExpiryDateText: null,
-        bestBeforePeriodText: null,
-        isEstimatedExpiry: false,
-        batchNumber: null,
-        rawBatchText: null,
-        confidence: 'unverified',
-        unverifiedReason: 'Manufacturing/expiry date could not be verified from the package.',
-      };
-    }
-
-    const json = await response.json();
-    const candidateText = json.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!candidateText) {
-      return {
-        manufacturingDate: null,
-        rawManufacturingDateText: null,
-        expiryDate: null,
-        rawExpiryDateText: null,
-        bestBeforePeriodText: null,
-        isEstimatedExpiry: false,
-        batchNumber: null,
-        rawBatchText: null,
-        confidence: 'unverified',
-        unverifiedReason: 'Manufacturing/expiry date could not be verified from the package.',
-      };
-    }
-
     const parsed: RawPackageOcrResponse = JSON.parse(candidateText);
 
     // Run through evaluatePackageOcr to calculate best before & normalize dates
