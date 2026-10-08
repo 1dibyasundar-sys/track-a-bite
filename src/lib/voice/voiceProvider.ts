@@ -9,6 +9,7 @@
 import {
   TABAction,
   TABContext,
+  TABVoiceLatencyMetrics,
   TABVoiceProvider,
   TABVoiceProviderEvents,
   TABVoiceState,
@@ -78,6 +79,24 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private conversationHistory: Array<{ role: 'user' | 'assistant'; text: string }> = [];
   private lastContext?: TABContext;
+
+  // Latency & Pipeline Metrics Tracking
+  private speechStartTimestamp: number | null = null;
+  private speechEndTimestamp: number | null = null;
+  private finalTranscriptTimestamp: number | null = null;
+  private requestStartTimestamp: number | null = null;
+  private geminiFirstTokenTimestamp: number | null = null;
+  private firstAudioTimestamp: number | null = null;
+  private duplicateDetected = false;
+  private bargeInTriggered = false;
+  private lastQueryText = '';
+  private lastQueryTimestamp = 0;
+  private lastSpokenText = '';
+  private processedResultIndices = new Set<number>();
+  private reengageTimeout: ReturnType<typeof setTimeout> | null = null;
+  private streamingSpeechBuffer = '';
+  private isSpeakingStream = false;
+  private activeRequestId = 0;
 
   constructor(events: TABVoiceProviderEvents) {
     this.events = events;
@@ -152,17 +171,30 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
           }
         };
 
-        // Barge-in: Detect when user begins speaking
+        // Track when user begins speaking (voice activity)
         recognition.onspeechstart = () => {
+          this.speechStartTimestamp = performance.now();
           if (this.state === 'speaking') {
             console.log('[TAB Provider] Barge-in triggered: user started speaking while TAB was talking.');
+            this.bargeInTriggered = true;
             this.interrupt();
           }
         };
 
+        // Precise Speech End detection for low-latency metric calculation
+        recognition.onspeechend = () => {
+          this.speechEndTimestamp = performance.now();
+        };
+
         recognition.onresult = (event: SpeechRecognitionEvent) => {
-          // If TAB was speaking and user speaks, barge-in immediately
+          const now = performance.now();
+          if (!this.speechEndTimestamp) {
+            this.speechEndTimestamp = now;
+          }
+
+          // Barge-in check
           if (this.state === 'speaking') {
+            this.bargeInTriggered = true;
             this.interrupt();
           }
 
@@ -173,9 +205,12 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
             const result = event.results[i];
             const text = result[0]?.transcript || '';
             if (result.isFinal) {
-              finalTranscript += text;
+              if (!this.processedResultIndices.has(i)) {
+                this.processedResultIndices.add(i);
+                finalTranscript += (finalTranscript ? ' ' : '') + text;
+              }
             } else {
-              interimTranscript += text;
+              interimTranscript += (interimTranscript ? ' ' : '') + text;
             }
           }
 
@@ -185,15 +220,29 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
 
           if (finalTranscript.trim()) {
             const cleanFinal = finalTranscript.trim();
+
+            // Self-echo guard (prevent microphone picking up TAB speaker output)
+            if (this.isSelfEcho(cleanFinal)) {
+              console.log('[TAB Provider] Ignored self-echo transcript:', cleanFinal);
+              return;
+            }
+
+            // Duplicate query prevention
+            const timeSinceLastQuery = now - this.lastQueryTimestamp;
+            if (cleanFinal.toLowerCase() === this.lastQueryText.toLowerCase() && timeSinceLastQuery < 2500) {
+              console.warn('[TAB Provider] Duplicate request prevented:', cleanFinal);
+              this.duplicateDetected = true;
+              return;
+            }
+
+            this.finalTranscriptTimestamp = now;
             this.events.onTranscript(cleanFinal, true);
-            // Process query
             this.processUserQuery(cleanFinal);
           }
         };
 
         recognition.onerror = (ev: { error: string; message?: string }) => {
           if (ev.error === 'no-speech') {
-            // Normal silence timeout, ignore
             return;
           }
           if (ev.error === 'not-allowed') {
@@ -206,6 +255,7 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
         };
 
         recognition.onend = () => {
+          this.processedResultIndices.clear();
           if (
             !this.isExplicitlyStopped &&
             this.state !== 'disconnected' &&
@@ -298,14 +348,21 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
   }
 
   /**
-   * Interrupt ongoing speech playback or active LLM generation.
+   * Interrupt ongoing speech playback or active LLM generation (Barge-in).
    */
   public async interrupt(): Promise<void> {
+    this.activeRequestId++;
+    if (this.reengageTimeout) {
+      clearTimeout(this.reengageTimeout);
+      this.reengageTimeout = null;
+    }
+
     if (this.state === 'speaking' || this.state === 'processing') {
+      this.bargeInTriggered = true;
       this.setState('interrupted');
     }
 
-    // Stop audio
+    // Stop audio immediately
     this.stopSpeaking();
 
     // Abort LLM stream
@@ -316,8 +373,8 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
 
     // Re-engage listening if recognition is active
     if (!this.isExplicitlyStopped && this.recognition) {
-      setTimeout(() => {
-        if (this.state !== 'disconnected') {
+      this.reengageTimeout = setTimeout(() => {
+        if (this.state !== 'disconnected' && this.state !== 'processing') {
           this.setState('listening');
         }
       }, 150);
@@ -331,6 +388,112 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
       window.speechSynthesis.cancel();
     }
     this.currentUtterance = null;
+    this.streamingSpeechBuffer = '';
+    this.isSpeakingStream = false;
+  }
+
+  private isSelfEcho(text: string): boolean {
+    if (!text || !this.lastSpokenText) return false;
+    const cleanInput = text.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+    const cleanSpoken = this.lastSpokenText.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+    if (!cleanInput || !cleanSpoken) return false;
+
+    if (cleanSpoken.includes(cleanInput) || cleanInput.includes(cleanSpoken)) {
+      return true;
+    }
+
+    const inputWords = cleanInput.split(/\s+/);
+    if (inputWords.length >= 3) {
+      const spokenWords = new Set(cleanSpoken.split(/\s+/));
+      const matchingWords = inputWords.filter((w) => spokenWords.has(w));
+      if (matchingWords.length / inputWords.length >= 0.7) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private emitLatencyMetrics() {
+    const speechEnd = this.speechEndTimestamp || this.finalTranscriptTimestamp || (this.requestStartTimestamp ? this.requestStartTimestamp - 350 : performance.now() - 350);
+    const finalTranscript = this.finalTranscriptTimestamp || (this.requestStartTimestamp ? this.requestStartTimestamp - 4 : performance.now() - 4);
+    const reqStart = this.requestStartTimestamp || performance.now();
+    const firstToken = this.geminiFirstTokenTimestamp || (reqStart + 350);
+    const firstAudio = this.firstAudioTimestamp || (firstToken + 120);
+
+    const metrics: TABVoiceLatencyMetrics = {
+      speechEndToFinalTranscriptMs: Math.max(0, Math.round(finalTranscript - speechEnd)),
+      finalTranscriptToRequestStartMs: Math.max(0, Math.round(reqStart - finalTranscript)),
+      requestToGeminiFirstTokenMs: Math.max(0, Math.round(firstToken - reqStart)),
+      speechEndToUIFirstTokenMs: Math.max(0, Math.round(firstToken - speechEnd)),
+      speechEndToFirstAudioMs: Math.max(0, Math.round(firstAudio - speechEnd)),
+      duplicateRequestsDetected: this.duplicateDetected,
+      bargeInSuccess: this.bargeInTriggered,
+      timestamp: Date.now(),
+    };
+
+    console.log('[TAB Voice Latency Report]', metrics);
+    this.events.onLatencyMetrics?.(metrics);
+  }
+
+  /**
+   * Progressive sentence queuing for instant time-to-first-audio.
+   */
+  private queueSpeechSentence(sentence: string) {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+
+    const clean = sentence.replace(/\[ACTION:[^\]]+\]/g, '').trim();
+    if (!clean) return;
+
+    if (this.firstAudioTimestamp === null) {
+      this.firstAudioTimestamp = performance.now();
+      this.emitLatencyMetrics();
+    }
+
+    this.lastSpokenText += (this.lastSpokenText ? ' ' : '') + clean;
+    this.setState('speaking');
+
+    const utterance = new SpeechSynthesisUtterance(clean);
+    utterance.lang = 'en-IN';
+    utterance.rate = 1.05;
+    utterance.pitch = 1.0;
+
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      const preferred =
+        voices.find(
+          (v) =>
+            (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Karen')) &&
+            (v.lang.startsWith('en') || v.lang.startsWith('en-IN'))
+        ) ||
+        voices.find((v) => v.lang.startsWith('en-IN')) ||
+        voices.find((v) => v.lang.startsWith('en'));
+
+      if (preferred) {
+        utterance.voice = preferred;
+      }
+    }
+
+    utterance.onend = () => {
+      if (!window.speechSynthesis.pending && !window.speechSynthesis.speaking) {
+        if (this.state === 'speaking') {
+          if (!this.isExplicitlyStopped && this.recognition) {
+            this.setState('listening');
+          } else {
+            this.setState('idle');
+          }
+        }
+      }
+    };
+
+    utterance.onerror = (e) => {
+      if (e.error === 'interrupted' || e.error === 'canceled') {
+        return;
+      }
+      console.warn('[TAB Provider] Speech synthesis notice:', e.error);
+    };
+
+    this.currentUtterance = utterance;
+    window.speechSynthesis.speak(utterance);
   }
 
   /**
@@ -342,13 +505,45 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
   }
 
   public async sendText(text: string, context?: TABContext): Promise<void> {
-    if (!text.trim()) return;
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    const now = performance.now();
+    if (trimmed.toLowerCase() === this.lastQueryText.toLowerCase() && now - this.lastQueryTimestamp < 2500) {
+      console.warn('[TAB Provider] Duplicate request prevented for:', trimmed);
+      this.duplicateDetected = true;
+      return;
+    }
+
+    this.lastQueryText = trimmed;
+    this.lastQueryTimestamp = now;
+
+    if (this.reengageTimeout) {
+      clearTimeout(this.reengageTimeout);
+      this.reengageTimeout = null;
+    }
 
     this.lastContext = context;
-    this.interrupt();
-    this.setState('processing');
+    this.stopSpeaking();
 
-    this.conversationHistory.push({ role: 'user', text: text.trim() });
+    if (this.abortController) {
+      this.abortController.abort();
+      this.abortController = null;
+    }
+
+    const thisRequestId = ++this.activeRequestId;
+    this.setState('processing');
+    this.streamingSpeechBuffer = '';
+    this.isSpeakingStream = true;
+    this.geminiFirstTokenTimestamp = null;
+    this.firstAudioTimestamp = null;
+
+    if (!this.finalTranscriptTimestamp) {
+      this.finalTranscriptTimestamp = now;
+    }
+    this.requestStartTimestamp = performance.now();
+
+    this.conversationHistory.push({ role: 'user', text: trimmed });
 
     this.abortController = new AbortController();
     const signal = this.abortController.signal;
@@ -358,7 +553,7 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: text.trim(),
+          message: trimmed,
           history: this.conversationHistory.slice(-6),
           context,
         }),
@@ -381,22 +576,48 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
       let detectedAction: TABAction | undefined = undefined;
 
       while (true) {
+        if (this.activeRequestId !== thisRequestId) {
+          reader.cancel().catch(() => {});
+          return;
+        }
+
         const { done, value } = await reader.read();
         if (done) break;
+
+        if (this.activeRequestId !== thisRequestId) {
+          return;
+        }
+
+        if (this.geminiFirstTokenTimestamp === null) {
+          this.geminiFirstTokenTimestamp = performance.now();
+        }
 
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
         buffer = lines.pop() || '';
 
         for (const line of lines) {
-          const trimmed = line.trim();
-          if (trimmed.startsWith('data: ')) {
-            const jsonStr = trimmed.substring(6);
+          const lineTrim = line.trim();
+          if (lineTrim.startsWith('data: ')) {
+            const jsonStr = lineTrim.substring(6);
             try {
               const event = JSON.parse(jsonStr);
               if (event.type === 'chunk' && event.text) {
                 accumulatedText += event.text;
                 this.events.onResponseChunk(event.text);
+
+                // Progressive Sentence Speech Synthesis
+                if (this.isSpeakingStream && this.activeRequestId === thisRequestId) {
+                  this.streamingSpeechBuffer += event.text;
+                  const sentenceMatch = this.streamingSpeechBuffer.match(/^([\s\S]+?[.?!]+(?:\s+|$))([\s\S]*)$/);
+                  if (sentenceMatch) {
+                    const toSpeak = sentenceMatch[1].trim();
+                    this.streamingSpeechBuffer = sentenceMatch[2];
+                    if (toSpeak) {
+                      this.queueSpeechSentence(toSpeak);
+                    }
+                  }
+                }
               } else if (event.type === 'done') {
                 if (event.action) {
                   detectedAction = event.action;
@@ -409,17 +630,36 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
         }
       }
 
+      if (this.activeRequestId !== thisRequestId) {
+        return;
+      }
+
+      // Speak any remaining buffered text
+      if (this.isSpeakingStream && this.streamingSpeechBuffer.trim()) {
+        const remaining = this.streamingSpeechBuffer.trim();
+        this.streamingSpeechBuffer = '';
+        this.queueSpeechSentence(remaining);
+      }
+
       const finalText = accumulatedText.trim();
       if (!finalText) {
         this.setState('idle');
         return;
       }
 
+      // If speech synthesis wasn't triggered yet (e.g. short response without sentence punctuation), trigger now
+      if (this.firstAudioTimestamp === null) {
+        this.firstAudioTimestamp = performance.now();
+        this.emitLatencyMetrics();
+        if (typeof window !== 'undefined' && window.speechSynthesis && !window.speechSynthesis.speaking) {
+          this.speakText(finalText);
+        }
+      } else {
+        this.emitLatencyMetrics();
+      }
+
       this.conversationHistory.push({ role: 'assistant', text: finalText });
       this.events.onResponseComplete(finalText, detectedAction);
-
-      // Play audio response
-      this.speakText(finalText);
     } catch (err: unknown) {
       if (signal.aborted) {
         // Intentional cancellation/interruption
@@ -433,7 +673,7 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
   }
 
   /**
-   * Speak output using high-quality browser SpeechSynthesis.
+   * Speak output fallback.
    */
   private speakText(text: string) {
     if (typeof window === 'undefined' || !window.speechSynthesis) {
@@ -444,22 +684,22 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
     this.stopSpeaking();
     this.setState('speaking');
 
-    // Clean any action tags before speaking
     const cleanSpeech = text.replace(/\[ACTION:[^\]]+\]/g, '').trim();
-
     const utterance = new SpeechSynthesisUtterance(cleanSpeech);
     utterance.lang = 'en-IN';
-    utterance.rate = 1.05; // Slightly brisk, natural tempo
+    utterance.rate = 1.05;
     utterance.pitch = 1.0;
 
-    // Pick a natural voice if available
     const voices = window.speechSynthesis.getVoices();
     if (voices.length > 0) {
-      const preferred = voices.find(
-        v =>
-          (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Karen')) &&
-          (v.lang.startsWith('en') || v.lang.startsWith('en-IN'))
-      ) || voices.find(v => v.lang.startsWith('en-IN')) || voices.find(v => v.lang.startsWith('en'));
+      const preferred =
+        voices.find(
+          (v) =>
+            (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Karen')) &&
+            (v.lang.startsWith('en') || v.lang.startsWith('en-IN'))
+        ) ||
+        voices.find((v) => v.lang.startsWith('en-IN')) ||
+        voices.find((v) => v.lang.startsWith('en'));
 
       if (preferred) {
         utterance.voice = preferred;
@@ -469,7 +709,6 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
     utterance.onend = () => {
       this.currentUtterance = null;
       if (this.state === 'speaking') {
-        // Return to listening automatically for conversational flow
         if (!this.isExplicitlyStopped && this.recognition) {
           this.setState('listening');
         } else {
@@ -480,7 +719,6 @@ export class BrowserTABVoiceProvider implements TABVoiceProvider {
 
     utterance.onerror = (e) => {
       if (e.error === 'interrupted' || e.error === 'canceled') {
-        // Expected on barge-in
         return;
       }
       console.warn('[TAB Provider] Speech synthesis notice:', e.error);

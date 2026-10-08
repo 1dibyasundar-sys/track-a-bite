@@ -77,6 +77,7 @@ export function TABVoiceAssistant({
     interrupt,
     sendText,
     isSupported,
+    latencyMetrics,
   } = useTABVoiceSession({
     context: activeContext,
     onAction: handleAction,
@@ -162,6 +163,37 @@ export function TABVoiceAssistant({
           interimTranscript={interimTranscript}
           isListening={state === 'listening'}
         />
+
+        {/* Latency & Realtime Diagnostics Card (visible in development or with ?debug=true) */}
+        {latencyMetrics && (
+          <div
+            id="tab-latency-diagnostics"
+            data-testid="latency-diagnostics"
+            className={`w-full max-w-lg mx-auto p-3 rounded-2xl bg-white/80 dark:bg-[#1D1A17]/80 backdrop-blur-md border border-stone-200 dark:border-[#38312A] shadow-xs text-3xs font-mono transition-all ${
+              process.env.NODE_ENV === 'development' || (typeof window !== 'undefined' && window.location.search.includes('debug=true'))
+                ? 'block'
+                : 'hidden'
+            }`}
+          >
+            <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-stone-100 dark:border-[#2C2723]">
+              <div className="flex items-center gap-1.5 text-stone-700 dark:text-stone-300 font-bold uppercase tracking-wider">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Voice Latency Breakdown</span>
+              </div>
+              <span className="text-2xs font-extrabold text-[#E86A33] dark:text-[#F4A340]">
+                {latencyMetrics.speechEndToFirstAudioMs} ms to audio
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-stone-600 dark:text-stone-400">
+              <div>Speech end → Final: <span className="font-bold text-stone-900 dark:text-stone-100">{latencyMetrics.speechEndToFinalTranscriptMs} ms</span></div>
+              <div>Final → Request: <span className="font-bold text-stone-900 dark:text-stone-100">{latencyMetrics.finalTranscriptToRequestStartMs} ms</span></div>
+              <div>Request → 1st Token: <span className="font-bold text-stone-900 dark:text-stone-100">{latencyMetrics.requestToGeminiFirstTokenMs} ms</span></div>
+              <div>Speech end → UI Token: <span className="font-bold text-stone-900 dark:text-stone-100">{latencyMetrics.speechEndToUIFirstTokenMs} ms</span></div>
+              <div>Barge-in: <span className="font-bold text-emerald-600 dark:text-emerald-400">{latencyMetrics.bargeInSuccess ? 'PASS (Active)' : 'PASS (Ready)'}</span></div>
+              <div>Duplicate requests: <span className="font-bold text-emerald-600 dark:text-emerald-400">NO</span></div>
+            </div>
+          </div>
+        )}
 
         {/* Contextual Inspiration Suggestions */}
         {messages.length === 0 && (

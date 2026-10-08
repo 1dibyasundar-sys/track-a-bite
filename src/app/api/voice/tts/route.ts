@@ -21,17 +21,22 @@ export async function POST(req: NextRequest) {
     }
 
     const candidateTtsModels = [
-      'gemini-3.8-flash-tts',
       'gemini-3.8-flash-lite-tts',
+      'gemini-3.1-flash-tts-preview',
+      'gemini-2.5-flash-preview-tts',
+      'gemini-3.8-flash-tts',
     ];
 
     let res: Response | null = null;
     for (const model of candidateTtsModels) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
       try {
         const response = await fetch(url, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': apiKey,
+          },
           body: JSON.stringify({
             contents: [{ role: 'user', parts: [{ text: textToSpeak }] }],
           }),

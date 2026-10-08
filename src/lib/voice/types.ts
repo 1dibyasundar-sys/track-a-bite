@@ -109,6 +109,17 @@ export interface TABContext {
   recentMealTitles?: string[];
 }
 
+export interface TABVoiceLatencyMetrics {
+  speechEndToFinalTranscriptMs: number;
+  finalTranscriptToRequestStartMs: number;
+  requestToGeminiFirstTokenMs: number;
+  speechEndToUIFirstTokenMs: number;
+  speechEndToFirstAudioMs: number;
+  duplicateRequestsDetected: boolean;
+  bargeInSuccess: boolean;
+  timestamp: number;
+}
+
 export interface TABVoiceProviderEvents {
   onStateChange: (state: TABVoiceState) => void;
   onTranscript: (transcript: string, isFinal: boolean) => void;
@@ -117,6 +128,7 @@ export interface TABVoiceProviderEvents {
   onAudioLevel?: (level: number) => void; // 0.0 to 1.0 for visualizer
   onError: (errorMessage: string, canRetry?: boolean) => void;
   onMicrophonePermissionChange?: (permission: TABMicrophonePermission) => void;
+  onLatencyMetrics?: (metrics: TABVoiceLatencyMetrics) => void;
 }
 
 export interface TABVoiceProvider {

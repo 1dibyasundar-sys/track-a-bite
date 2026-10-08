@@ -13,6 +13,7 @@ import {
     TABContext,
     TABMessage,
     TABMicrophonePermission,
+    TABVoiceLatencyMetrics,
     TABVoiceState,
 } from './types';
 
@@ -30,6 +31,7 @@ export function useTABVoiceSession(options: UseTABVoiceOptions = {}) {
     const [audioLevel, setAudioLevel] = useState<number>(0);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isSupported, setIsSupported] = useState<boolean>(true);
+    const [latencyMetrics, setLatencyMetrics] = useState<TABVoiceLatencyMetrics | null>(null);
 
     const providerRef = useRef<BrowserTABVoiceProvider | null>(null);
     const optionsRef = useRef(options);
@@ -118,6 +120,12 @@ export function useTABVoiceSession(options: UseTABVoiceOptions = {}) {
             onError: (msg) => {
                 setErrorMessage(msg);
             },
+            onLatencyMetrics: (metrics) => {
+                setLatencyMetrics(metrics);
+                if (typeof window !== 'undefined') {
+                    (window as unknown as { __TAB_LAST_LATENCY_METRICS__?: TABVoiceLatencyMetrics }).__TAB_LAST_LATENCY_METRICS__ = metrics;
+                }
+            },
         });
 
         providerRef.current = provider;
@@ -198,5 +206,6 @@ export function useTABVoiceSession(options: UseTABVoiceOptions = {}) {
         interrupt,
         sendText,
         isSupported,
+        latencyMetrics,
     };
 }
